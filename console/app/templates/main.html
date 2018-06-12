@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from 'macro/macro_aside.html' import aside_menu_one, aside_menu_list,aside_header, aside_menu_title %}
+
+{% block main %}cur{% endblock %}
+
+{% set active = active | default('index') %}
+{% set menu_open = menu_open | default('close') %}
+
+{% set table_menu = [
+('表格-01', 'main.index', active == 'index'),
+] %}
+
+{% set menu_menu = [('菜单管理', 'main.menu_list', active == 'menu')] %}
+
+
+{% block page_content %}
+    <div class="aside">
+        <div class="aside-menu">
+            {{ aside_header('表格') }}
+            <dl class="aside-menu-dl">
+                <dd class="act">
+                    {{ aside_menu_title('表格展示', menu_open == 'open') }}
+                    {{ aside_menu_list(table_menu) }}
+                </dd>
+
+                <dd>
+                    {{ aside_menu_one(menu_menu) }}
+                </dd>
+
+
+            </dl>
+        </div>
+        <a href="javascript:void(0)" class="btn-fold-menu" title="收起">收起</a>
+    </div>
+    <div class="main">
+        <div class="console-container">
+            {% block main_content %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}
