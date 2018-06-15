@@ -16,6 +16,7 @@ common_css = Bundle(
 common_js = Bundle(
     'vendor/nprogress/nprogress.js',
     'vendor/toastr/toastr.min.js',
+    'js/update_password.js',
     'js/class.js',
     'js/app.js',
     filters='jsmin',
