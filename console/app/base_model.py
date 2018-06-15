@@ -3,6 +3,15 @@ from flask_sqlalchemy import Model
 
 class BaseModel(Model):
     @staticmethod
+    def update_model(model, data):
+        if not data:
+            return False
+
+        if isinstance(data, dict):
+            for k, v in data.items():
+                setattr(model, k, v)
+
+    @staticmethod
     def enum_to_value(data):
         if not data:
             return None

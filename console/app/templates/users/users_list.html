@@ -1,0 +1,114 @@
+{% extends "users.html" %}
+{% import "macro/macro_content.html" as content %}
+{% import "macro/macro_form.html" as render_form %}
+{% from "macro/macro_table.html" import td_status %}
+
+{% set active = 'users_list' %}
+{% set menu_open = 'users' %}
+
+{% block users_content %}
+    {% include "users/modal/user_modal.html" %}
+    {% include "users/modal/edit_user_modal.html" %}
+    {% include "users/modal/update_password_modal.html" %}
+
+    <div class="row">
+        <div class="col-sm-12">
+            {{ content.panel_title('用户列表') }}
+        </div>
+
+        <div class="col-sm-12">
+            <div class="alert alert-warning" style="margin-bottom: 16px">
+                <span>
+                    <b>提示：</b>
+                    <span>即将过期: 距离失效 在15天以内； 有效期内: 距离失效大于15天</span>
+                </span>
+
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+
+            <div>
+                <a href="javascript:void (0)" class="btn btn-primary create_user">创建用户</a>
+            </div>
+            <div>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th width="150">用户名</th>
+                        <th width="120">状态</th>
+                        <th width="150">登录时间</th>
+                        <th width="120">登录IP</th>
+                        <th width="150">注册时间</th>
+                        <th width="150">到期时间</th>
+                        <th>权限</th>
+                        <th width="160" class="text-right">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if users %}
+                        {% for user in users %}
+                            <tr>
+                                <td>{{ user.username or '--' }}</td>
+                                <td>
+                                    {% if user.is_expiry == None or user.is_expiry > 15 %}
+                                        {{ td_status('有效期内', 'ok') }}
+                                    {% elif user.is_expiry >=0 %}
+                                        {{ td_status('即将过期', 'warn') }}
+                                    {% else %}
+                                        {{ td_status('已经过期', 'no') }}
+                                    {% endif %}
+                                </td>
+
+                                <td>{{ user.login_time or '--' }}</td>
+                                <td>{{ user.login_ip or '--' }}</td>
+                                <td>{{ user.register_time or '--' }}</td>
+                                <td>
+                                    <label class="label_border">
+                                        {{ user.expiry_time.strftime('%Y-%m-%d') if  user.expiry_time else  '无限期' }}
+                                    </label>
+                                </td>
+                                <td>{{ user.role.value }}</td>
+
+                                <td class="text-right">
+                                    {% if not user.is_admin %}
+                                        <div>
+                                            <a href="javascript:void (0)" class="edit_user" data-id="{{ user.id }}"
+                                               data-username="{{ user.username }}">编辑信息</a>
+                                            <span class="text-explode">|</span>
+                                            <a href="javascript:void (0)" class="delete-user" data-id="{{ user.id }}">删除</a>
+                                        </div>
+                                        <div>
+                                            <a href="javascript:void (0)" class="update_password" data-id="{{ user.id }}"
+                                               data-username="{{ user.username }}">修改密码</a>
+                                        </div>
+                                    {% else %}
+                                        --
+                                    {% endif %}
+
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                    {% else %}
+                        <tr>
+                            <td style="padding: 50px 0" colspan="8" align="center">
+                                <span>没有记录</span>
+                            </td>
+                        </tr>
+
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/users/users.js') }}"></script>
+{% endblock %}

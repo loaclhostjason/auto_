@@ -1,0 +1,34 @@
+<div tabindex="-1" class="modal fade" id="edit_user_modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h3 class="modal-title"></h3>
+                </div>
+
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <form class="form-horizontal" name="form">
+                            <div class="form-group">
+                                <div class="col-sm-3">{{ render_form.input_label(form.username) }}</div>
+                                <div class="col-sm-6">{{ render_form.input(form.username, id='edit_username') }}</div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-3">{{ render_form.input_label(form.expiry_time) }}</div>
+                                <div class="col-sm-6">{{ render_form.input(form.expiry_time, id='edit_expiry_time') }}</div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary submit_edit_user">确定</button>
+                    <button class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

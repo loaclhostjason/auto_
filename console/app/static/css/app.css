@@ -91,3 +91,26 @@ console-title h4 {
 .bline-dotted {
     border-bottom: 1px dotted #000;
 }
+
+b.status {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: url("/static/img/cms-icons.png");
+}
+
+b.unknow {
+    background-position: -61px -76px !important;
+}
+
+b.ok {
+    background-position: -61px -4px !important;
+}
+
+b.no {
+    background-position: -61px -28px !important;
+}
+
+b.warn {
+    background-position: -61px -52px !important;
+}

@@ -28,9 +28,12 @@
                             <a href="{{ url_for('main.index') }}"><i class="glyphicon glyphicon-th-list"></i> 表格</a>
                         </li>
 
-                        <li class="">
-                            <a href="#"><i class="glyphicon glyphicon-file"></i> 表单</a>
-                        </li>
+                        {% if current_user.is_admin %}
+                            <li class="{% if menu_cur == 'users' %}cur{% endif %}">
+                                <a href="{{ url_for('users.users_list') }}"><i class="fa fa-users"></i> 用户管理</a>
+                            </li>
+                        {% endif %}
+
                     </ul>
                 {% endif %}
 

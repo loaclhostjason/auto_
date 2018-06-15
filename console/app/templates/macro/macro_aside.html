@@ -1,7 +1,7 @@
-{% macro aside_header(title) -%}
+{% macro aside_header(title, icon="fa fa-skyatlas") -%}
     <div class="aside-head">
         <div class="aside-head-logo">
-            <span class="aside-head-logo-ficon"><i class="fa fa-skyatlas"></i></span>
+            <span class="aside-head-logo-ficon"><i class="{{ icon }}"></i></span>
             <h3 class="aside-head-title">{{ title }}</h3>
         </div>
     </div>

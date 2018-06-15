@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from 'macro/macro_aside.html' import aside_menu_one, aside_menu_list,aside_header, aside_menu_title %}
+
+{% set menu_cur = 'users' %}
+{% set users_menu = [('用户列表', 'users.users_list', active == 'users_list')] %}
+
+
+{% block page_content %}
+    <div class="aside">
+        <div class="aside-menu">
+            {{ aside_header('用户管理', 'fa fa-user-o') }}
+            <dl class="aside-menu-dl">
+                <dd>
+                    {{ aside_menu_one(users_menu, 'fa fa-user-plus') }}
+                </dd>
+
+            </dl>
+        </div>
+        <a href="javascript:void(0)" class="btn-fold-menu" title="收起">收起</a>
+    </div>
+    <div class="main">
+        <div class="console-container">
+            {% block users_content %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}

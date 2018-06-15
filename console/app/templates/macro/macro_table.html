@@ -1,0 +1,8 @@
+{% macro td_status(title, status) %}
+    <div style="float:left">
+        <b class="status {{ status }}"></b>
+    </div>
+    <div style="float:left; margin-left: 2px;">
+        <span class="{% if status == 'ok' %}text-success{% elif status == 'warn' %}text-warning{% else %}text-danger{% endif %}">{{ title }}</span>
+    </div>
+{% endmacro %}

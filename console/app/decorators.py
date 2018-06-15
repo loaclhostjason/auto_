@@ -1,6 +1,7 @@
 from functools import wraps
-from flask import g
+from flask import g, abort
 from flask import make_response
+from flask_login import current_user
 
 
 def after_this_request(f):
@@ -21,3 +22,13 @@ def allow_cross(func):
         return r
 
     return wrapper_func
+
+
+def role_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            abort(403)
+        return f(*args, **kwargs)
+
+    return decorated_function

@@ -53,6 +53,9 @@ def create_app():
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
+    from .users import users as users_blueprint
+    app.register_blueprint(users_blueprint, url_prefix='/users')
+
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 

@@ -31,6 +31,17 @@ class Check:
         message type in ['errors', 'warning', 'success', 'info']
     '''
 
+    def get_error_message(self):
+        if request.method == 'POST':
+            if not self.form.validate_on_submit():
+                form_errors = self.form.errors
+                try:
+                    errors = '\n\t'.join(sum(form_errors.values(), []))
+                except Exception as e:
+                    errors = '出错'
+                return errors
+            return None
+
     def check_validate_on_submit(self, message_type='errors'):
         if request.method == 'POST':
             if not self.form.validate_on_submit():

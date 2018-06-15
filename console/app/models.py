@@ -7,6 +7,13 @@ from datetime import datetime
 from . import db, login_manager
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from enum import Enum
+
+
+class RoleType(Enum):
+    admin = '超级管理员'
+    user = '普通用户'
+    test = '测试以后'
 
 
 class User(UserMixin, db.Model):
@@ -19,7 +26,9 @@ class User(UserMixin, db.Model):
     login_time = db.Column(db.DateTime())
     register_time = db.Column(db.DateTime(), default=datetime.now)
 
-    role = db.Column(db.String(16))
+    role = db.Column(db.Enum(RoleType), nullable=False)
+
+    expiry_time = db.Column(db.DateTime)
 
     def __init__(self, *args, **kwargs):
         super(User, self).__init__(*args, **kwargs)
@@ -35,6 +44,18 @@ class User(UserMixin, db.Model):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    @property
+    def is_admin(self):
+        return bool(self.username == 'admin')
+
+    @property
+    def is_expiry(self):
+        now = datetime.now()
+        if not self.expiry_time:
+            return
+        dif_time = (self.expiry_time - now).days
+        return dif_time
+
     @classmethod
     def update_time_ip(cls):
         user = cls.query.filter(cls.username == current_user.username).first_or_404()
@@ -42,20 +63,12 @@ class User(UserMixin, db.Model):
         user.login_ip = request.remote_addr
         db.session.add(user)
 
-    def generate_auth_token(self, expiration):
-        s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
-
-        return s.dumps({'id': self.id})
-
-    @staticmethod
-    def verify_auth_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
-
-        try:
-            data = s.loads(token)
-        except:
-            return None
-        return User.query.get(data['id'])
+    def to_dict(self):
+        d = {
+            'username': self.username,
+            'expiry_time': self.expiry_time.strftime('%Y-%m-%d') if self.expiry_time else ''
+        }
+        return d
 
     @staticmethod
     def insert_admin():
