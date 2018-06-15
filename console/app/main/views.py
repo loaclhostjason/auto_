@@ -11,15 +11,7 @@ import os
 from datetime import datetime
 
 
-@main.route('/main')
-@main.route('/')
+@main.route('/files', methods=['GET', 'POST'])
 @login_required
-def index():
-    return render_template('main/index.html')
-
-
-@main.route('/menu', methods=['GET', 'POST'])
-@login_required
-def menu_list():
-
-    return render_template('main/menu.html')
+def files():
+    return render_template('main/files.html')

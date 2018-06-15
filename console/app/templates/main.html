@@ -1,30 +1,30 @@
 {% extends "base.html" %}
 {% from 'macro/macro_aside.html' import aside_menu_one, aside_menu_list,aside_header, aside_menu_title %}
 
-{% set active = active | default('index') %}
-{% set menu_open = menu_open | default('index') %}
+{% set active = active | default('file') %}
+{% set menu_open = menu_open | default('file') %}
 {% set menu_cur = 'main' %}
 
-{% set table_menu = [
-('表格-01', 'main.index', active == 'index', 'fa fa-television'),
-('表格-02', 'main.menu_list', active == 'ssss', 'fa fa-television'),
-] %}
+{#{% set table_menu = [#}
+{#('表格-01', 'main.index', active == 'index', 'fa fa-television'),#}
+{#('表格-02', 'main.menu_list', active == 'ssss', 'fa fa-television'),#}
+{#] %}#}
 
-{% set menu_menu = [('菜单管理', 'main.menu_list', active == 'menu')] %}
+{% set file_menu = [('文件列表', 'main.files', active == 'file')] %}
 
 
 {% block page_content %}
     <div class="aside">
         <div class="aside-menu">
-            {{ aside_header('表格') }}
+            {{ aside_header('文件管理', 'fa fa-folder-open-o') }}
             <dl class="aside-menu-dl">
-                <dd class="act">
-                    {{ aside_menu_title('表格展示', menu_open == 'index', 'fa fa-home') }}
-                    {{ aside_menu_list(table_menu) }}
-                </dd>
+{#                <dd class="act">#}
+{#                    {{ aside_menu_title('表格展示', menu_open == 'index', 'fa fa-home') }}#}
+{#                    {{ aside_menu_list(table_menu) }}#}
+{#                </dd>#}
 
                 <dd>
-                    {{ aside_menu_one(menu_menu, 'fa fa-file-o') }}
+                    {{ aside_menu_one(file_menu, 'fa fa-file-o') }}
                 </dd>
 
 

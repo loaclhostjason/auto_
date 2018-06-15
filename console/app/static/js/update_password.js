@@ -1,6 +1,6 @@
 $(document).ready(function () {
     let users = new AppCommonClass();
-    
+
     let update_password_modal = $('#update_password_modal');
     update_password_modal.on('hide.bs.modal', function () {
         users.hide_modal($(this));

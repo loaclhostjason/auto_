@@ -1,7 +1,7 @@
 {% extends "bootstrap/base.html" %}
 
 {% set menu_cur = menu_cur | default('main') %}
-{% block title %}Flask-tc-ui{% endblock %}
+{% block title %}自动灌装{% endblock %}
 
 {% block head %}
 
@@ -18,14 +18,14 @@
     <div class="header">
         <div class="header-nav">
             <h1>
-                <a href="/" class="logo"><i class="fa fa-skyatlas"></i> Flask-TC</a>
+                <a href="/" class="logo"><i class="fa fa-skyatlas"></i> 自动灌装</a>
             </h1>
             <div class="header-panel">
                 {% if current_user.is_authenticated %}
                     <ul class="header-menu panel-menu">
 
                         <li class="{% if menu_cur == 'main' %}cur{% endif %}">
-                            <a href="{{ url_for('main.index') }}"><i class="glyphicon glyphicon-th-list"></i> 表格</a>
+                            <a href="{{ url_for('main.files') }}"><i class="glyphicon glyphicon-th-list"></i> 文件列表</a>
                         </li>
 
                         {% if current_user.is_admin %}
