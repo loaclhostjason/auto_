@@ -1,0 +1,73 @@
+{% extends "main.html" %}
+{% import "macro/macro_content.html" as content %}}
+
+{% set active = 'file' %}
+{% set menu_open = 'file' %}
+
+{% block main_content %}
+    {% include 'main/modals/create_project.html' %}
+
+    <div class="col-sm-12 console-title clearfix">
+        <div class="pull-left">
+            {% if not project %}
+                <h4>新建项目文件</h4>
+            {% else %}
+                <h4>编辑项目文件</h4>
+            {% endif %}
+            <a href="{{ url_for('.projects') }}" class="btn btn-xs btn-toinstlist">
+                <span class="icon-toinstlist"></span>
+                <span>返回</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-sm-12 padding-0">
+        <div class="row">
+            <div class="col-sm-6">
+
+
+                <div class="panel-border">
+                    <div class="charttable-title">
+                        <span class="title-text">创建项目--工作区
+                            {% if not project %}
+                                <a href="javascript:void (0)"
+                                   class="btn btn-primary btn-xs pull-right add-project">添加</a>
+                            {% endif %}
+
+                        </span>
+                    </div>
+                    <div class="charttable-w">
+                        <div id="myDiagramProject" style="min-height: 700px"></div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-sm-6">
+                <div class="panel-border">
+                    <div class="charttable-title">
+                        <span class="title-text">项目属性</span></div>
+                    <div class="charttable-w">
+                        <div id="myDiagramFunc" style="min-height: 700px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ super() }}
+    <script src="{{ url_for("static", filename="js/gojs/go.js") }}"></script>
+    {% assets "go_js" %}
+        <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    <script src="{{ url_for('static', filename='js/main/project_tree.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main/project.js') }}"></script>
+
+    <script>
+        project_id = "{{ project.id if project else '' }}"
+    </script>
+{% endblock %}

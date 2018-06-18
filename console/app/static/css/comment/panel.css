@@ -1,0 +1,42 @@
+.charttable-title {
+    background: #f6f6f6;
+    line-height: 24px;
+    position: relative;
+    padding-left: 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    min-width: 100px;
+}
+
+.title-text {
+    margin-right: 54px;
+    min-width: 50px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.charttable-w {
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #fff;
+}
+
+.panel-border {
+    border: 1px solid #d8d8d8;
+}
+
+.padding-0 {
+    padding: 0;
+}
+
+.modal-content {
+    border-radius: 0;
+    /*border: 1px solid #999;*/
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+}

@@ -21,7 +21,7 @@ moment = Moment()
 error_handler = ErrorHandler()
 jinja_env = JinjaEnv()
 
-upload_files = UploadSet('files', DOCUMENTS)
+upload_files = UploadSet('projects', DOCUMENTS)
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'

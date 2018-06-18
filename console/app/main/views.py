@@ -9,9 +9,24 @@ from ..app import upload_files
 from config import Config
 import os
 from datetime import datetime
+from .models import *
 
 
-@main.route('/files', methods=['GET', 'POST'])
+@main.route('/', methods=['GET', 'POST'])
+@main.route('/projects', methods=['GET', 'POST'])
 @login_required
-def files():
-    return render_template('main/files.html')
+def projects():
+    return render_template('main/projects.html')
+
+
+@main.route('/project/create_edit', methods=['GET', 'POST'])
+@login_required
+def create_edit_project():
+    return render_template('main/create_edit_project.html')
+
+
+@main.route('/project/edit/<int:project_id>', methods=['GET', 'POST'])
+@login_required
+def edit_file(project_id):
+    project = Project.query.get_or_404(project_id)
+    return render_template('main/create_edit_project.html', project=project)

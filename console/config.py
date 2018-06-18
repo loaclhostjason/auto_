@@ -28,7 +28,7 @@ class ReadConfigJson(object):
 
 
 base_path = os.path.abspath(os.path.dirname(__file__))
-upload_path = os.path.join(base_path, 'upload', 'files')
+upload_path = os.path.join(base_path, 'upload', 'projects')
 print(upload_path)
 
 
