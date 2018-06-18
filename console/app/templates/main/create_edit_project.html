@@ -6,6 +6,7 @@
 
 {% block main_content %}
     {% include 'main/modals/create_project.html' %}
+    {% include 'main/modals/add_content.html' %}
 
     <div class="col-sm-12 console-title clearfix">
         <div class="pull-left">
@@ -37,18 +38,38 @@
                         </span>
                     </div>
                     <div class="charttable-w">
-                        <div id="myDiagramProject" style="min-height: 700px"></div>
+                        <div id="myDiagramProject" style="min-height: 400px"></div>
+                    </div>
+                </div>
+
+                <div class="panel-border" style="margin-top: 10px">
+                    <div class="charttable-title">
+                        <span class="title-text">项目属性</span></div>
+                    <div class="charttable-w">
+                        <div style="min-height: 300px">
+                            <div class="col-sm-12">
+                                <form method="post" class="form-horizontal" id="attr-form"></form>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
 
             </div>
+
             <div class="col-sm-6">
                 <div class="panel-border">
                     <div class="charttable-title">
-                        <span class="title-text">项目属性</span></div>
+                        <span class="title-text">创建项目--功能区
+                            {% if not project %}
+                                <a href="javascript:void (0)"
+                                   class="btn btn-primary btn-xs pull-right add-project">添加</a>
+                            {% endif %}
+
+                        </span>
+                    </div>
                     <div class="charttable-w">
-                        <div id="myDiagramFunc" style="min-height: 700px"></div>
+                        <div id="myDiagramProject" style="min-height: 750px"></div>
                     </div>
                 </div>
             </div>
@@ -66,6 +87,7 @@
     {% endassets %}
     <script src="{{ url_for('static', filename='js/main/project_tree.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main/project.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main/content.js') }}"></script>
 
     <script>
         project_id = "{{ project.id if project else '' }}"

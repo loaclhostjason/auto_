@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from .models import *
 
 
+# project tree
 @main.route('/project/tree')
 @login_required
 def get_project_tree():
@@ -34,6 +35,7 @@ def get_project_tree():
     return jsonify({'success': True, 'data': result})
 
 
+# project edit
 @main.route('/project/create', methods=['POST'])
 @login_required
 def create_project():
@@ -64,3 +66,20 @@ def create_project():
     relation = ProjectRelation(**project_relation)
     db.session.add(relation)
     return jsonify({'success': True, 'message': '更新成功', 'project_id': project_id})
+
+
+@main.route('/project/content/add/<int:id>', methods=['POST'])
+@login_required
+def add_file_tree_content(id):
+    form_data = request.form.to_dict()
+
+    if not form_data.get('content'):
+        return jsonify({'success': False, 'message': '内容不能为空'})
+
+    d = {
+        'parent_id': form_data.get('parent_id'),
+        'project_id': id,
+    }
+
+    copy_result_id = ProjectRelation.add_project_relation(d, form_data['content'])
+    return jsonify({'success': True, 'type': form_data.get('type')})

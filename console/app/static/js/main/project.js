@@ -38,4 +38,20 @@ $(document).ready(function () {
     // init
     if (project_id)
         projects.get_protect_relation(project_id);
+
+    // submit content
+    let add_content = $('#add-content');
+    $('.submit-content').click(function () {
+        let params = add_content.find('form').serialize();
+        let parent_id = add_content.find('[name="parent_id"]').val();
+        params += '&parent_id=' + parent_id;
+
+        $.post('/project/content/add/' + project_id, params, function (resp) {
+            if (resp.success) {
+                add_content.modal('hide');
+                projects.get_protect_relation(project_id)
+            } else
+                toastr.error(resp.message)
+        })
+    })
 });

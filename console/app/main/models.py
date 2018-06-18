@@ -29,10 +29,24 @@ class ProjectRelation(db.Model):
     # todo delete
     timestamp = db.Column(db.DateTime, default=datetime.now)
 
-    relation_order = db.Column(db.Integer, default=0)
+    relation_order = db.Column(db.Integer, default=1)
 
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     project = db.relationship('Project', backref=db.backref("project_relation", cascade="all, delete-orphan"))
 
     def __init__(self, *args, **kwargs):
         super(ProjectRelation, self).__init__(*args, **kwargs)
+
+    @classmethod
+    def add_project_relation(cls, data, content):
+        # max_order = cls.query.filter(cls.project_id == project_id).order_by(cls.relation_order.desc(), cls.id.desc()).first()
+        result = []
+        for index, name in enumerate(content.split('\r\n'), start=1):
+            data['relation_order'] = index
+            data['name'] = name
+            result.append(cls(**data))
+
+        db.session.add_all(result)
+        db.session.flush()
+        result = [v.id for v in result]
+        return result
