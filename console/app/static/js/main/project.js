@@ -18,6 +18,8 @@ $(document).ready(function () {
     Projects.prototype.constructor = Projects;
 
     let projects = new Projects();
+    $.g_projects = new Projects();
+
     let create_project_modal = $('#create_project_modal');
     $('.add-project').click(function () {
         projects.show_modal(create_project_modal, $(this));

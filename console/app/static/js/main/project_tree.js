@@ -50,13 +50,45 @@ let projectContextMenu =
 
         }),
         makeButton("删除", function (e, obj) {
+            let node = obj.part.adornedPart;
+            if (node === node) return false;
+
+            let thisemp = node.data;
+            let id = thisemp['key'];
+            $.post('/project/tree/delete/' + id, '', function (resp) {
+                if (resp.success) {
+                    toastr.success(resp.message);
+                    $.g_projects.get_protect_relation(project_id);
+                } else {
+                    toastr.error(resp.message)
+                }
+            })
 
         }),
         makeButton("复制", function (e, obj) {
+            let node = obj.part.adornedPart;
+            if (node === node) return false;
 
-        }),
-        makeButton("黏贴", function (e, obj) {
+            let thisemp = node.data;
+            let key = thisemp['key'];
+            let level = thisemp['level'];
+            let name = thisemp['name'];
 
+            console.log(thisemp);
+            if (key) {
+                let params = {
+                    'level': level - 1,
+                    'content': name
+                };
+                $.post('/project/content/add/' + project_id + '?copy_id=' + key + '&action=copy', params, function (resp) {
+                    if (resp.success) {
+                        toastr.success('复制成功');
+                        $.g_projects.get_protect_relation(project_id);
+                    } else {
+                        toastr.error(resp.message)
+                    }
+                })
+            }
         }),
         makeButton("上移", function (e, obj) {
 

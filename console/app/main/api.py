@@ -2,6 +2,7 @@ from . import main
 from flask import jsonify, request
 from flask_login import login_required, current_user
 from .models import *
+from .func import *
 
 
 # project tree
@@ -74,15 +75,36 @@ def create_project():
 @login_required
 def add_file_tree_content(id):
     form_data = request.form.to_dict()
+    copy_id = request.args.get('copy_id')
+    action = request.args.get('action')
+
+    copy_parent_id = get_copy_parent_id(copy_id)
+    if isinstance(copy_parent_id, dict):
+        return jsonify(copy_parent_id)
 
     if not form_data.get('content'):
         return jsonify({'success': False, 'message': '内容不能为空'})
 
     d = {
-        'parent_id': form_data.get('parent_id'),
+        'parent_id': form_data.get('parent_id') if not copy_parent_id else copy_parent_id,
         'project_id': id,
         'level': form_data.get('level'),
     }
 
     copy_result_id = ProjectRelation.add_project_relation(d, form_data['content'], id)
+    if copy_result_id and action == 'copy':
+        copy_product_children(key, copy_result_id)
     return jsonify({'success': True, 'type': form_data.get('type')})
+
+
+@main.route('/project/tree/delete/<int:id>', methods=['POST'])
+@login_required
+def delete_project(id):
+    project_relation = ProjectRelation.query.filter_by(id=id).first()
+    if not project_relation:
+        return jsonify({'success': False, 'message': '没有此记录'})
+    if not project_relation.parent_id:
+        return jsonify({'success': False, 'message': '这节点为根节点，不支持删除'})
+    db.session.delete(project_relation)
+    delete_product_children(id)
+    return jsonify({'success': True, 'message': '更新成功'})
