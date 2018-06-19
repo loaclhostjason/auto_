@@ -16,7 +16,8 @@ from .models import *
 @main.route('/projects', methods=['GET', 'POST'])
 @login_required
 def projects():
-    return render_template('main/projects.html')
+    projects = Project.query.order_by(Project.id).all()
+    return render_template('main/projects.html', projects=projects)
 
 
 @main.route('/project/create_edit', methods=['GET', 'POST'])

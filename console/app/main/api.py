@@ -122,7 +122,7 @@ def add_file_tree_content(id):
 
 @main.route('/project/tree/delete/<int:id>', methods=['POST'])
 @login_required
-def delete_project(id):
+def delete_project_tree(id):
     project_relation = ProjectRelation.query.filter_by(id=id).first()
     if not project_relation:
         return jsonify({'success': False, 'message': '没有此记录'})
@@ -134,6 +134,14 @@ def delete_project(id):
     delete_project_children(id)
     order_delete_project(parent_id)
     return jsonify({'success': True, 'message': '更新成功'})
+
+
+@main.route('/project/delete/<int:id>', methods=['POST'])
+@login_required
+def delete_project(id):
+    project = Project.query.get_or_404(id)
+    db.session.delete(project)
+    return jsonify({'success': True, 'message': '删除成功'})
 
 
 @main.route('/project/relation', methods=['POST'])
