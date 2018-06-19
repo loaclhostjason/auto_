@@ -91,6 +91,10 @@ def add_file_tree_content(id):
         'level': form_data.get('level'),
     }
 
+    print(form_data.get('level'))
+    if form_data.get('level') == '4':
+        d['type'] = 'func'
+
     copy_result_id = ProjectRelation.add_project_relation(d, form_data['content'], id)
     if copy_result_id and action == 'copy':
         copy_product_children(copy_id, copy_result_id)
@@ -105,8 +109,11 @@ def delete_project(id):
         return jsonify({'success': False, 'message': '没有此记录'})
     if not project_relation.parent_id:
         return jsonify({'success': False, 'message': '这节点为根节点，不支持删除'})
+
+    parent_id = project_relation.parent_id
     db.session.delete(project_relation)
-    delete_product_children(id)
+    delete_project_children(id)
+    order_delete_project(parent_id)
     return jsonify({'success': True, 'message': '更新成功'})
 
 
@@ -118,7 +125,6 @@ def update_project_relation_order():
     type = request.args.get('type')
     if not id or not type:
         return jsonify({'success': False, 'message': '参数不对'})
-    print(type)
 
     project_relation = ProjectRelation.query.filter_by(id=id).first()
     if not project_relation:

@@ -12,7 +12,7 @@ def get_copy_parent_id(copy_id):
     return copy_parent_id
 
 
-def delete_product_children(id):
+def delete_project_children(id):
     relations = ProjectRelation.query.filter_by(parent_id=id).all()
     if not relations:
         return
@@ -22,7 +22,17 @@ def delete_product_children(id):
         db.session.delete(relation)
         db.session.commit()
 
-        delete_product_children(next_id)
+        delete_project_children(next_id)
+
+
+def order_delete_project(parent_id):
+    project_relations = ProjectRelation.query.filter_by(parent_id=parent_id). \
+        order_by(ProjectRelation.relation_order, ProjectRelation.id).all()
+    if not project_relations:
+        return
+    for index, val in enumerate(project_relations, start=1):
+        val.relation_order = index
+        db.session.add(val)
 
 
 def copy_product_children(no_copy_id, copy_result_id):
