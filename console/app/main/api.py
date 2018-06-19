@@ -18,8 +18,8 @@ def get_project_tree():
     if not project_id:
         return jsonify({'success': False, 'message': '没有获取到配置文件信息'})
 
-    project_relations = ProjectRelation.query.filter_by(project_id=project_id).order_by(ProjectRelation.relation_order,
-                                                                                        ProjectRelation.id).all()
+    project_relations = ProjectRelation.query.filter_by(project_id=project_id, type='worker').order_by(ProjectRelation.relation_order,
+                                                                                                       ProjectRelation.id).all()
     if not project_relations:
         return jsonify({'success': True, 'data': result})
 
@@ -93,7 +93,7 @@ def add_file_tree_content(id):
 
     copy_result_id = ProjectRelation.add_project_relation(d, form_data['content'], id)
     if copy_result_id and action == 'copy':
-        copy_product_children(key, copy_result_id)
+        copy_product_children(copy_id, copy_result_id)
     return jsonify({'success': True, 'type': form_data.get('type')})
 
 
@@ -108,3 +108,45 @@ def delete_project(id):
     db.session.delete(project_relation)
     delete_product_children(id)
     return jsonify({'success': True, 'message': '更新成功'})
+
+
+@main.route('/project/relation', methods=['POST'])
+@login_required
+def update_project_relation_order():
+    id = request.args.get('id')
+
+    type = request.args.get('type')
+    if not id or not type:
+        return jsonify({'success': False, 'message': '参数不对'})
+    print(type)
+
+    project_relation = ProjectRelation.query.filter_by(id=id).first()
+    if not project_relation:
+        return jsonify({'success': False, 'message': '没有记录'})
+    parent_id = project_relation.parent_id
+
+    if type == 'up':
+        prev_project_relation = ProjectRelation.query.filter_by(parent_id=parent_id, relation_order=project_relation.relation_order - 1).first()
+        if not prev_project_relation:
+            return jsonify({'success': False, 'message': '不能上移'})
+
+        pre_order = prev_project_relation.relation_order + 1
+        this_order = prev_project_relation.relation_order
+
+        prev_project_relation.relation_order = pre_order
+        project_relation.relation_order = this_order
+
+        return jsonify({'success': True, 'message': '更新成功'})
+
+    else:
+        next_project_relation = ProjectRelation.query.filter_by(parent_id=parent_id, relation_order=project_relation.relation_order + 1).first()
+        if not next_project_relation:
+            return jsonify({'success': False, 'message': '不能下移'})
+
+        next_order = next_project_relation.relation_order - 1
+        this_order = next_project_relation.relation_order
+
+        next_project_relation.relation_order = next_order
+        project_relation.relation_order = this_order
+
+        return jsonify({'success': True, 'message': '更新成功'})

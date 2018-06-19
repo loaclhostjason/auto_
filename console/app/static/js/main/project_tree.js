@@ -51,7 +51,7 @@ let projectContextMenu =
         }),
         makeButton("删除", function (e, obj) {
             let node = obj.part.adornedPart;
-            if (node === node) return false;
+            if (node === null) return false;
 
             let thisemp = node.data;
             let id = thisemp['key'];
@@ -67,7 +67,7 @@ let projectContextMenu =
         }),
         makeButton("复制", function (e, obj) {
             let node = obj.part.adornedPart;
-            if (node === node) return false;
+            if (node === null) return false;
 
             let thisemp = node.data;
             let key = thisemp['key'];
@@ -77,7 +77,7 @@ let projectContextMenu =
             console.log(thisemp);
             if (key) {
                 let params = {
-                    'level': level - 1,
+                    'level': level,
                     'content': name
                 };
                 $.post('/project/content/add/' + project_id + '?copy_id=' + key + '&action=copy', params, function (resp) {
@@ -91,10 +91,36 @@ let projectContextMenu =
             }
         }),
         makeButton("上移", function (e, obj) {
+            let node = obj.part.adornedPart;
+            if (node === null) return false;
 
+            let thisemp = node.data;
+            let key = thisemp['key'];
+
+            $.post('/project/relation?id=' + key + '&type=up', '', function (resp) {
+                if (resp.success) {
+                    toastr.success(resp.message);
+                    $.g_projects.get_protect_relation(project_id)
+                } else {
+                    toastr.error(resp.message)
+                }
+            })
         }),
         makeButton("下移", function (e, obj) {
+            let node = obj.part.adornedPart;
+            if (node === null) return false;
 
+            let thisemp = node.data;
+            let key = thisemp['key'];
+
+            $.post('/project/relation?id=' + key + '&type=down', '', function (resp) {
+                if (resp.success) {
+                    toastr.success(resp.message);
+                    $.g_projects.get_protect_relation(project_id)
+                } else {
+                    toastr.error(resp.message)
+                }
+            })
         }),
     );
 

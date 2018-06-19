@@ -34,8 +34,8 @@ def copy_product_children(no_copy_id, copy_result_id):
     for v in product_relation:
         d = {
             'parent_id': parent_id,
-            'product_id': v.product_id,
-            'level': int(v.level),
+            'project_id': v.project_id,
+            'level': v.level,
         }
         copy_result_id = ProjectRelation.add_project_relation(d, v.name, v.project_id)
         if not copy_result_id:
