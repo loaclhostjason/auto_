@@ -12,6 +12,18 @@ $(document).ready(function () {
                     toastr.error(resp.message)
             });
         };
+
+        this.get_func_relation = function (project_id, parent_id) {
+            $.get('/project/func/tree?project_id=' + project_id + '&id=' + parent_id).done(function (resp) {
+                if (resp.success) {
+                    let data = resp['data'];
+                    let nodedata = data['nodedata'];
+                    let linkdata = data['linkdata'];
+                    $.g_func_myDiagram.model = new go.GraphLinksModel(nodedata, linkdata);
+                } else
+                    toastr.error(resp.message)
+            });
+        };
     }
 
     Projects.prototype = Object.create(AppCommonClass.prototype);
@@ -52,9 +64,11 @@ $(document).ready(function () {
         $.post('/project/content/add/' + project_id, params, function (resp) {
             if (resp.success) {
                 add_content.modal('hide');
+                if (level >= 4)
+                    projects.get_func_relation(project_id, parent_id);
                 projects.get_protect_relation(project_id)
             } else
                 toastr.error(resp.message)
         })
-    })
+    });
 });

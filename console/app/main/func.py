@@ -51,3 +51,39 @@ def copy_product_children(no_copy_id, copy_result_id):
         if not copy_result_id:
             return
         copy_product_children(v.id, copy_result_id)
+
+
+def get_func_relation(init_result, project_id, parent_id):
+    if not project_id:
+        return init_result
+
+    project_relation = ProjectRelation.query.filter_by(id=parent_id).first()
+    if not project_relation:
+        return init_result
+
+    init_result['nodedata'].append({'category': 'ProductNode',
+                                    'name': project_relation.name,
+                                    'type': 'project',
+                                    'key': 'product_node_%s' % parent_id,
+                                    })
+    # result = {
+    #     'nodedata': [],
+    #     'linkdata': [],
+    # }
+    func_relations = ProjectRelation.query.filter_by(project_id=project_id, parent_id=parent_id, type='func').all()
+    if not func_relations:
+        return init_result
+
+    for index, fr in enumerate(func_relations):
+        init_result['nodedata'].append({
+            'category': 'FuncNode',
+            'name': fr.name,
+            'key': fr.id,
+        })
+        init_result['linkdata'].append({
+            'from': 'product_node_%s' % parent_id,
+            'to': fr.id,
+            'category': 'ProductLink'
+        })
+
+    return init_result

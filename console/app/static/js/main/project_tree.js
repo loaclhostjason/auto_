@@ -130,8 +130,11 @@ myDiagram.nodeTemplate =
         $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name")),
         {
             click: function (e, obj) {
+                let node = obj.part.data;
+                if (node === null) return false;
 
-
+                let parent_id = node['key'];
+                $.g_projects.get_func_relation(project_id, parent_id)
             }
         },
         {

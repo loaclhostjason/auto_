@@ -5,6 +5,24 @@ from .models import *
 from .func import *
 
 
+@main.route('/project/func/tree')
+@login_required
+def get_prject_func_tree():
+    result = {
+        'nodedata': [],
+        'linkdata': [],
+    }
+
+    project_id = request.args.get('project_id')
+    parent_id = request.args.get('id')
+
+    if not project_id or not parent_id:
+        return jsonify({'success': False, 'messgae': 'id 不存在'})
+
+    result = get_func_relation(result, project_id, parent_id)
+    return jsonify({'success': True, 'data': result})
+
+
 # project tree
 @main.route('/project/tree')
 @login_required
@@ -18,8 +36,9 @@ def get_project_tree():
     if not project_id:
         return jsonify({'success': False, 'message': '没有获取到配置文件信息'})
 
-    project_relations = ProjectRelation.query.filter_by(project_id=project_id, type='worker').order_by(ProjectRelation.relation_order,
-                                                                                                       ProjectRelation.id).all()
+    project_relations_query = ProjectRelation.query.order_by(ProjectRelation.relation_order, ProjectRelation.id)
+    project_relations = project_relations_query.filter_by(project_id=project_id, type='worker').all()
+
     if not project_relations:
         return jsonify({'success': True, 'data': result})
 
