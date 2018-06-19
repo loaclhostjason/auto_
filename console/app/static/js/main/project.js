@@ -44,7 +44,8 @@ $(document).ready(function () {
     $('.submit-content').click(function () {
         let params = add_content.find('form').serialize();
         let parent_id = add_content.find('[name="parent_id"]').val();
-        params += '&parent_id=' + parent_id;
+        let level = add_content.find('[name="level"]').val();
+        params += '&parent_id=' + parent_id + '&level=' + level;
 
         $.post('/project/content/add/' + project_id, params, function (resp) {
             if (resp.success) {

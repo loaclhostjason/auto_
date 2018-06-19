@@ -35,11 +35,13 @@ let projectContextMenu =
 
             let thisemp = node.data;
             let parent_id = thisemp['key'];
+            let level = thisemp['level'];
 
 
             let add_content = $("#add-content");
             app_common.show_modal(add_content, $(this));
             add_content.find('[name="parent_id"]').val(parent_id);
+            add_content.find('[name="level"]').val(Number(level) + 1);
         }),
         makeButton("新增配置", function (e, obj) {
 

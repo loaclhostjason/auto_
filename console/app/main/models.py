@@ -1,5 +1,11 @@
 from .. import db
 from datetime import datetime
+from enum import Enum
+
+
+class ProjectRelationType(Enum):
+    worker = '工作树'
+    func = '功能树'
 
 
 class Project(db.Model):
@@ -25,8 +31,9 @@ class ProjectRelation(db.Model):
 
     # 名称
     name = db.Column(db.String(32))
+    level = db.Column(db.Integer, default=1, nullable=False)
+    type = db.Column(db.Enum(ProjectRelationType), default='worker', nullable=False)
 
-    # todo delete
     timestamp = db.Column(db.DateTime, default=datetime.now)
 
     relation_order = db.Column(db.Integer, default=1)
@@ -38,10 +45,11 @@ class ProjectRelation(db.Model):
         super(ProjectRelation, self).__init__(*args, **kwargs)
 
     @classmethod
-    def add_project_relation(cls, data, content):
-        # max_order = cls.query.filter(cls.project_id == project_id).order_by(cls.relation_order.desc(), cls.id.desc()).first()
+    def add_project_relation(cls, data, content, project_id):
+        max_order = cls.query.filter(cls.project_id == project_id, cls.parent_id == data['parent_id']). \
+            order_by(cls.relation_order.desc(), cls.id.desc()).first()
         result = []
-        for index, name in enumerate(content.split('\r\n'), start=1):
+        for index, name in enumerate(content.split('\r\n'), start=max_order.relation_order + 1 if max_order else 1):
             data['relation_order'] = index
             data['name'] = name
             result.append(cls(**data))

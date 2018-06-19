@@ -17,7 +17,8 @@ def get_project_tree():
     if not project_id:
         return jsonify({'success': False, 'message': '没有获取到配置文件信息'})
 
-    project_relations = ProjectRelation.query.filter_by(project_id=project_id).order_by(ProjectRelation.relation_order, ProjectRelation.id).all()
+    project_relations = ProjectRelation.query.filter_by(project_id=project_id).order_by(ProjectRelation.relation_order,
+                                                                                        ProjectRelation.id).all()
     if not project_relations:
         return jsonify({'success': True, 'data': result})
 
@@ -29,6 +30,7 @@ def get_project_tree():
         result['nodedata'].append({
             'name': relation.name,
             'key': relation.id,
+            'level': relation.level,
         })
 
     result['linkdata'] = link_data
@@ -79,7 +81,8 @@ def add_file_tree_content(id):
     d = {
         'parent_id': form_data.get('parent_id'),
         'project_id': id,
+        'level': form_data.get('level'),
     }
 
-    copy_result_id = ProjectRelation.add_project_relation(d, form_data['content'])
+    copy_result_id = ProjectRelation.add_project_relation(d, form_data['content'], id)
     return jsonify({'success': True, 'type': form_data.get('type')})
