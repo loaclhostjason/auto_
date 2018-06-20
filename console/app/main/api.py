@@ -1,8 +1,10 @@
 from . import main
 from flask import jsonify, request
 from flask_login import login_required, current_user
-from .models import *
+# from .models import *
 from .func import *
+from ..manage.models import *
+import json
 
 
 @main.route('/project/func/tree')
@@ -186,3 +188,29 @@ def update_project_relation_order():
         project_relation.relation_order = this_order
 
         return jsonify({'success': True, 'message': '更新成功'})
+
+
+# main attr content
+@main.route('/attr/content', methods=['GET', 'POST'])
+@login_required
+def submit_attr_content():
+    # get attr 参数
+    level = request.args.get('level')
+    project_id = request.args.get('project_id')
+    project_relation_id = request.args.get('project_relation_id')
+
+    attr = Attr.query.filter(Attr.level == level).first()
+
+    if not attr or not project_id or not project_relation_id:
+        return jsonify({'success': False, 'messgae': '参数不对'})
+
+    data = None
+    content = None
+    if attr.content:
+        data = json.loads(attr.content)
+
+    attr_content = AttrContent.query.filter_by(project_id=project_id, project_relation_id=project_relation_id).first()
+
+    if attr_content and attr_content.real_content:
+        content = json.loads(attr_content.real_content)
+    return jsonify({'success': True, 'data': data, 'content': content})

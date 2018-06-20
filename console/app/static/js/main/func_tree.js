@@ -40,7 +40,13 @@ $(document).ready(function () {
             $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name")),
             {
                 click: function (e, obj) {
+                    let node = obj.part.data;
+                    if (node === null) return false;
 
+                    let parent_id = node['key'];
+                    let level = node['level'];
+
+                    $.g_projects.get_attr_input(project_id, level, parent_id)
                 }
             }
         ));
@@ -51,8 +57,13 @@ $(document).ready(function () {
             $$(go.TextBlock, {margin: 8, stroke: "green"}, new go.Binding("text", "name")),
             {
                 click: function (e, obj) {
+                    let node = obj.part.data;
+                    if (node === null) return false;
 
+                    let parent_id = node['key'];
+                    let level = node['level'];
 
+                    $.g_projects.get_attr_input(project_id, level, parent_id)
                 }
             },
             {

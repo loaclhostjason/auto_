@@ -13,6 +13,20 @@ $(document).ready(function () {
             });
         };
 
+        this.get_attr_input = function (project_id, level, id) {
+            $.get('/attr/content?project_id=' + project_id + '&level=' + level + '&project_relation_id=' + id, function (resp) {
+                if (resp.success) {
+                    let data = resp['data'];
+                    let content = resp['content'];
+                    attr_html(data, content);
+                } else {
+                    toastr.error(resp.messgae)
+                }
+
+
+            });
+        };
+
         this.get_func_relation = function (project_id, parent_id) {
             $.get('/project/func/tree?project_id=' + project_id + '&id=' + parent_id).done(function (resp) {
                 if (resp.success) {

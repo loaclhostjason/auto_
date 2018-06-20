@@ -64,6 +64,7 @@ def get_func_relation(init_result, project_id, parent_id):
     init_result['nodedata'].append({'category': 'ProductNode',
                                     'name': project_relation.name,
                                     'type': 'project',
+                                    'level': project_relation.level,
                                     'key': 'product_node_%s' % parent_id,
                                     })
     # result = {
@@ -79,6 +80,7 @@ def get_func_relation(init_result, project_id, parent_id):
             'category': 'FuncNode',
             'name': fr.name,
             'key': fr.id,
+            'level': fr.level,
         })
         init_result['linkdata'].append({
             'from': 'product_node_%s' % parent_id,
