@@ -27,8 +27,8 @@ $(document).ready(function () {
             });
         };
 
-        this.get_func_relation = function (project_id, parent_id) {
-            $.get('/project/func/tree?project_id=' + project_id + '&id=' + parent_id).done(function (resp) {
+        this.get_func_relation = function (project_id, parent_id, level) {
+            $.get('/project/func/tree?project_id=' + project_id + '&id=' + parent_id + '&level=' + level).done(function (resp) {
                 if (resp.success) {
                     let data = resp['data'];
                     let nodedata = data['nodedata'];

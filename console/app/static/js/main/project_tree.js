@@ -235,7 +235,7 @@ myDiagram.nodeTemplateMap.add("FirstNode",
 
                 let parent_id = node['key'];
                 let level = node['level'];
-                // $.g_projects.get_func_relation(project_id, parent_id);
+                $.g_projects.get_func_relation(project_id, parent_id, level);
 
                 $.g_projects.get_attr_input(project_id, level, parent_id)
             }
@@ -256,7 +256,7 @@ myDiagram.nodeTemplateMap.add("SecondNode",
 
                 let parent_id = node['key'];
                 let level = node['level'];
-                // $.g_projects.get_func_relation(project_id, parent_id)
+                $.g_projects.get_func_relation(project_id, parent_id, level);
                 $.g_projects.get_attr_input(project_id, level, parent_id)
             }
         }, {
@@ -276,7 +276,7 @@ myDiagram.nodeTemplateMap.add("ThirdNode",
 
                 let parent_id = node['key'];
                 let level = node['level'];
-                $.g_projects.get_func_relation(project_id, parent_id);
+                $.g_projects.get_func_relation(project_id, parent_id, level);
                 $.g_projects.get_attr_input(project_id, level, parent_id)
             }
         }, {
