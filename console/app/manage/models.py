@@ -21,6 +21,12 @@ class Attr(db.Model):
     username = db.Column(db.String(12), default='系统')
 
     @classmethod
+    def edit(cls, form_data, attr):
+        cls.update_model(attr, form_data)
+        db.session.add(attr)
+        return
+
+    @classmethod
     def init_attr(cls):
         r = [
             {'name': '结构树节点-1', 'level': 1, 'type': 'worker'},
