@@ -17,22 +17,14 @@ $(document).ready(function () {
                 )
             });
 
-    function makeButton(text, action, visiblePredicate) {
-        return $$("ContextMenuButton",
-            $$(go.TextBlock, text),
-            {click: action},
-            visiblePredicate ? new go.Binding("visible", "", function (o, e) {
-                return o.diagram ? visiblePredicate(o, e) : false;
-            }).ofObject() : {});
-    }
-
-    let funcContextMenu =
-        $$(go.Adornment, "Vertical",
-            makeButton("新增失效",
-                function (e, obj) {
-
-                })
-        );
+    // function makeButton(text, action, visiblePredicate) {
+    //     return $$("ContextMenuButton",
+    //         $$(go.TextBlock, text),
+    //         {click: action},
+    //         visiblePredicate ? new go.Binding("visible", "", function (o, e) {
+    //             return o.diagram ? visiblePredicate(o, e) : false;
+    //         }).ofObject() : {});
+    // }
 
     myDiagram.nodeTemplateMap.add("ProductNode",
         $$(go.Node, "Auto",
@@ -65,9 +57,6 @@ $(document).ready(function () {
 
                     $.g_projects.get_attr_input(project_id, level, parent_id)
                 }
-            },
-            {
-                contextMenu: funcContextMenu
             }
         ));
 

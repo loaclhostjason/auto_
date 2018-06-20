@@ -29,14 +29,17 @@
                     {% if projects %}
                         {% for project in projects %}
                             <tr>
-                                <td>{{ project.name or '--' }}</td>
+                                <td>
+                                    <a href="{{ url_for('.edit_file', project_id=project.id) }}">{{ project.name or '--' }}</a>
+                                </td>
                                 <td>{{ project.user.username }}</td>
                                 <td>{{ project.last_time }}</td>
 
                                 <td class="text-right">
                                     <a href="{{ url_for('.edit_file', project_id=project.id) }}">编辑</a>
                                     <span class="text-explode">|</span>
-                                    <a href="javascript:void (0)" class="delete-project" data-id="{{ project.id }}">删除</a>
+                                    <a href="javascript:void (0)" class="delete-project"
+                                       data-id="{{ project.id }}">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
