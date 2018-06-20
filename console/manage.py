@@ -6,6 +6,7 @@ from flask_assets import ManageAssets
 from app.models import *
 from app.assets import assets_env
 from app import app, db
+from app.manage.models import Attr
 
 manager = Manager(app)
 migrate = Migrate(app, db)
@@ -29,6 +30,7 @@ def deploy():
 
     # 创建内置用户
     User.insert_admin()
+    Attr.init_attr()
 
 
 if __name__ == '__main__':
