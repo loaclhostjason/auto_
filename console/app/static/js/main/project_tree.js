@@ -27,7 +27,7 @@ function makeButton(text, action, visiblePredicate) {
         }).ofObject() : {});
 }
 
-let projectContextMenu =
+let firstContextMenu =
     $$(go.Adornment, "Vertical",
         makeButton("新增DID", function (e, obj) {
             let node = obj.part.adornedPart;
@@ -42,12 +42,24 @@ let projectContextMenu =
             app_common.show_modal(add_content, $(this));
             add_content.find('[name="parent_id"]').val(parent_id);
             add_content.find('[name="level"]').val(Number(level) + 1);
-        }),
+        })
+    );
+
+let secondContextMenu =
+    $$(go.Adornment, "Vertical",
         makeButton("新增配置", function (e, obj) {
+            let node = obj.part.adornedPart;
+            if (node === null) return false;
 
-        }),
-        makeButton("新增配置选项", function (e, obj) {
+            let thisemp = node.data;
+            let parent_id = thisemp['key'];
+            let level = thisemp['level'];
 
+
+            let add_content = $("#add-content");
+            app_common.show_modal(add_content, $(this));
+            add_content.find('[name="parent_id"]').val(parent_id);
+            add_content.find('[name="level"]').val(Number(level) + 1);
         }),
         makeButton("删除", function (e, obj) {
             let node = obj.part.adornedPart;
@@ -74,21 +86,19 @@ let projectContextMenu =
             let level = thisemp['level'];
             let name = thisemp['name'];
 
-            console.log(thisemp);
-            if (key) {
-                let params = {
-                    'level': level,
-                    'content': name
-                };
-                $.post('/project/content/add/' + project_id + '?copy_id=' + key + '&action=copy', params, function (resp) {
-                    if (resp.success) {
-                        toastr.success('复制成功');
-                        $.g_projects.get_protect_relation(project_id);
-                    } else {
-                        toastr.error(resp.message)
-                    }
-                })
-            }
+            let params = {
+                'level': level,
+                'content': name
+            };
+            $.post('/project/content/add/' + project_id + '?copy_id=' + key + '&action=copy', params, function (resp) {
+                if (resp.success) {
+                    toastr.success('复制成功');
+                    $.g_projects.get_protect_relation(project_id);
+                } else {
+                    toastr.error(resp.message)
+                }
+            })
+
         }),
         makeButton("上移", function (e, obj) {
             let node = obj.part.adornedPart;
@@ -124,7 +134,97 @@ let projectContextMenu =
         }),
     );
 
-myDiagram.nodeTemplate =
+
+let thirdContextMenu =
+    $$(go.Adornment, "Vertical",
+        makeButton("新增配置选项", function (e, obj) {
+            let node = obj.part.adornedPart;
+            if (node === null) return false;
+
+            let thisemp = node.data;
+            let parent_id = thisemp['key'];
+            let level = thisemp['level'];
+
+
+            let add_content = $("#add-content");
+            app_common.show_modal(add_content, $(this));
+            add_content.find('[name="parent_id"]').val(parent_id);
+            add_content.find('[name="level"]').val(Number(level) + 1);
+        }),
+        makeButton("删除", function (e, obj) {
+            let node = obj.part.adornedPart;
+            if (node === null) return false;
+
+            let thisemp = node.data;
+            let id = thisemp['key'];
+            $.post('/project/tree/delete/' + id, '', function (resp) {
+                if (resp.success) {
+                    toastr.success(resp.message);
+                    $.g_projects.get_protect_relation(project_id);
+                } else {
+                    toastr.error(resp.message)
+                }
+            })
+
+        }),
+        makeButton("复制", function (e, obj) {
+            let node = obj.part.adornedPart;
+            if (node === null) return false;
+
+            let thisemp = node.data;
+            let key = thisemp['key'];
+            let level = thisemp['level'];
+            let name = thisemp['name'];
+
+            let params = {
+                'level': level,
+                'content': name
+            };
+            $.post('/project/content/add/' + project_id + '?copy_id=' + key + '&action=copy', params, function (resp) {
+                if (resp.success) {
+                    toastr.success('复制成功');
+                    $.g_projects.get_protect_relation(project_id);
+                } else {
+                    toastr.error(resp.message)
+                }
+            })
+
+        }),
+        makeButton("上移", function (e, obj) {
+            let node = obj.part.adornedPart;
+            if (node === null) return false;
+
+            let thisemp = node.data;
+            let key = thisemp['key'];
+
+            $.post('/project/relation?id=' + key + '&type=up', '', function (resp) {
+                if (resp.success) {
+                    toastr.success(resp.message);
+                    $.g_projects.get_protect_relation(project_id)
+                } else {
+                    toastr.error(resp.message)
+                }
+            })
+        }),
+        makeButton("下移", function (e, obj) {
+            let node = obj.part.adornedPart;
+            if (node === null) return false;
+
+            let thisemp = node.data;
+            let key = thisemp['key'];
+
+            $.post('/project/relation?id=' + key + '&type=down', '', function (resp) {
+                if (resp.success) {
+                    toastr.success(resp.message);
+                    $.g_projects.get_protect_relation(project_id)
+                } else {
+                    toastr.error(resp.message)
+                }
+            })
+        }),
+    );
+
+myDiagram.nodeTemplateMap.add("FirstNode",
     $$(go.Node, "Auto",
         $$(go.Shape, "RoundedRectangle", {strokeWidth: 1, fill: 'white'}),
         $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name")),
@@ -136,11 +236,64 @@ myDiagram.nodeTemplate =
                 let parent_id = node['key'];
                 $.g_projects.get_func_relation(project_id, parent_id)
             }
-        },
-        {
-            contextMenu: projectContextMenu
+        }, {
+            contextMenu: firstContextMenu
         }
-    );
+    ));
+
+
+myDiagram.nodeTemplateMap.add("SecondNode",
+    $$(go.Node, "Auto",
+        $$(go.Shape, "RoundedRectangle", {strokeWidth: 1, fill: 'white'}),
+        $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name")),
+        {
+            click: function (e, obj) {
+                let node = obj.part.data;
+                if (node === null) return false;
+
+                let parent_id = node['key'];
+                $.g_projects.get_func_relation(project_id, parent_id)
+            }
+        }, {
+            contextMenu: secondContextMenu
+        }
+    ));
+
+
+myDiagram.nodeTemplateMap.add("ThirdNode",
+    $$(go.Node, "Auto",
+        $$(go.Shape, "RoundedRectangle", {strokeWidth: 1, fill: 'white'}),
+        $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name")),
+        {
+            click: function (e, obj) {
+                let node = obj.part.data;
+                if (node === null) return false;
+
+                let parent_id = node['key'];
+                $.g_projects.get_func_relation(project_id, parent_id)
+            }
+        }, {
+            contextMenu: thirdContextMenu
+        }
+    ));
+
+// myDiagram.nodeTemplate =
+//     $$(go.Node, "Auto",
+//         $$(go.Shape, "RoundedRectangle", {strokeWidth: 1, fill: 'white'}),
+//         $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name")),
+//         {
+//             click: function (e, obj) {
+//                 let node = obj.part.data;
+//                 if (node === null) return false;
+//
+//                 let parent_id = node['key'];
+//                 $.g_projects.get_func_relation(project_id, parent_id)
+//             }
+//         },
+//         {
+//             contextMenu: projectContextMenu
+//         }
+//     );
 
 myDiagram.linkTemplate =
     $$(go.Link, {selectionAdorned: false},

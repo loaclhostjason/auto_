@@ -51,6 +51,7 @@ def get_project_tree():
             'name': relation.name,
             'key': relation.id,
             'level': relation.level,
+            'category': 'FirstNode' if relation.level == 1 else ('SecondNode' if relation.level == 2 else 'ThirdNode')
         })
 
     result['linkdata'] = link_data
@@ -159,7 +160,8 @@ def update_project_relation_order():
     parent_id = project_relation.parent_id
 
     if type == 'up':
-        prev_project_relation = ProjectRelation.query.filter_by(parent_id=parent_id, relation_order=project_relation.relation_order - 1).first()
+        prev_project_relation = ProjectRelation.query.filter_by(parent_id=parent_id,
+                                                                relation_order=project_relation.relation_order - 1).first()
         if not prev_project_relation:
             return jsonify({'success': False, 'message': '不能上移'})
 
@@ -172,7 +174,8 @@ def update_project_relation_order():
         return jsonify({'success': True, 'message': '更新成功'})
 
     else:
-        next_project_relation = ProjectRelation.query.filter_by(parent_id=parent_id, relation_order=project_relation.relation_order + 1).first()
+        next_project_relation = ProjectRelation.query.filter_by(parent_id=parent_id,
+                                                                relation_order=project_relation.relation_order + 1).first()
         if not next_project_relation:
             return jsonify({'success': False, 'message': '不能下移'})
 
