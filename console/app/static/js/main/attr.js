@@ -1,18 +1,19 @@
-let attr_html = function (data, content) {
+let attr_html = function (data, content, id, level) {
     let attr_form = $('#attr-form');
     if (!data || !data.length) {
         attr_form.html('');
         return false
     }
     let form_html = '';
-
+    form_html += '<input name="project_relation_id" type="hidden" value="' + id + '">';
+    form_html += '<input name="level" type="hidden" value="' + level + '">';
     data.forEach(function (value) {
         form_html += '<div class="form-group">';
-        form_html += '<div class="col-sm-2"><label class="control-label pull-right">' + required_html(value['required']) + value['item_zh'] + '</label></div>';
+        form_html += '<div class="col-sm-2"><label class="control-label pull-right">' + required_html(value['item_required']) + value['item_zh'] + '</label></div>';
         form_html += '<div class="col-sm-8">' + required_input(value['item'], value['item_required'], content) + '</div>';
         form_html += '</div>';
     });
-    form_html += '<div class="form-group"><div class="col-sm-2"><button type="button" class="btn btn-primary submit-add-attr">保存</button></div></div>';
+    form_html += '<div class="form-group"><div class="col-sm-2"></div><div class="col-sm-8"><button type="button" class="btn btn-primary submit-add-attr">保存</button></div></div>';
     attr_form.html(form_html);
 
 };

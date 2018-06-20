@@ -18,7 +18,7 @@ $(document).ready(function () {
                 if (resp.success) {
                     let data = resp['data'];
                     let content = resp['content'];
-                    attr_html(data, content);
+                    attr_html(data, content, id, level);
                 } else {
                     toastr.error(resp.messgae)
                 }
@@ -85,4 +85,16 @@ $(document).ready(function () {
                 toastr.error(resp.message)
         })
     });
+
+
+    // submit attr
+    $(document).on('click', '.submit-add-attr', function () {
+        let form_data = $('form#attr-form').serialize();
+        $.post('/manage/attr/content/add?project_id=' + project_id, form_data, function (resp) {
+            if (resp.success) {
+                toastr.success(resp['message'])
+            } else
+                toastr.error(resp['message'])
+        })
+    })
 });
