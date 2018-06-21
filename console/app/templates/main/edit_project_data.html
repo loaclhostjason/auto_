@@ -1,0 +1,132 @@
+{% extends "main.html" %}
+{% import "macro/macro_content.html" as content %}}
+
+{% set active = 'file' %}
+{% set menu_open = 'file' %}
+
+{% block main_content %}
+
+    <div class="col-sm-12 console-title clearfix bline">
+        <div class="pull-left">
+
+            <h4>编辑项目【{{ project.name }}】数据</h4>
+
+            <a href="{{ url_for('.projects') }}" class="btn btn-xs btn-toinstlist">
+                <span class="icon-toinstlist"></span>
+                <span>返回</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-sm-12 padding-0">
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr>
+                <th style="vertical-align: middle">项目名称</th>
+                <th width="100" style="vertical-align: middle">level2</th>
+                <th width="150" style="vertical-align: middle">level3</th>
+                <th width="150" style="vertical-align: middle">level4</th>
+                <th colspan="8">
+                    <div class="text-center with-bottom-border">
+                        <span>bite0</span>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="row">
+                            {% for index in range(8)[::-1] %}
+                                <div style="width: 12.5%; float: left">
+                                    <span>{{ index }}</span>
+                                    {% if index != 0 %}
+                                        <i class="resize-line-icon"></i>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </th>
+                <th colspan="8">
+                    <div class="text-center with-bottom-border">
+                        <span>bite1</span>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="row">
+                            {% for index in range(8)[::-1] %}
+                                <div style="width: 12.5%; float: left">
+                                    <span>{{ index }}</span>
+                                    {% if index != 0 %}
+                                        <i class="resize-line-icon"></i>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </th>
+                <th colspan="8">
+                    <div class="text-center with-bottom-border">
+                        <span>bite2</span>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="row">
+                            {% for index in range(8)[::-1] %}
+                                <div style="width: 12.5%; float: left">
+                                    <span>{{ index }}</span>
+                                    {% if index != 0 %}
+                                        <i class="resize-line-icon"></i>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if result %}
+                {% for data in result %}
+                    <tr>
+                        {% if loop.first %}
+                            <td colspan="text-center" rowspan="{{ result| length }}">
+                                {{ data.level_1 }}
+                            </td>
+                        {% endif %}
+
+
+
+                        <td colspan="text-center">
+                            {{ data.level_2 }}
+                        </td>
+
+                        <td colspan="text-center">
+                            {{ data.level_3 }}
+                        </td>
+
+                        <td colspan="text-center">
+                            {{ data.level_4 }}
+                        </td>
+
+                        {% for bite in range(8) %}
+                            <td>{{ bite }}</td>
+                        {% endfor %}
+
+                        {% for bite in range(8) %}
+                            <td>{{ bite }}</td>
+                        {% endfor %}
+
+                        {% for bite in range(8) %}
+                            <td>{{ bite }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td style="padding: 50px 0" colspan="32" align="center">
+                        <span>没有记录</span>
+                    </td>
+                </tr>
+
+            {% endif %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

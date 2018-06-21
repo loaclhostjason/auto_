@@ -36,7 +36,7 @@
                                 <td>{{ project.last_time }}</td>
 
                                 <td class="text-right">
-                                    <a href="{{ url_for('.edit_file', project_id=project.id) }}">数据编辑</a>
+                                    <a href="{{ url_for('.edit_project_data', project_id=project.id) }}">数据编辑</a>
                                     <span class="text-explode">|</span>
                                     <a href="{{ url_for('.edit_file', project_id=project.id) }}">编辑结构</a>
                                     <span class="text-explode">|</span>

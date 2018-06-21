@@ -123,3 +123,17 @@ td label {
     background-image: url(/static/img/bee.png);
     background-position: -233px -74px;
 }
+
+.with-bottom-border {
+    border-bottom: 1px solid #ccc;
+}
+
+.table thead .resize-line-icon {
+    border-right: 1px solid #d1d5de;
+    position: relative;
+    right: 0px;
+    height: 20px;
+    /* top: 5px; */
+    cursor: default;
+    padding: 0 5px;
+}
