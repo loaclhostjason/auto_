@@ -16,20 +16,20 @@ $(document).ready(function () {
     user_modal.on('hide.bs.modal', function () {
         users.hide_modal($(this));
     });
+    user_modal.on('show.bs.modal', function () {
+        laydate.render({
+            elem: '#expiry_time',
+            min: moment().format('YYYY-MM-DD'),
+            calendar: true,
+            value: new Date()
+        });
+    });
 
     laydate.render({
         elem: '#expiry_time',
         min: moment().format('YYYY-MM-DD'),
         calendar: true,
         value: new Date()
-    });
-
-    user_modal.find('input').bind('input propertychange', function () {
-        let submit_user = $('.submit_user');
-        let user_name = $('[name="username"]').val();
-        let upw = $('[name="upw"]').val();
-        let upw2 = $('[name="upw2"]').val();
-        user_name && upw && upw2 ? submit_user.removeAttr('disabled') : submit_user.attr('disabled', true);
     });
 
     $('.submit_user').click(function () {
