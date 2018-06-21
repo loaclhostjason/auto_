@@ -89,3 +89,33 @@ def get_func_relation(init_result, project_id, parent_id):
         })
 
     return init_result
+
+
+def get_project_children(project_id):
+    result = list()
+    first_relation = ProjectRelation.query.filter_by(project_id=project_id, level=1).first()
+    d = {
+        'level_1': first_relation.name,
+    }
+
+    second_relation = ProjectRelation.query.filter_by(parent_id=first_relation.id, level=2).all()
+    if not second_relation:
+        return result
+
+    for v in second_relation:
+        d['level_2'] = v.name
+
+        third_relation = ProjectRelation.query.filter_by(parent_id=v.id, level=3).all()
+        if third_relation:
+            for th in third_relation:
+                d['level_3'] = th.name
+
+                forth_relation = ProjectRelation.query.filter_by(parent_id=th.id, level=4).all()
+                if forth_relation:
+                    for forth in forth_relation:
+                        # d['level_4'] = forth.name
+                        # print(forth.name)
+                        d.update({'level_4': forth.name, 'level_4_id': forth.id})
+                        result.append(d.copy())
+
+    return result

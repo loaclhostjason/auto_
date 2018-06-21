@@ -1,6 +1,7 @@
 from .. import db
 from datetime import datetime
 from enum import Enum
+from flask import request
 
 
 class ProjectRelationType(Enum):
@@ -58,3 +59,59 @@ class ProjectRelation(db.Model):
         db.session.flush()
         result = [v.id for v in result]
         return result
+
+
+class ProjectData(db.Model):
+    __tablename__ = 'project_data'
+    id = db.Column(db.Integer, primary_key=True)
+    project_relation_id = db.Column(db.Integer, db.ForeignKey('project_relation.id'))
+    las = db.Column(db.String(32))
+    name = db.Column(db.String(32))
+
+    content = db.Column(db.Text)
+    real_content = db.Column(db.Text)
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+
+    project = db.relationship('Project', backref=db.backref("project_data", cascade="all, delete-orphan"))
+    project_relation = db.relationship('ProjectRelation',
+                                       backref=db.backref("project_data", cascade="all, delete-orphan"))
+
+    @staticmethod
+    def init_key(str_key):
+        key = []
+        for index in range(8):
+            key.append('%s_%s' % (str_key, index))
+        return key
+
+    @classmethod
+    def get_content(cls, project_id):
+        byte0 = cls.init_key('byte0')
+        byte1 = cls.init_key('byte1')
+        byte2 = cls.init_key('byte2')
+        byte3 = cls.init_key('byte3')
+
+        extra_key = [
+            'byte0', 'byte1', 'byte2', 'byte3'
+        ]
+
+        key = byte0 + byte1 + byte2 + byte3 + extra_key
+
+        project_relation_id = request.form.getlist('project_relation_id')
+        result = []
+        for index, val in enumerate(project_relation_id):
+            d = {
+                'project_id': project_id,
+                'project_relation_id': val,
+                'content': {},
+            }
+            for v in key:
+                try:
+                    d['las'] = request.form.getlist('las')[index]
+                    d['name'] = request.form.getlist('name')[index]
+                    if request.form.getlist(v)[index]:
+                        d['content'][v] = request.form.getlist(v)[index]
+                except Exception:
+                    pass
+            result.append(d)
+        return [v for v in result if v.get('content')]

@@ -137,3 +137,11 @@ td label {
     cursor: default;
     padding: 0 5px;
 }
+
+.table .resize-line {
+    position: relative;
+    right: 0;
+    height: 20px;
+    cursor: default;
+    padding: 0 5px;
+}
