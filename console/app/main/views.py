@@ -28,8 +28,7 @@ def projects():
 @login_required
 def edit_project_data(project_id):
     project = Project.query.get_or_404(project_id)
-    project_data = ProjectData.query.filter_by(project_id=project_id).all()
-    
+
     if request.method == 'POST':
         data = ProjectData.get_content(project_id)
         if not data:
@@ -37,14 +36,23 @@ def edit_project_data(project_id):
         result = []
         for d in data:
             d['content'] = json.dumps(d['content'])
-            result.append(ProjectData(**d))
-        db.session.add_all(result)
+            project_relation_id = d['project_relation_id']
+
+            old_project_data = ProjectData.query.filter_by(project_relation_id=project_relation_id).first()
+            if old_project_data:
+                ProjectData.update_model(old_project_data, d)
+            else:
+                new_project_data = ProjectData(**d)
+                db.session.add(new_project_data)
+
         flash({'success': '更新成功'})
         return redirect(request.url)
 
     result = get_project_children(project_id)
     # max_len = max([len(v) for v in result.values()])
-    return render_template('main/edit_project_data.html', project=project, result=result)
+    project_data = ProjectData.query.filter_by(project_id=project_id).all()
+    project_data = {v.project_relation_id: v.to_dict() for v in project_data}
+    return render_template('main/edit_project_data.html', project=project, result=result, project_data=project_data)
 
 
 @main.route('/project/create_edit', methods=['GET', 'POST'])

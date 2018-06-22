@@ -105,6 +105,10 @@
                             <input type="hidden" name="project_relation_id" value="{{ data.level_4_id }}">
                             <input type="hidden" name="name" value="{{ data.level_4 }}">
 
+                            {% set data_info = project_data.get(data.level_4_id) or {} %}
+                            {% set content = (data_info.get('content') | loads_jason) or {} %}
+{#                            {{ content }}#}
+
 
                             {% if loop.first %}
                                 <td colspan="text-center" rowspan="{{ result| length }}">
@@ -125,7 +129,7 @@
                             </td>
 
                             <td colspan="text-center">
-                                <input name="las" class="tc-search-words" style="width: 80px">
+                                <input name="las" class="tc-search-words" style="width: 80px" value="{{ data_info.get('las', '') }}">
                             </td>
 
                             <td colspan="8">
@@ -133,7 +137,8 @@
                                     <div class="row">
                                         {% for index in range(8)[::-1] %}
                                             <div style="width: 12.5%; float: left">
-                                                <input type="checkbox" name="byte0_{{ index }}" value="y">
+                                                <input type="checkbox" name="byte0_{{ index }}" value="y"
+                                                       {% if content.get('byte0_%s' % index) %}checked{% endif %}>
                                             </div>
                                         {% endfor %}
                                     </div>
@@ -141,26 +146,7 @@
                                 <div class="bline col-xs-12" style="margin:  10px 0"></div>
                                 <div class="col-xs-12">
                                     <div class="row">
-                                        <input type="text" class="tc-search-words col-xs-12" name="byte0">
-                                    </div>
-                                </div>
-                            </td>
-
-
-                            <td colspan="8">
-                                <div class="col-xs-12">
-                                    <div class="row">
-                                        {% for index in range(8)[::-1] %}
-                                            <div style="width: 12.5%; float: left">
-                                                <input type="checkbox" name="byte1_{{ index }}"  value="y">
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                                <div class="bline col-xs-12" style="margin:  10px 0"></div>
-                                <div class="col-xs-12">
-                                    <div class="row">
-                                        <input type="text" class="tc-search-words col-xs-12" name="byte1">
+                                        <input type="text" class="tc-search-words col-xs-12" name="byte0" value="{{ content.get('byte0', '') }}">
                                     </div>
                                 </div>
                             </td>
@@ -171,7 +157,8 @@
                                     <div class="row">
                                         {% for index in range(8)[::-1] %}
                                             <div style="width: 12.5%; float: left">
-                                                <input type="checkbox" name="byte2_{{ index }}"  value="y">
+                                                <input type="checkbox" name="byte1_{{ index }}"  value="y"
+                                                       {% if content.get('byte1_%s' % index) %}checked{% endif %}>
                                             </div>
                                         {% endfor %}
                                     </div>
@@ -179,7 +166,27 @@
                                 <div class="bline col-xs-12" style="margin:  10px 0"></div>
                                 <div class="col-xs-12">
                                     <div class="row">
-                                        <input type="text" class="tc-search-words col-xs-12" name="byte2">
+                                        <input type="text" class="tc-search-words col-xs-12" name="byte1" value="{{ content.get('byte1', '') }}">
+                                    </div>
+                                </div>
+                            </td>
+
+
+                            <td colspan="8">
+                                <div class="col-xs-12">
+                                    <div class="row">
+                                        {% for index in range(8)[::-1] %}
+                                            <div style="width: 12.5%; float: left">
+                                                <input type="checkbox" name="byte2_{{ index }}"  value="y"
+                                                       {% if content.get('byte2_%s' % index) %}checked{% endif %}>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="bline col-xs-12" style="margin:  10px 0"></div>
+                                <div class="col-xs-12">
+                                    <div class="row">
+                                        <input type="text" class="tc-search-words col-xs-12" name="byte2" value="{{ content.get('byte2', '') }}">
                                     </div>
                                 </div>
                             </td>
@@ -189,7 +196,8 @@
                                     <div class="row">
                                         {% for index in range(8)[::-1] %}
                                             <div style="width: 12.5%; float: left">
-                                                <input type="checkbox" name="byte3_{{ index }}"  value="y">
+                                                <input type="checkbox" name="byte3_{{ index }}"  value="y"
+                                                       {% if content.get('byte3_%s' % index) %}checked{% endif %}>
                                             </div>
                                         {% endfor %}
                                     </div>
@@ -197,7 +205,7 @@
                                 <div class="bline col-xs-12" style="margin:  10px 0"></div>
                                 <div class="col-xs-12">
                                     <div class="row">
-                                        <input type="text" class="tc-search-words col-xs-12" name="byte3">
+                                        <input type="text" class="tc-search-words col-xs-12" name="byte3" value="{{ content.get('byte3', '') }}">
                                     </div>
                                 </div>
                             </td>
