@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<ConfigurationModule test-CONFIG-SCHEMA-VERSION="1.0">
+		<Header>
+			<ee>123</ee>
+		</Header>
+	</ConfigurationModule>

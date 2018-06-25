@@ -33,7 +33,6 @@ def edit_project_data(project_id):
         data = ProjectData.get_content(project_id)
         if not data:
             return redirect(request.url)
-        result = []
         for d in data:
             d['content'] = json.dumps(d['content'])
             project_relation_id = d['project_relation_id']
@@ -45,6 +44,7 @@ def edit_project_data(project_id):
                 new_project_data = ProjectData(**d)
                 db.session.add(new_project_data)
 
+        ProjectData.update_real_content(project_id)
         flash({'success': '更新成功'})
         return redirect(request.url)
 

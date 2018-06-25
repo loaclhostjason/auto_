@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ConfigurationModule ECU-CONFIG-SCHEMA-VERSION="1.0">
+  <Header>
+    <EcuName>IPK</EcuName>
+    <RequestId>0760</RequestId>
+    <ResponseId>0768</ResponseId>
+    <ConfigurationFileNumber>1026389707</ConfigurationFileNumber>
+
+    <Protocol>
+      <ApplicationLayer>
+        <ApplicationLayerSpec>ISO14229</ApplicationLayerSpec>
+        <P2>50</P2>
+        <P2Star>5000</P2Star>
+        <S3>5000</S3>
+      </ApplicationLayer>
+      <PhysicalLayer>
+        <Baudrate>500000</Baudrate>
+        <PhysicalLayerSpec>ISO11898</PhysicalLayerSpec>
+        <Pin PinDefinition="CAN_H" PinNumber="6" />
+        <Pin PinDefinition="CAN_L" PinNumber="14" />
+      </PhysicalLayer>
+    </Protocol>
+    <SecurityLevel>01</SecurityLevel>
+    <AlgorithmNumber>16</AlgorithmNumber>
+    <ConfigurationIndex>00</ConfigurationIndex>
+  </Header>
+  <DidList>
+    <DidItem>
+      <DidNo>C167</DidNo>
+      <DidIndicator>0000</DidIndicator>
+      <Name>FuelConfig7</Name>
+      <DidLength>8</DidLength>
+      <DefaultValue>0000000000000000</DefaultValue>
+    </DidItem>
+    <DidItem>
+      <DidNo>C161</DidNo>
+      <DidIndicator>0000</DidIndicator>
+      <Name>FuelConfig1</Name>
+      <DidLength>8</DidLength>
+      <DefaultValue>0000000000000000</DefaultValue>
+    </DidItem>
+    <DidItem>
+      <DidNo>C162</DidNo>
+      <DidIndicator>0000</DidIndicator>
+      <Name>FuelConfig2</Name>
+      <DidLength>8</DidLength>
+      <DefaultValue>0000000000000000</DefaultValue>
+    </DidItem>
+	<DidItem>
+      <DidNo>F190</DidNo>
+      <DidIndicator>F190</DidIndicator>
+      <Name>VIN</Name>
+      <DidLength>17</DidLength>
+      <DefaultValue>0000000000000000000000000000000000</DefaultValue>
+    </DidItem>
+  </DidList>
+  <ReadSection>
+    <ReadItem IDREF="C167" />
+    <ReadItem IDREF="C161" />
+    <ReadItem IDREF="C162" />
+	<ReadItem IDREF="F190" />
+  </ReadSection>
+  <ModificationSection>
+    <ModificationItem IDREF="C167">
+      <Parameter ParamDefaultValue="02">
+        <ParameterName>insFuelTankType</ParameterName>
+        <BytePosition>3</BytePosition>
+        <BitPosition>2</BitPosition>
+        <BitLength>3</BitLength>
+        <ConfData useConfData="true">
+          <ConfigData Value="02" ConfigExpression="$D10J.$H10K"/>
+          <ConfigData Value="03" ConfigExpression="$D10K+$C708"/>
+          <ConfigData Value="04" ConfigExpression="$D10L-$543D"/>
+        </ConfData>
+      </Parameter>
+      <Parameter ParamDefaultValue="2D">
+        <ParameterName>insFuelTankTotalCapacity</ParameterName>
+        <BytePosition>6</BytePosition>
+        <BitPosition>0</BitPosition>
+        <BitLength>8</BitLength>
+        <ConfData useConfData="no">
+        </ConfData>
+      </Parameter>
+    </ModificationItem>
+   </ModificationSection>
+  <WriteSection>
+    <WriteItem IDREF="C167" DidWriteScope="All" DelayForMS="0" />
+    <WriteItem IDREF="C161" DidWriteScope="All" DelayForMS="0" />
+    <WriteItem IDREF="C162" DidWriteScope="All" DelayForMS="0" />
+    <WriteItem IDREF="F190" DidWriteScope="All" DelayForMS="0" />
+  </WriteSection>
+  <RevisionLog>
+    <RevisionLogEntry>
+      <ConfigurationFileNumber>1026389701</ConfigurationFileNumber>
+      <RevisionDate>2015-06-12</RevisionDate>
+      <RevisionDescription>intinal version</RevisionDescription>
+      <RevisionAuthor>Song Chaoyang</RevisionAuthor>
+    </RevisionLogEntry>
+    <RevisionLogEntry>
+      <ConfigurationFileNumber>1026389702</ConfigurationFileNumber>
+      <RevisionDate>2015-07-31</RevisionDate>
+      <RevisionDescription>change the intinal value of C1A1 BYTE8 BIT4-5，C166，Byte3-4,default value to 0BB8,change c182 default value,C111 byte4 bit0,change C183 default value,change C1B1 Byte1 bit2-3 default value,change c184 default value</RevisionDescription>
+      <RevisionAuthor>Song Chaoyang</RevisionAuthor>
+    </RevisionLogEntry>
+    <RevisionLogEntry>
+      <ConfigurationFileNumber>1026389703</ConfigurationFileNumber>
+      <RevisionDate>2016-03-16</RevisionDate>
+      <RevisionDescription>Change as the Change request form V1.1 describe</RevisionDescription>
+      <RevisionAuthor>Song Chaoyang</RevisionAuthor>
+    </RevisionLogEntry>
+    <RevisionLogEntry>
+      <ConfigurationFileNumber>1026389704</ConfigurationFileNumber>
+      <RevisionDate>2016-04-26</RevisionDate>
+      <RevisionDescription>Interchange value of C111 byte6,bit7~6</RevisionDescription>
+      <RevisionAuthor>Han Xiaoxuan</RevisionAuthor>
+    </RevisionLogEntry>
+    <RevisionLogEntry>
+      <ConfigurationFileNumber>1026389705</ConfigurationFileNumber>
+      <RevisionDate>2016-05-21</RevisionDate>
+      <RevisionDescription>Modify the DID length of C1E1,remove F1A9 from ReadSection.</RevisionDescription>
+      <RevisionAuthor>Han Xiaoxuan</RevisionAuthor>
+    </RevisionLogEntry>
+    <RevisionLogEntry>
+      <ConfigurationFileNumber>1026389706</ConfigurationFileNumber>
+      <RevisionDate>2016-06-02</RevisionDate>
+      <RevisionDescription>Add insSIAModePrm, insEPBStatusLampOnEnPrm,insEPBStatusLampFlashEnPrm,insEPBStatusGongEnPrm. Change insDipdBeamGreenLampEnPrm, insDipBeamGreenLampCheckEnPrm,insMenuTPMSReEnPrm</RevisionDescription>
+      <RevisionAuthor>Hou Haiyun</RevisionAuthor>
+    </RevisionLogEntry>
+    <RevisionLogEntry>
+      <ConfigurationFileNumber>1026389707</ConfigurationFileNumber>
+      <RevisionDate>2016-06-16</RevisionDate>
+      <RevisionDescription>F1A9 and F90 to option items in WriteSection</RevisionDescription>
+      <RevisionAuthor>Hou Haiyun</RevisionAuthor>
+    </RevisionLogEntry>
+    <RevisionLogEntry>
+      <ConfigurationFileNumber>1026389707</ConfigurationFileNumber>
+      <RevisionDate>2016-06-29</RevisionDate>
+      <RevisionDescription>1.!603 to C60A/C607;2.insFuelTankTotalCapacity default value 37 to 2D;3.revist the mistake insCruiseActEchoMesEnPrm C60C is 1;4.!F15E to F15M/F15K/F15X/F15Y;5.!(E00W/E00R) to E00U/E00X/E00L/E00F;6.Revise insPrndEnPrm 01 to 02;7.Delete !603 and others from proudcts</RevisionDescription>
+      <RevisionAuthor>Hou Haiyun</RevisionAuthor>
+    </RevisionLogEntry>
+  </RevisionLog>
+</ConfigurationModule>

@@ -2,6 +2,7 @@ from .. import db
 from datetime import datetime
 from enum import Enum
 from flask import request
+import json
 
 
 class ProjectRelationType(Enum):
@@ -115,3 +116,26 @@ class ProjectData(db.Model):
                     pass
             result.append(d)
         return [v for v in result if v.get('content')]
+
+    @classmethod
+    def update_real_content(cls, project_id):
+        db.session.commit()
+        project_data = cls.query.filter_by(project_id=project_id).all()
+        if not project_data:
+            return
+
+        result = []
+        for data in project_data:
+            content = json.loads(data.content) if data.content else None
+            if content:
+                for index in range(3):
+                    if content.get('byte%s' % index):
+                        result.append(data.name)
+                        result.append(data.las)
+                        result.append('byte%s' % index)
+                        for loop in range(8):
+                            if content.get('byte%s_%s' % (index, loop)):
+                                result.append('byte%s' % loop)
+                                result.append(content.get('byte%s' % index))
+
+            data.real_content = ';'.join(result)
