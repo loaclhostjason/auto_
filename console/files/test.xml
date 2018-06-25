@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-	<ConfigurationModule test-CONFIG-SCHEMA-VERSION="1.0">
+	<ConfigurationModule site-129-CONFIG-SCHEMA-VERSION="1.0">
 		<Header>
-			<ee>123</ee>
+			<ssss>sbc</ssss>
 		</Header>
 	</ConfigurationModule>

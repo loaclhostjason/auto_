@@ -2,7 +2,7 @@ import xml.dom.minidom
 import os
 import json
 from app import create_app
-from app.main.models import Project
+from app.main.models import Project, ProjectRelation
 from app.manage.models import AttrContent
 
 app = create_app()
@@ -33,8 +33,8 @@ class ExportXml(object):
     @property
     def xml_header_attr(self):
         result = dict()
-        attr_content = AttrContent.query.filter_by(project_id=self.project_id,
-                                                   project_relation_id=self.project_id).first()
+        project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, parent_id=None).first()
+        attr_content = AttrContent.query.filter_by(project_relation_id=project_relation.id).first()
 
         if not attr_content or not attr_content.real_content:
             return result
@@ -73,5 +73,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(project_id=1)
+    export_xml = ExportXml(project_id=2)
     export_xml.run()
