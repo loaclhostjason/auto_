@@ -87,16 +87,16 @@ class ProjectData(db.Model):
 
     @classmethod
     def get_content(cls, project_id):
-        byte0 = cls.init_key('byte0')
-        byte1 = cls.init_key('byte1')
-        byte2 = cls.init_key('byte2')
-        byte3 = cls.init_key('byte3')
+        bit0 = cls.init_key('bit0')
+        bit1 = cls.init_key('bit1')
+        bit2 = cls.init_key('bit2')
+        bit3 = cls.init_key('bit3')
 
         extra_key = [
             'byte0', 'byte1', 'byte2', 'byte3'
         ]
 
-        key = byte0 + byte1 + byte2 + byte3 + extra_key
+        key = bit0 + bit1 + bit2 + bit3 + extra_key
 
         project_relation_id = request.form.getlist('project_relation_id')
         result = []
@@ -134,8 +134,8 @@ class ProjectData(db.Model):
                         result.append(data.las)
                         result.append('byte%s' % index)
                         for loop in range(8):
-                            if content.get('byte%s_%s' % (index, loop)):
-                                result.append('byte%s' % loop)
-                                result.append(content.get('byte%s' % index))
+                            if content.get('bit%s_%s' % (index, loop)):
+                                result.append('bit%s' % loop)
+                        result.append(content.get('byte%s' % index))
 
             data.real_content = ';'.join(result)

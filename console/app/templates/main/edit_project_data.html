@@ -137,8 +137,8 @@
                                     <div class="row">
                                         {% for index in range(8)[::-1] %}
                                             <div style="width: 12.5%; float: left">
-                                                <input type="checkbox" name="byte0_{{ index }}" value="y"
-                                                       {% if content.get('byte0_%s' % index) %}checked{% endif %}>
+                                                <input type="checkbox" name="bit0_{{ index }}" value="y"
+                                                       {% if content.get('bit0_%s' % index) %}checked{% endif %}>
                                             </div>
                                         {% endfor %}
                                     </div>
@@ -157,8 +157,8 @@
                                     <div class="row">
                                         {% for index in range(8)[::-1] %}
                                             <div style="width: 12.5%; float: left">
-                                                <input type="checkbox" name="byte1_{{ index }}"  value="y"
-                                                       {% if content.get('byte1_%s' % index) %}checked{% endif %}>
+                                                <input type="checkbox" name="bit1_{{ index }}"  value="y"
+                                                       {% if content.get('bit1_%s' % index) %}checked{% endif %}>
                                             </div>
                                         {% endfor %}
                                     </div>
@@ -177,8 +177,8 @@
                                     <div class="row">
                                         {% for index in range(8)[::-1] %}
                                             <div style="width: 12.5%; float: left">
-                                                <input type="checkbox" name="byte2_{{ index }}"  value="y"
-                                                       {% if content.get('byte2_%s' % index) %}checked{% endif %}>
+                                                <input type="checkbox" name="bit2_{{ index }}"  value="y"
+                                                       {% if content.get('bit2_%s' % index) %}checked{% endif %}>
                                             </div>
                                         {% endfor %}
                                     </div>
@@ -196,8 +196,8 @@
                                     <div class="row">
                                         {% for index in range(8)[::-1] %}
                                             <div style="width: 12.5%; float: left">
-                                                <input type="checkbox" name="byte3_{{ index }}"  value="y"
-                                                       {% if content.get('byte3_%s' % index) %}checked{% endif %}>
+                                                <input type="checkbox" name="bit3_{{ index }}"  value="y"
+                                                       {% if content.get('bit3_%s' % index) %}checked{% endif %}>
                                             </div>
                                         {% endfor %}
                                     </div>
