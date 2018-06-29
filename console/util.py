@@ -6,9 +6,18 @@ from app.main.models import Project, ProjectRelation, ProjectData
 from app.manage.models import AttrContent
 from app.main.func import get_project_children
 from collections import defaultdict
+from enum import Enum
 
 app = create_app()
 app.app_context().push()
+
+
+class Byte(Enum):
+    byte = 'BytePosition'
+
+
+class Bite(Enum):
+    bite = 'BitPosition'
 
 
 class ExportXml(object):
@@ -56,13 +65,16 @@ class ExportXml(object):
 
         new_result = dict()
         for address, projects in r.items():
-            for project in projects:
-                pass
-
-            project = ProjectData.query.filter_by(project_id=self.project_id).all()
+            project_query = ProjectData.query.filter_by(project_id=self.project_id)
+            project = project_query.all()
             d = {
                 'conf_data': [(v.conf_data, v.las) for v in project if v.conf_data]
             }
+
+            for project in projects:
+                p = project_query.filter_by(project_relation_id=project['project_relation_id']).first()
+                content = json.loads(p.content) if p.content else None
+
             new_result[address] = d
 
         print(new_result)
@@ -110,8 +122,17 @@ class ExportXml(object):
                 node_modification_item.appendChild(node_conf_data)
 
                 node_modification.appendChild(node_modification_item)
-
         root.appendChild(node_modification)
+
+        node_write_section = doc.createElement('WriteSection')
+        if modification_section:
+            for key, val in modification_section.items():
+                node_write_item = doc.createElement('WriteItem')
+                node_write_item.setAttribute('IDREF', key)
+                node_write_item.setAttribute('DidWriteScope', 'All')
+                node_write_item.setAttribute('DelayForMS', '0')
+                node_write_section.appendChild(node_write_item)
+        root.appendChild(node_write_section)
 
         return doc
 

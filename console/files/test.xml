@@ -15,4 +15,7 @@
 				</ConfData>
 			</ModificationItem>
 		</ModificationSection>
+		<WriteSection>
+			<WriteItem DelayForMS="0" DidWriteScope="All" IDREF="A"/>
+		</WriteSection>
 	</ConfigurationModule>

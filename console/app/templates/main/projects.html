@@ -45,7 +45,7 @@
                                            data-id="{{ project.id }}">删除</a>
                                     </div>
                                     <div>
-                                        <a href="">数据发布</a>
+                                        <a href="{{ url_for('.download_file', file_name=project.name) }}">数据发布</a>
                                     </div>
 
                                 </td>

@@ -29,7 +29,10 @@ class ReadConfigJson(object):
 
 base_path = os.path.abspath(os.path.dirname(__file__))
 upload_path = os.path.join(base_path, 'upload', 'projects')
-print(upload_path)
+file_path = os.path.join(base_path, 'files')
+
+if not os.path.exists(file_path):
+    os.makedirs(file_path)
 
 
 class Config:
@@ -50,6 +53,7 @@ class Config:
     ASSETS_DEBUG = False
 
     UPLOADS_DEFAULT_DEST = upload_path
+    FILE_PATH = file_path
 
     @staticmethod
     def init_app(app):

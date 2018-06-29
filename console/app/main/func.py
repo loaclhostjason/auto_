@@ -1,4 +1,6 @@
 from .models import *
+import os
+from flask import make_response, current_app, send_file, abort
 
 
 def get_copy_parent_id(copy_id):
@@ -119,3 +121,23 @@ def get_project_children(project_id):
                         result.append(d.copy())
 
     return result
+
+
+def download_files(filename):
+    try:
+        from urllib.parse import quote
+
+        filename = '%s.xml' % filename
+        filename_path = os.path.join(current_app.config['FILE_PATH'], filename)
+        print(filename_path)
+
+        response = make_response(send_file(filename_path, as_attachment=True))
+        response.headers["Content-Disposition"] = \
+            "attachment;" \
+            "filename*=UTF-8''{utf_filename}".format(
+                utf_filename=quote(filename.encode('utf-8'))
+            )
+        return response
+    except Exception as e:
+        print(e)
+        abort(404)

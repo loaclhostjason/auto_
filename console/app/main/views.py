@@ -96,3 +96,10 @@ def after_request(response):
             db.session.commit()
 
     return response
+
+
+@main.route('/download_file')
+@login_required
+def download_file():
+    file_name = request.args.get('file_name')
+    return download_files(file_name)
