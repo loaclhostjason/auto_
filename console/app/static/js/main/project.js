@@ -96,5 +96,28 @@ $(document).ready(function () {
             } else
                 toastr.error(resp['message'])
         })
+    });
+
+    // update username
+    let update_name = $('#update-name-modal');
+    update_name.on('hide.bs.modal', function () {
+        $(this).find('form')[0].reset();
+    });
+
+    update_name.find('.submit_update_name').click(function () {
+        let params = update_name.find('form').serialize();
+        $.post('/project/edit/name', params, function (resp) {
+            if (resp.success) {
+                toastr.success(resp.message);
+                if (resp.level === 4) {
+                    projects.get_func_relation(project_id, resp.parent_id, 3);
+                } else
+                    projects.get_protect_relation(project_id);
+
+                update_name.modal('hide');
+            } else {
+                toastr.error(resp.message)
+            }
+        })
     })
 });

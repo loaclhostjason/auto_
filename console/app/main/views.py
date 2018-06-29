@@ -105,3 +105,32 @@ def after_request(response):
 def download_file():
     file_name = request.args.get('file_name')
     return download_files(file_name)
+
+
+@main.route('/project/edit/name', methods=['POST'])
+@login_required
+def edit_project_name():
+    name = request.form.get('name')
+    id = request.form.get('id')
+    if not name:
+        return jsonify({'success': False, 'message': '名称不能为空'})
+
+    project_relation = ProjectRelation.query.filter_by(id=id).first()
+    if not project_relation:
+        return jsonify({'success': False, 'message': '没有此记录'})
+
+    if not project_relation.parent_id:
+        old_project = Project.query.filter_by(name=name).first()
+        if old_project:
+            return jsonify({'success': False, 'message': '名称已经存在'})
+
+        project = Project.query.filter_by(name=project_relation.name).first()
+        project.name = name
+        db.session.add(project)
+
+    project_relation.name = name
+    db.session.add(project_relation)
+
+    print('level', project_relation.level)
+    return jsonify(
+        {'success': True, 'message': '更新成功', 'level': project_relation.level, 'parent_id': project_relation.parent_id})
