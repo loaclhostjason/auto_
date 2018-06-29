@@ -74,9 +74,24 @@ class ProjectData(db.Model):
 
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
+    timestamp = db.Column(db.DateTime, default=datetime.now)
     project = db.relationship('Project', backref=db.backref("project_data", cascade="all, delete-orphan"))
     project_relation = db.relationship('ProjectRelation',
                                        backref=db.backref("project_data", cascade="all, delete-orphan"))
+
+    @property
+    def conf_data(self):
+        if not self.content:
+            return
+
+        content = json.loads(self.content)
+        extra_key = [
+            'byte0', 'byte1', 'byte2', 'byte3'
+        ]
+        for key in extra_key:
+            if content.get(key):
+                return content[key]
+        return
 
     @staticmethod
     def init_key(str_key):
@@ -100,6 +115,7 @@ class ProjectData(db.Model):
 
         project_relation_id = request.form.getlist('project_relation_id')
         result = []
+        print(project_relation_id)
         for index, val in enumerate(project_relation_id):
             d = {
                 'project_id': project_id,
@@ -107,13 +123,11 @@ class ProjectData(db.Model):
                 'content': {},
             }
             for v in key:
-                try:
-                    d['las'] = request.form.getlist('las')[index]
-                    d['name'] = request.form.getlist('name')[index]
-                    if request.form.getlist(v)[index]:
-                        d['content'][v] = request.form.getlist(v)[index]
-                except Exception:
-                    pass
+                d['las'] = request.form.getlist('las')[index]
+                d['name'] = request.form.getlist('name')[index]
+                if request.form.get('%s_%s' % (val, v)):
+                    d['content'][v] = request.form.get('%s_%s' % (val, v))
+
             result.append(d)
         return [v for v in result if v.get('content')]
 
@@ -139,3 +153,5 @@ class ProjectData(db.Model):
                         result.append(content.get('byte%s' % index))
 
             data.real_content = ';'.join(result)
+            print(';'.join(result))
+            db.session.add(data)

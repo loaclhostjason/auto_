@@ -33,15 +33,20 @@ def edit_project_data(project_id):
         data = ProjectData.get_content(project_id)
         if not data:
             return redirect(request.url)
-        for d in data:
-            d['content'] = json.dumps(d['content'])
-            project_relation_id = d['project_relation_id']
 
+        new_dict = dict()
+        for v in data:
+            new_dict[v['project_relation_id']] = v
+
+        print(new_dict)
+        for project_relation_id, val in new_dict.items():
+            val['content'] = json.dumps(val['content'])
             old_project_data = ProjectData.query.filter_by(project_relation_id=project_relation_id).first()
             if old_project_data:
-                ProjectData.update_model(old_project_data, d)
+
+                ProjectData.update_model(old_project_data, val)
             else:
-                new_project_data = ProjectData(**d)
+                new_project_data = ProjectData(**val)
                 db.session.add(new_project_data)
 
         ProjectData.update_real_content(project_id)
@@ -66,3 +71,28 @@ def create_edit_project():
 def edit_file(project_id):
     project = Project.query.get_or_404(project_id)
     return render_template('main/create_edit_project.html', project=project)
+
+
+@main.after_request
+def after_request(response):
+    if not request.url_rule or request.method != 'POST':
+        return response
+
+    project_relation = ProjectRelation.query.order_by(ProjectRelation.timestamp.desc()).all()
+    r = defaultdict(list)
+    if project_relation:
+        for pr in project_relation:
+            r[pr.project_id].append(pr.timestamp)
+
+    d = {k: max(v) for k, v in r.items() if v}
+    if not d:
+        return response
+
+    for project_id, timestamp in d.items():
+        project = Project.query.filter_by(id=project_id).first()
+        if project and project.last_time < timestamp:
+            project.last_time = timestamp
+            db.session.add(project)
+            db.session.commit()
+
+    return response

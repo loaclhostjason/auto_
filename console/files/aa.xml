@@ -24,6 +24,8 @@
     <AlgorithmNumber>16</AlgorithmNumber>
     <ConfigurationIndex>00</ConfigurationIndex>
   </Header>
+
+
   <DidList>
     <DidItem>
       <DidNo>C167</DidNo>
@@ -54,12 +56,16 @@
       <DefaultValue>0000000000000000000000000000000000</DefaultValue>
     </DidItem>
   </DidList>
+
+
   <ReadSection>
     <ReadItem IDREF="C167" />
     <ReadItem IDREF="C161" />
     <ReadItem IDREF="C162" />
 	<ReadItem IDREF="F190" />
   </ReadSection>
+
+
   <ModificationSection>
     <ModificationItem IDREF="C167">
       <Parameter ParamDefaultValue="02">
@@ -83,12 +89,16 @@
       </Parameter>
     </ModificationItem>
    </ModificationSection>
+
+
   <WriteSection>
     <WriteItem IDREF="C167" DidWriteScope="All" DelayForMS="0" />
     <WriteItem IDREF="C161" DidWriteScope="All" DelayForMS="0" />
     <WriteItem IDREF="C162" DidWriteScope="All" DelayForMS="0" />
     <WriteItem IDREF="F190" DidWriteScope="All" DelayForMS="0" />
   </WriteSection>
+
+
   <RevisionLog>
     <RevisionLogEntry>
       <ConfigurationFileNumber>1026389701</ConfigurationFileNumber>

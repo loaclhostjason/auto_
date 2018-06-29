@@ -102,12 +102,13 @@
                 {% if result %}
                     {% for data in result %}
                         <tr>
+                            {% set project_relation_id = data.level_4_id %}
                             <input type="hidden" name="project_relation_id" value="{{ data.level_4_id }}">
                             <input type="hidden" name="name" value="{{ data.level_4 }}">
 
                             {% set data_info = project_data.get(data.level_4_id) or {} %}
                             {% set content = (data_info.get('content') | loads_jason) or {} %}
-{#                            {{ content }}#}
+                            {#                            {{ content }}#}
 
 
                             {% if loop.first %}
@@ -129,7 +130,8 @@
                             </td>
 
                             <td colspan="text-center">
-                                <input name="las" class="tc-search-words" style="width: 80px" value="{{ data_info.get('las', '') }}">
+                                <input name="las" class="tc-search-words" style="width: 80px"
+                                       value="{{ data_info.get('las', '') }}">
                             </td>
 
                             <td colspan="8">
@@ -137,7 +139,7 @@
                                     <div class="row">
                                         {% for index in range(8)[::-1] %}
                                             <div style="width: 12.5%; float: left">
-                                                <input type="checkbox" name="bit0_{{ index }}" value="y"
+                                                <input type="checkbox" name="{{ project_relation_id }}_bit0_{{ index }}" value="y"
                                                        {% if content.get('bit0_%s' % index) %}checked{% endif %}>
                                             </div>
                                         {% endfor %}
@@ -146,7 +148,8 @@
                                 <div class="bline col-xs-12" style="margin:  10px 0"></div>
                                 <div class="col-xs-12">
                                     <div class="row">
-                                        <input type="text" class="tc-search-words col-xs-12" name="byte0" value="{{ content.get('byte0', '') }}">
+                                        <input type="text" class="tc-search-words col-xs-12" name="{{ project_relation_id }}_byte0"
+                                               value="{{ content.get('byte0', '') }}">
                                     </div>
                                 </div>
                             </td>
@@ -157,7 +160,7 @@
                                     <div class="row">
                                         {% for index in range(8)[::-1] %}
                                             <div style="width: 12.5%; float: left">
-                                                <input type="checkbox" name="bit1_{{ index }}"  value="y"
+                                                <input type="checkbox" name="{{ project_relation_id }}_bit1_{{ index }}" value="y"
                                                        {% if content.get('bit1_%s' % index) %}checked{% endif %}>
                                             </div>
                                         {% endfor %}
@@ -166,7 +169,8 @@
                                 <div class="bline col-xs-12" style="margin:  10px 0"></div>
                                 <div class="col-xs-12">
                                     <div class="row">
-                                        <input type="text" class="tc-search-words col-xs-12" name="byte1" value="{{ content.get('byte1', '') }}">
+                                        <input type="text" class="tc-search-words col-xs-12" name="{{ project_relation_id }}_byte1"
+                                               value="{{ content.get('byte1', '') }}">
                                     </div>
                                 </div>
                             </td>
@@ -177,7 +181,7 @@
                                     <div class="row">
                                         {% for index in range(8)[::-1] %}
                                             <div style="width: 12.5%; float: left">
-                                                <input type="checkbox" name="bit2_{{ index }}"  value="y"
+                                                <input type="checkbox" name="{{ project_relation_id }}_bit2_{{ index }}" value="y"
                                                        {% if content.get('bit2_%s' % index) %}checked{% endif %}>
                                             </div>
                                         {% endfor %}
@@ -186,7 +190,8 @@
                                 <div class="bline col-xs-12" style="margin:  10px 0"></div>
                                 <div class="col-xs-12">
                                     <div class="row">
-                                        <input type="text" class="tc-search-words col-xs-12" name="byte2" value="{{ content.get('byte2', '') }}">
+                                        <input type="text" class="tc-search-words col-xs-12" name="{{ project_relation_id }}_byte2"
+                                               value="{{ content.get('byte2', '') }}">
                                     </div>
                                 </div>
                             </td>
@@ -196,7 +201,7 @@
                                     <div class="row">
                                         {% for index in range(8)[::-1] %}
                                             <div style="width: 12.5%; float: left">
-                                                <input type="checkbox" name="bit3_{{ index }}"  value="y"
+                                                <input type="checkbox" name="{{ project_relation_id }}_bit3_{{ index }}" value="y"
                                                        {% if content.get('bit3_%s' % index) %}checked{% endif %}>
                                             </div>
                                         {% endfor %}
@@ -205,7 +210,8 @@
                                 <div class="bline col-xs-12" style="margin:  10px 0"></div>
                                 <div class="col-xs-12">
                                     <div class="row">
-                                        <input type="text" class="tc-search-words col-xs-12" name="byte3" value="{{ content.get('byte3', '') }}">
+                                        <input type="text" class="tc-search-words col-xs-12" name="{{ project_relation_id }}_byte3"
+                                               value="{{ content.get('byte3', '') }}">
                                     </div>
                                 </div>
                             </td>
