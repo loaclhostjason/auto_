@@ -8,11 +8,14 @@
 		</ReadSection>
 		<ModificationSection>
 			<ModificationItem IDREF="A">
-				<ConfData useConfData="true">
-					<ConfigData ConfigExpression="$D10J.$H10K" Value="2"/>
-					<ConfigData ConfigExpression="$D10L-$543D" Value="4"/>
-					<ConfigData ConfigExpression="$D10K+$C708" Value="3"/>
-				</ConfData>
+				<ParameterName>dd</ParameterName>
+				<Parameter ParamDefaultValue="2">
+					<ConfData useConfData="true">
+						<ConfigData ConfigExpression="$D10J.$H10K" Value="2"/>
+						<ConfigData ConfigExpression="$D10L-$543D" Value="4"/>
+						<ConfigData ConfigExpression="$D10K+$C708" Value="3"/>
+					</ConfData>
+				</Parameter>
 			</ModificationItem>
 		</ModificationSection>
 		<WriteSection>

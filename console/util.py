@@ -74,6 +74,7 @@ class ExportXml(object):
             for project in projects:
                 p = project_query.filter_by(project_relation_id=project['project_relation_id']).first()
                 content = json.loads(p.content) if p.content else None
+                d['parameter_name'] = p.name
 
             new_result[address] = d
 
@@ -87,6 +88,7 @@ class ExportXml(object):
         root.setAttribute('%s-CONFIG-SCHEMA-VERSION' % self.xml_managers_attr, '1.0')
         doc.appendChild(root)
 
+        # header
         manager_dict = self.xml_header_attr
         header_manager = doc.createElement('Header')
         if manager_dict:
@@ -96,6 +98,7 @@ class ExportXml(object):
                 header_manager.appendChild(node_name)
         root.appendChild(header_manager)
 
+        # ReadSection
         section_manager = doc.createElement('ReadSection')
         if self.read_section:
             for v in self.read_section:
@@ -104,6 +107,7 @@ class ExportXml(object):
                 section_manager.appendChild(node_name)
         root.appendChild(section_manager)
 
+        # ModificationSection
         modification_section = self.modification
         node_modification = doc.createElement('ModificationSection')
         if modification_section:
@@ -111,6 +115,16 @@ class ExportXml(object):
                 node_modification_item = doc.createElement('ModificationItem')
                 node_modification_item.setAttribute('IDREF', key)
 
+                # Parameter
+                node_parameter = doc.createElement('Parameter')
+                node_parameter.setAttribute('ParamDefaultValue', val['conf_data'][0][0] if val['conf_data'] else '')
+
+                # ParameterName
+                node_parameter_name = doc.createElement('ParameterName')
+                node_parameter_name.appendChild(doc.createTextNode(str(val['parameter_name'])))
+                node_modification_item.appendChild(node_parameter_name)
+
+                # ConfData
                 node_conf_data = doc.createElement('ConfData')
                 node_conf_data.setAttribute('useConfData', 'true')
                 for data in val['conf_data']:
@@ -119,8 +133,9 @@ class ExportXml(object):
                     node_config_data.setAttribute('ConfigExpression', data[1])
                     node_conf_data.appendChild(node_config_data)
 
-                node_modification_item.appendChild(node_conf_data)
+                    node_parameter.appendChild(node_conf_data)
 
+                node_modification_item.appendChild(node_parameter)
                 node_modification.appendChild(node_modification_item)
         root.appendChild(node_modification)
 
