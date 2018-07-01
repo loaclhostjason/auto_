@@ -206,7 +206,7 @@ def submit_attr_content():
     attr = Attr.query.filter(Attr.level == level).first()
 
     if not attr or not project_id or not project_relation_id:
-        return jsonify({'success': False, 'messgae': '参数不对'})
+        return jsonify({'success': False, 'message': '参数不对'})
 
     data = None
     content = None
