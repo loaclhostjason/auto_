@@ -13,15 +13,17 @@ $(document).ready(function () {
             });
         };
 
-        this.get_func_relation = function (project_id, parent_id) {
-            $.get('/project/func/tree?project_id=' + project_id + '&id=' + parent_id).done(function (resp) {
+        this.get_attr_input = function (project_id, level, id) {
+            $.get('/attr/content?project_id=' + project_id + '&level=' + level + '&project_relation_id=' + id, function (resp) {
                 if (resp.success) {
                     let data = resp['data'];
-                    let nodedata = data['nodedata'];
-                    let linkdata = data['linkdata'];
-                    $.g_func_myDiagram.model = new go.GraphLinksModel(nodedata, linkdata);
-                } else
-                    toastr.error(resp.message)
+                    let content = resp['content'];
+                    attr_html(data, content, id, level);
+                } else {
+                    toastr.error(resp.messgae)
+                }
+
+
             });
         };
     }
@@ -64,11 +66,41 @@ $(document).ready(function () {
         $.post('/project/content/add/' + project_id, params, function (resp) {
             if (resp.success) {
                 add_content.modal('hide');
-                if (level >= 4)
-                    projects.get_func_relation(project_id, parent_id);
                 projects.get_protect_relation(project_id)
             } else
                 toastr.error(resp.message)
         })
     });
+
+
+    // submit attr
+    $(document).on('click', '.submit-add-attr', function () {
+        let form_data = $('form#attr-form').serialize();
+        $.post('/manage/attr/content/add?project_id=' + project_id, form_data, function (resp) {
+            if (resp.success) {
+                toastr.success(resp['message'])
+            } else
+                toastr.error(resp['message'])
+        })
+    });
+
+    // update username
+    let update_name = $('#update-name-modal');
+    update_name.on('hide.bs.modal', function () {
+        $(this).find('form')[0].reset();
+    });
+
+    update_name.find('.submit_update_name').click(function () {
+        let params = update_name.find('form').serialize();
+        $.post('/project/edit/name', params, function (resp) {
+            if (resp.success) {
+                toastr.success(resp.message);
+                projects.get_protect_relation(project_id);
+
+                update_name.modal('hide');
+            } else {
+                toastr.error(resp.message)
+            }
+        })
+    })
 });

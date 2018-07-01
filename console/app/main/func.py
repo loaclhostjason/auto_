@@ -1,4 +1,6 @@
 from .models import *
+import os
+from flask import make_response, current_app, send_file, abort
 
 
 def get_copy_parent_id(copy_id):
@@ -64,13 +66,17 @@ def get_func_relation(init_result, project_id, parent_id):
     init_result['nodedata'].append({'category': 'ProductNode',
                                     'name': project_relation.name,
                                     'type': 'project',
+                                    'level': project_relation.level,
                                     'key': 'product_node_%s' % parent_id,
+                                    'parent_id': parent_id,
                                     })
     # result = {
     #     'nodedata': [],
     #     'linkdata': [],
     # }
-    func_relations = ProjectRelation.query.filter_by(project_id=project_id, parent_id=parent_id, type='func').all()
+    func_relations = ProjectRelation.query.order_by(ProjectRelation.id.asc()). \
+        filter_by(project_id=project_id, parent_id=parent_id, type='func').all()
+
     if not func_relations:
         return init_result
 
@@ -79,6 +85,8 @@ def get_func_relation(init_result, project_id, parent_id):
             'category': 'FuncNode',
             'name': fr.name,
             'key': fr.id,
+            'level': fr.level,
+            'parent_id': fr.parent_id,
         })
         init_result['linkdata'].append({
             'from': 'product_node_%s' % parent_id,
@@ -87,3 +95,53 @@ def get_func_relation(init_result, project_id, parent_id):
         })
 
     return init_result
+
+
+def get_project_children(project_id):
+    result = list()
+    first_relation = ProjectRelation.query.filter_by(project_id=project_id, level=1).first()
+    d = {
+        'level_1': first_relation.name,
+    }
+
+    second_relation = ProjectRelation.query.filter_by(parent_id=first_relation.id, level=2).all()
+    if not second_relation:
+        return result
+
+    for v in second_relation:
+        d['level_2'] = v.name
+
+        third_relation = ProjectRelation.query.filter_by(parent_id=v.id, level=3).all()
+        if third_relation:
+            for th in third_relation:
+                d['level_3'] = th.name
+
+                forth_relation = ProjectRelation.query.filter_by(parent_id=th.id, level=4).all()
+                if forth_relation:
+                    for forth in forth_relation:
+                        # d['level_4'] = forth.name
+                        # print(forth.name)
+                        d.update({'level_4': forth.name, 'level_4_id': forth.id})
+                        result.append(d.copy())
+
+    return result
+
+
+def download_files(filename):
+    try:
+        from urllib.parse import quote
+
+        filename = '%s.xml' % filename
+        filename_path = os.path.join(current_app.config['FILE_PATH'], filename)
+        print(filename_path)
+
+        response = make_response(send_file(filename_path, as_attachment=True))
+        response.headers["Content-Disposition"] = \
+            "attachment;" \
+            "filename*=UTF-8''{utf_filename}".format(
+                utf_filename=quote(filename.encode('utf-8'))
+            )
+        return response
+    except Exception as e:
+        print(e)
+        abort(404)

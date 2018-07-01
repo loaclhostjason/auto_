@@ -22,21 +22,32 @@
                         <th>产品</th>
                         <th width="100">拥有者</th>
                         <th width="150">最后修改时间</th>
-                        <th width="160" class="text-right">操作</th>
+                        <th width="180" class="text-right">操作</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% if projects %}
                         {% for project in projects %}
                             <tr>
-                                <td>{{ project.name or '--' }}</td>
+                                <td>
+                                    <a href="{{ url_for('.edit_file', project_id=project.id) }}">{{ project.name or '--' }}</a>
+                                </td>
                                 <td>{{ project.user.username }}</td>
                                 <td>{{ project.last_time }}</td>
 
                                 <td class="text-right">
-                                    <a href="{{ url_for('.edit_file', project_id=project.id) }}">编辑</a>
-                                    <span class="text-explode">|</span>
-                                    <a href="javascript:void (0)" class="delete-project" data-id="{{ project.id }}">删除</a>
+                                    <div>
+                                        <a href="{{ url_for('.edit_project_data', project_id=project.id) }}">数据编辑</a>
+                                        <span class="text-explode">|</span>
+                                        <a href="{{ url_for('.edit_file', project_id=project.id) }}">编辑结构</a>
+                                        <span class="text-explode">|</span>
+                                        <a href="javascript:void (0)" class="delete-project"
+                                           data-id="{{ project.id }}">删除</a>
+                                    </div>
+                                    <div>
+                                        <a href="{{ url_for('.download_file', file_name=project.name) }}">数据发布</a>
+                                    </div>
+
                                 </td>
                             </tr>
                         {% endfor %}

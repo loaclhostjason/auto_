@@ -68,7 +68,7 @@ def edit_users(id):
             return jsonify({'success': False, 'message': user_message})
 
         old_user = User.query.filter_by(username=users_params['username']).first()
-        if old_user:
+        if old_user and old_user.username != users_params['username']:
             return jsonify({'success': False, 'message': '用户名重复了'})
 
         users_params['expiry_time'] = '{} {}'.format(users_params['expiry_time'], '23:59:59')

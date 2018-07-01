@@ -1,6 +1,8 @@
 from .. import db
 from enum import Enum
 from datetime import datetime
+from ..base import Tool
+import json
 
 
 class AttrType(Enum):
@@ -29,10 +31,9 @@ class Attr(db.Model):
     @classmethod
     def init_attr(cls):
         r = [
-            {'name': '结构树节点-1', 'level': 1, 'type': 'worker'},
-            {'name': '结构树节点-2', 'level': 2, 'type': 'worker'},
-            {'name': '结构树节点-3', 'level': 3, 'type': 'worker'},
-            {'name': '功能树节点', 'level': 4, 'type': 'func'},
+            {'name': 'ECU属性配置', 'level': 1, 'type': 'worker'},
+            {'name': 'DID属性配置', 'level': 2, 'type': 'worker'},
+            {'name': '装配项属性配置', 'level': 3, 'type': 'worker'},
         ]
         attr = Attr.query.all()
         if attr:
@@ -58,3 +59,30 @@ class AttrContent(db.Model):
     project = db.relationship('Project', backref=db.backref("attr_content", cascade="all, delete-orphan"))
     project_relation = db.relationship('ProjectRelation',
                                        backref=db.backref("attr_content", cascade="all, delete-orphan"))
+
+    def get_insert_data(self, data, project_id):
+        if not data:
+            return
+        project_relation_id = data.get('project_relation_id')
+
+        Tool.remove_key(data, ['level', 'project_relation_id'])
+
+        d = {
+            'project_id': project_id,
+            'project_relation_id': project_relation_id,
+            'real_content': json.dumps(data),
+        }
+        return d
+
+    @classmethod
+    def create_edit(cls, data, project_id, project_relation_id):
+        is_have_content = cls.query.filter_by(project_id=project_id, project_relation_id=project_relation_id).first()
+
+        data = cls().get_insert_data(data, project_id)
+        if not is_have_content:
+            content = cls(**data)
+            db.session.add(content)
+            return
+
+        cls.update_model(is_have_content, data)
+        return

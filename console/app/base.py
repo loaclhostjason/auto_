@@ -148,3 +148,18 @@ class Tool:
         t = time.localtime(int_time)
         format_time = time.strftime(format, t)
         return format_time
+
+    @staticmethod
+    def remove_key(my_list, my_key):
+
+        if isinstance(my_key, list):
+            for k in my_key:
+                try:
+                    del my_list[k]
+                except KeyError:
+                    pass
+        else:
+            try:
+                del my_list[my_key]
+            except KeyError:
+                pass
