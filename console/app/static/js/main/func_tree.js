@@ -38,6 +38,22 @@ $(document).ready(function () {
                 let update_name = $('#update-name-modal');
                 app_common.show_modal(update_name);
                 update_name.find('[name="id"]').val(id);
+            }),
+            makeButton('删除', function (e, obj) {
+                let node = obj.part.adornedPart;
+                if (node === null) return false;
+
+                let thisemp = node.data;
+                let id = thisemp['key'];
+                let parent_id = thisemp['parent_id'];
+                $.post('/project/tree/delete/' + id, '', function (resp) {
+                    if (resp.success) {
+                        toastr.success(resp.message);
+                        $.g_projects.get_func_relation(project_id, parent_id, 3);
+                    } else {
+                        toastr.error(resp.message)
+                    }
+                })
             })
         );
 

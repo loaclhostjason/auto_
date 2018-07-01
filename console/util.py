@@ -52,9 +52,42 @@ class ExportXml(object):
         return content
 
     @property
+    def xml_did_list(self):
+        result = dict()
+        project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, level=2).all()
+        if not project_relation:
+            return result
+
+        for pr in project_relation:
+            attr_content = AttrContent.query.filter_by(project_relation_id=pr.id).first()
+            real_content = json.loads(attr_content.real_content) if attr_content and attr_content.real_content else None
+            result[pr.name] = real_content or {}
+
+        return result
+
+    @property
     def read_section(self):
         result = get_project_children(self.project_id)
         return list(set([v['level_2'] for v in result if v.get('level_2')]))
+
+    def __get_(self, projects):
+        d = defaultdict(list)
+        for project in projects:
+            p = ProjectData.query.filter_by(project_id=self.project_id).filter_by(project_relation_id=project['project_relation_id']).first()
+            content = json.loads(p.content) if p and p.content else None
+            d['parameter_name'] = p.name if p else 'null'
+
+            if content:
+                for v in ['byte0', 'byte1', 'byte2', 'byte3']:
+                    if content.get(v):
+
+                        d['byte'].append({'BytePosition': content.get(v)})
+
+                        for bit in ['bit0_', 'bit1_', 'bit2_', 'bit3_']:
+                            for index in range(8):
+                                if content.get('%s%d' % (bit, index)):
+                                    d['byte'].append({'BitPosition': index})
+        return d
 
     @property
     def modification(self):
@@ -70,15 +103,10 @@ class ExportXml(object):
             d = {
                 'conf_data': [(v.conf_data, v.las) for v in project if v.conf_data]
             }
+            new_result[address] = self.__get_(projects)
+            new_result[address]['conf_data'] = d['conf_data']
 
-            for project in projects:
-                p = project_query.filter_by(project_relation_id=project['project_relation_id']).first()
-                content = json.loads(p.content) if p.content else None
-                d['parameter_name'] = p.name
-
-            new_result[address] = d
-
-        print(new_result)
+        print(11, new_result)
         return new_result
 
     def set_xml(self):
@@ -97,6 +125,19 @@ class ExportXml(object):
                 node_name.appendChild(doc.createTextNode(str(val)))
                 header_manager.appendChild(node_name)
         root.appendChild(header_manager)
+
+        # did list
+        did_list = {k: v for k, v in self.xml_did_list.items() if v}
+        node_did_list = doc.createElement('DidList')
+        if did_list:
+            for cid, val in did_list.items():
+                node_did_item = doc.createElement('DidItem')
+                for k, v in val.items():
+                    did_item_s = doc.createElement(k)
+                    did_item_s.appendChild(doc.createTextNode(str(v)))
+                    node_did_item.appendChild(did_item_s)
+                node_did_list.appendChild(node_did_item)
+        root.appendChild(node_did_list)
 
         # ReadSection
         section_manager = doc.createElement('ReadSection')
@@ -123,6 +164,14 @@ class ExportXml(object):
                 node_parameter_name = doc.createElement('ParameterName')
                 node_parameter_name.appendChild(doc.createTextNode(str(val['parameter_name'])))
                 node_modification_item.appendChild(node_parameter_name)
+
+                # bite
+                if val['byte']:
+                    for v in val['byte']:
+                        for k, v in v.items():
+                            node_byte_name = doc.createElement(k)
+                            node_byte_name.appendChild(doc.createTextNode(str(v)))
+                            node_modification_item.appendChild(node_byte_name)
 
                 # ConfData
                 node_conf_data = doc.createElement('ConfData')
@@ -159,5 +208,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(1)
+    export_xml = ExportXml(2)
     export_xml.run()

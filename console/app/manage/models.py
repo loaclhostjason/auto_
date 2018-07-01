@@ -31,9 +31,9 @@ class Attr(db.Model):
     @classmethod
     def init_attr(cls):
         r = [
-            {'name': '结构树节点-1', 'level': 1, 'type': 'worker'},
-            {'name': '结构树节点-2', 'level': 2, 'type': 'worker'},
-            {'name': '结构树节点-3', 'level': 3, 'type': 'worker'},
+            {'name': 'ECU属性配置', 'level': 1, 'type': 'worker'},
+            {'name': 'DID属性配置', 'level': 2, 'type': 'worker'},
+            {'name': '装配项属性配置', 'level': 3, 'type': 'worker'},
             {'name': '功能树节点', 'level': 4, 'type': 'func'},
         ]
         attr = Attr.query.all()

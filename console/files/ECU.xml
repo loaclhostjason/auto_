@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<ConfigurationModule ECU-CONFIG-SCHEMA-VERSION="1.0">
+		<Header>
+			<EcuName>IPK</EcuName>
+			<RequestId>0760</RequestId>
+			<ResponseId>0768</ResponseId>
+			<ConfigurationFileNumber>1026389707</ConfigurationFileNumber>
+			<ApplicationLayerSpec>ISO11898</ApplicationLayerSpec>
+		</Header>
+		<DidList>
+			<DidItem>
+				<DidIndicator>0000</DidIndicator>
+				<Name>FuelConfig7</Name>
+				<DidLength>8</DidLength>
+				<DefaultValue>0000000000000000</DefaultValue>
+			</DidItem>
+		</DidList>
+		<ReadSection>
+			<ReadItem IDREF="C001"/>
+		</ReadSection>
+		<ModificationSection>
+			<ModificationItem IDREF="C001">
+				<ParameterName>null</ParameterName>
+				<BytePosition>1</BytePosition>
+				<BitPosition>5</BitPosition>
+				<BitPosition>6</BitPosition>
+				<BitPosition>7</BitPosition>
+				<Parameter ParamDefaultValue="1">
+					<ConfData useConfData="true">
+						<ConfigData ConfigExpression="WE" Value="1"/>
+					</ConfData>
+				</Parameter>
+			</ModificationItem>
+		</ModificationSection>
+		<WriteSection>
+			<WriteItem DelayForMS="0" DidWriteScope="All" IDREF="C001"/>
+		</WriteSection>
+	</ConfigurationModule>

@@ -28,7 +28,7 @@ $(document).ready(function () {
         };
 
         this.get_func_relation = function (project_id, parent_id, level) {
-            $.get('/project/func/tree?project_id=' + project_id + '&id=' + parent_id + '&level=' + level).done(function (resp) {
+            $.get('/project/func/tree?project_id=' + project_id + '&id=' + parent_id + '&level=' + level || 0).done(function (resp) {
                 if (resp.success) {
                     let data = resp['data'];
                     let nodedata = data['nodedata'];
@@ -79,7 +79,7 @@ $(document).ready(function () {
             if (resp.success) {
                 add_content.modal('hide');
                 if (level >= 4)
-                    projects.get_func_relation(project_id, parent_id);
+                    projects.get_func_relation(project_id, parent_id, level - 1);
                 projects.get_protect_relation(project_id)
             } else
                 toastr.error(resp.message)

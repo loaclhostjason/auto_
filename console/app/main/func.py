@@ -68,12 +68,15 @@ def get_func_relation(init_result, project_id, parent_id):
                                     'type': 'project',
                                     'level': project_relation.level,
                                     'key': 'product_node_%s' % parent_id,
+                                    'parent_id': parent_id,
                                     })
     # result = {
     #     'nodedata': [],
     #     'linkdata': [],
     # }
-    func_relations = ProjectRelation.query.filter_by(project_id=project_id, parent_id=parent_id, type='func').all()
+    func_relations = ProjectRelation.query.order_by(ProjectRelation.id.asc()). \
+        filter_by(project_id=project_id, parent_id=parent_id, type='func').all()
+
     if not func_relations:
         return init_result
 
@@ -83,6 +86,7 @@ def get_func_relation(init_result, project_id, parent_id):
             'name': fr.name,
             'key': fr.id,
             'level': fr.level,
+            'parent_id': fr.parent_id,
         })
         init_result['linkdata'].append({
             'from': 'product_node_%s' % parent_id,

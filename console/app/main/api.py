@@ -17,7 +17,7 @@ def get_prject_func_tree():
 
     project_id = request.args.get('project_id')
     parent_id = request.args.get('id')
-    level = request.args.get('level')
+    level = request.args.get('level') or 0
     print(level)
     if level and int(level) < 3:
         return jsonify({'success': True, 'data': result})
