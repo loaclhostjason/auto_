@@ -112,24 +112,24 @@
 
 
                             {% if loop.first %}
-                                <td colspan="text-center" rowspan="{{ result| length }}">
+                                <td class="text-center" rowspan="{{ result| length }}">
                                     {{ data.level_1 }}
                                 </td>
                             {% endif %}
 
-                            <td colspan="text-center">
+                            <td class="text-center">
                                 {{ data.level_2 }}
                             </td>
 
-                            <td colspan="text-center">
+                            <td class="text-center">
                                 {{ data.level_3 }}
                             </td>
 
-                            <td colspan="text-center">
+                            <td class="text-center">
                                 {{ data.level_4 }}
                             </td>
 
-                            <td colspan="text-center">
+                            <td class="text-center">
                                 <input name="las" class="tc-search-words" style="width: 80px"
                                        value="{{ data_info.get('las', '') }}">
                             </td>

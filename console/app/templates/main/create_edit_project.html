@@ -61,10 +61,42 @@
             <div class="col-sm-8">
                 <div class="panel-border">
                     <div class="charttable-title">
-                        <span class="title-text">项目--功能区</span>
+                        <span class="title-text">项目--数据编辑区</span>
                     </div>
-                    <div class="charttable-w">
-                        <div id="myDiagramFunc" style="min-height: 750px"></div>
+                    <div class="charttable-w" style="padding: 10px">
+                        <div style="overflow-y: auto;">
+                            <form method="post" id="project-data-form">
+                                <table class="table table-hover table-bordered table-project-data">
+                                    <thead>
+                                    <tr>
+                                        <th width="160" style="vertical-align: middle">项目名称</th>
+                                        <th width="100" style="vertical-align: middle">地址</th>
+                                        <th width="100" style="vertical-align: middle"></th>
+                                        <th width="100" style="vertical-align: middle"></th>
+                                        <th width="120" style="vertical-align: middle">LAS</th>
+                                        <th colspan="8">
+                                            <div class="text-center with-bottom-border">
+                                                <span>BYTE00</span>
+                                            </div>
+                                            <div style="width: 172px">
+                                                {% for index in range(8)[::-1] %}
+                                                    <div style="width: 12.5%; float: left">
+                                                        <span>{{ index }}</span>
+                                                        {% if index != 0 %}
+                                                            <i class="resize-line-icon"></i>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody></tbody>
+
+                                </table>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
