@@ -156,5 +156,17 @@ $(document).ready(function () {
                 toastr.error(resp.message)
             }
         })
-    })
+    });
+
+
+    // submit project data
+    $('.submit-project-data').click(function () {
+        let params = $('form#project-data-form').serialize();
+        $.post('/project/data/submit/' + project_id, params, function (resp) {
+            if (resp.success) {
+                toastr.success(resp.message);
+            } else
+                toastr.error(resp.message);
+        })
+    });
 });
