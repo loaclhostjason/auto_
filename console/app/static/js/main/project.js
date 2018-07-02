@@ -180,6 +180,6 @@ $(document).ready(function () {
     let update_las_modal = $("#update-las-modal");
     $(document).on('click', '.show-las-modal', function () {
         projects.show_modal(update_las_modal, $(this));
-        update_las_modal.find('.modal-title').text($(this).data('value'));
+        update_las_modal.find('.modal-title').text('Las【'+$(this).data('value') + '】编辑信息');
     })
 });
