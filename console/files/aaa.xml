@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<ConfigurationModule aaa-CONFIG-SCHEMA-VERSION="1.0">
+		<Header/>
+		<DidList/>
+		<ReadSection>
+			<ReadItem IDREF="c"/>
+		</ReadSection>
+		<ModificationSection>
+			<ModificationItem IDREF="c">
+				<ParameterName>dd</ParameterName>
+				<BytePosition>2</BytePosition>
+				<BitPosition>6</BitPosition>
+				<BitPosition>7</BitPosition>
+				<BytePosition>1</BytePosition>
+				<BitPosition>4</BitPosition>
+				<BitPosition>5</BitPosition>
+				<BitPosition>6</BitPosition>
+				<BitPosition>7</BitPosition>
+				<BytePosition>42</BytePosition>
+				<BitPosition>4</BitPosition>
+				<BitPosition>5</BitPosition>
+				<BitPosition>6</BitPosition>
+				<BitPosition>7</BitPosition>
+				<Parameter ParamDefaultValue="2">
+					<ConfData useConfData="true">
+						<ConfigData ConfigExpression="$D10J.$H10K" Value="2"/>
+						<ConfigData ConfigExpression="$D10L-$543D" Value="42"/>
+						<ConfigData ConfigExpression="$D10K+$C708" Value="1"/>
+					</ConfData>
+				</Parameter>
+			</ModificationItem>
+		</ModificationSection>
+		<WriteSection>
+			<WriteItem DelayForMS="0" DidWriteScope="All" IDREF="c"/>
+		</WriteSection>
+	</ConfigurationModule>

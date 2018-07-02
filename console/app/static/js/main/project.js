@@ -63,16 +63,19 @@ $(document).ready(function () {
                 html += '<td class="text-center">' + data['level_4'] + '</td>';
                 html += '<td class="text-center"><input name="las" class="tc-search-words" style="width: 80px" value="' + (data_info['las'] || '') + '"></td>';
 
-                html += '<td colspan="8"><div class="col-xs-12"><div class="row">';
-                number.forEach(function (value) {
-                    html += '<div style="width: 12.5%; float: left">';
-                    html += '<input type="checkbox" name="' + prid + '_bit0_' + value + '" value="y"' + (content['bit0_' + value] === 'y' ? 'checked' : '') + '>';
-                    html += '</div>';
+                let bet_number = [0, 1, 2, 3];
+                bet_number.forEach(function (num) {
+                    html += '<td colspan="8"><div class="col-xs-12"><div class="row">';
+                    number.forEach(function (value) {
+                        html += '<div style="width: 12.5%; float: left">';
+                        html += '<input type="checkbox" name="' + prid + '_bit' + num + '_' + value + '" value="y"' + (content['bit' + num + '_' + value] === 'y' ? 'checked' : '') + '>';
+                        html += '</div>';
+                    });
+                    html += '</div></div><div class="bline col-xs-12" style="margin:  10px 0"></div>';
+                    html += '<div class="col-xs-12"><div class="row">';
+                    html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="' + (content['byte' + num] || '') + '">';
+                    html += '</div></div></td>';
                 });
-                html += '</div></div><div class="bline col-xs-12" style="margin:  10px 0"></div>';
-                html += '<div class="col-xs-12"><div class="row">';
-                html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte0" value="' + (content['byte0'] || '') + '">';
-                html += '</div></div></td>';
 
 
                 html += '</tr>'
@@ -120,6 +123,8 @@ $(document).ready(function () {
         $.post('/project/content/add/' + project_id, params, function (resp) {
             if (resp.success) {
                 add_content.modal('hide');
+                if (level >= 4)
+                    projects.get_project_data(project_id, parent_id);
                 projects.get_protect_relation(project_id)
             } else
                 toastr.error(resp.message)
