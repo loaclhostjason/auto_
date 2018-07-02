@@ -63,7 +63,15 @@
                     <div class="charttable-title">
                         <span class="title-text">项目--数据编辑区</span>
                     </div>
-                    <div class="charttable-w" style="padding: 10px">
+                    <div style="margin: 0 10px;">
+                        <div class="alert alert-warning" style="margin-top: 10px">
+                            <span>
+                                <b>提示：</b>
+                                <span>数据编辑，需要对字节进行勾选！</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="charttable-w" style="padding: 0 10px 10px 10px">
                         <div style="overflow-y: auto;min-height: 200px;">
                             <form method="post" id="project-data-form">
                                 <table class="table table-hover table-bordered table-project-data">
@@ -146,7 +154,7 @@
                                 </table>
                             </form>
                         </div>
-                        <div>
+                        <div style="margin-top: 10px">
                             <button class="btn btn-primary submit-project-data" type="button">保存</button>
                         </div>
                     </div>
