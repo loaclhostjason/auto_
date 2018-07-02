@@ -51,7 +51,7 @@ $(document).ready(function () {
                 let content = data_info['content'] || {};
                 let number = [7, 6, 5, 4, 3, 2, 1, 0];
 
-                html += '<tr>';
+                html += '<tr class="data-class">';
                 html += '<input type="hidden" name="project_relation_id" value="' + data['level_4_id'] + '">';
                 html += '<input type="hidden" name="name" value="' + data['level_4'] + '">';
 
@@ -61,8 +61,9 @@ $(document).ready(function () {
                 html += '<td class="text-center">' + data['level_2'] + '</td>';
                 html += '<td class="text-center">' + data['level_3'] + '</td>';
                 html += '<td class="text-center">' + data['level_4'] + '</td>';
-                html += '<td class="text-center"><input name="las" class="tc-search-words" style="width: 80px" value="' + (data_info['las'] || '') + '">';
-                html += '<a href="javascript:void(0)" class="show-las-modal" data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></td>';
+                html += '<td class="text-center"><input name="las" class="tc-search-words" value="' + (data_info['las'] || '') + '">';
+                html += '<a href="javascript:void(0)" class="show-las-modal pull-right" style="padding-left: 10px" data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a>';
+                html += '<a href="javascript:void(0)" class="del-project-func text-danger pull-right" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a></td>';
 
                 let bet_number = [0, 1, 2, 3];
                 bet_number.forEach(function (num) {
@@ -177,9 +178,62 @@ $(document).ready(function () {
     });
 
     // show las modal
+    let btn_las;
     let update_las_modal = $("#update-las-modal");
     $(document).on('click', '.show-las-modal', function () {
         projects.show_modal(update_las_modal, $(this));
-        update_las_modal.find('.modal-title').text('Las【'+$(this).data('value') + '】编辑信息');
+        update_las_modal.find('.modal-title').text('Las【' + $(this).data('value') + '】编辑信息');
+    });
+    update_las_modal.on('hide.bs.modal', function () {
+        $(this).find('input').val('');
+        $(this).find('select').val('');
+    });
+    update_las_modal.on('show.bs.modal', function (event) {
+        btn_las = $(event.relatedTarget);
+    });
+
+    $(document).on('change', '.las_f', function () {
+        let this_val = $(this).val();
+
+        let start_rule_len = $('.start_rule').length;
+        let rule_html = '';
+        rule_html += '<div class="form-group start_rule"><div class="col-sm-6"><input name="las_' + start_rule_len + '" class="form-control pull-left" required></div>';
+        rule_html += '<div class="col-sm-6"><select class="form-control pull-left las_f" name="las_f_' + start_rule_len + '"><option value="">请选择</option> <option value="|">|</option><option value="-">-</option><option value="+">+</option><option value="&">&</option> </select></div></div>';
+
+
+        if (this_val) {
+            $(this).parents('.start_rule').after(rule_html)
+        } else {
+            $(this).parents('.start_rule').nextAll().remove();
+        }
+    });
+    $('.submit_update_las').click(function () {
+        let start_rule_len = $('.start_rule').length;
+        let las_name = btn_las.parents('td').find('input');
+        let new_las_name = '';
+        for (let i = 0; i < start_rule_len; i++) {
+            new_las_name += '$' + $('[name="las_' + i + '"]').val() + $('[name="las_f_' + i + '"]').val()
+        }
+        las_name.val(new_las_name);
+        update_las_modal.modal('hide');
+    });
+
+    $(document).on('click', '.del-project-func', function () {
+        let id = $(this).data('id');
+        let _this = $(this);
+        Modal.confirm({
+            msg: '是否删除？'
+        }).on(function (e) {
+            if (e) {
+                $.post('/project/tree/delete/' + id, '', function (data) {
+                    if (data.success) {
+                        toastr.success(data.message);
+                        _this.parents('.data-class').remove();
+                    } else {
+                        toastr.error(data.message);
+                    }
+                })
+            }
+        })
     })
 });

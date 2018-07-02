@@ -10,9 +10,6 @@
                 <div class="modal-body clearfix">
                     <form class="form-horizontal" name="form">
 
-
-                        <input type="hidden" name="id" value="">
-
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="pull-left">
@@ -23,16 +20,21 @@
                             </div>
                             <div class="col-sm-12">
 
-                                <div class="form-group">
-                                    <div class="col-sm-3">
-                                        <label for="" class="control-label pull-right">
-                                            <span class="text-danger">*</span><span>名称:</span>
-                                        </label>
+                                <div class="form-group start_rule">
+                                    <div class="col-sm-6">
+                                        <input name="las_0" class="form-control pull-left" required>
                                     </div>
                                     <div class="col-sm-6">
-                                        <label><input name="name" class="form-control pull-left" required></label>
+                                        <select class="form-control pull-left las_f" name="las_f_0">
+                                            <option value="">请选择</option>
+                                            <option value="|">|</option>
+                                            <option value="-">-</option>
+                                            <option value="+">+</option>
+                                            <option value="&">&</option>
+                                        </select>
                                     </div>
                                 </div>
+
 
                             </div>
 
@@ -41,7 +43,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-primary submit_update_name">确定</button>
+                    <button class="btn btn-primary submit_update_las">确定</button>
                     <button class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </div>
