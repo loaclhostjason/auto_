@@ -61,7 +61,8 @@ $(document).ready(function () {
                 html += '<td class="text-center">' + data['level_2'] + '</td>';
                 html += '<td class="text-center">' + data['level_3'] + '</td>';
                 html += '<td class="text-center">' + data['level_4'] + '</td>';
-                html += '<td class="text-center"><input name="las" class="tc-search-words" style="width: 80px" value="' + (data_info['las'] || '') + '"></td>';
+                html += '<td class="text-center"><input name="las" class="tc-search-words" style="width: 80px" value="' + (data_info['las'] || '') + '">';
+                html += '<a href="javascript:void(0)" class="show-las-modal" data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></td>';
 
                 let bet_number = [0, 1, 2, 3];
                 bet_number.forEach(function (num) {
@@ -174,4 +175,11 @@ $(document).ready(function () {
                 toastr.error(resp.message);
         })
     });
+
+    // show las modal
+    let update_las_modal = $("#update-las-modal");
+    $(document).on('click', '.show-las-modal', function () {
+        projects.show_modal(update_las_modal, $(this));
+        update_las_modal.find('.modal-title').text($(this).data('value'));
+    })
 });
