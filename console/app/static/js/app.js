@@ -177,8 +177,3 @@ jQuery.cachedScript = function (url, options) {
 
     return jQuery.ajax(options);
 };
-
-
-$.ajaxSetup({
-    async: false
-});

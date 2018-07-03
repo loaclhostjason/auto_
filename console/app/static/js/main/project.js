@@ -124,12 +124,19 @@ $(document).ready(function () {
 
         $.post('/project/content/add/' + project_id, params, function (resp) {
             if (resp.success) {
+                setTimeout(function () {
+                    if (level >= 4) {
+                        projects.get_project_data(project_id, parent_id);
+                    }
+                    projects.get_protect_relation(project_id);
+                }, 500);
+
                 add_content.modal('hide');
-                if (level >= 4)
-                    projects.get_project_data(project_id, parent_id);
-                projects.get_protect_relation(project_id)
-            } else
-                toastr.error(resp.message)
+            } else {
+                toastr.error(resp.message);
+                return false
+            }
+
         })
     });
 
