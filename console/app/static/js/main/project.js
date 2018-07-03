@@ -69,8 +69,8 @@ $(document).ready(function () {
 
 
                 let bet_number = [];
-                if (did_len){
-                    for (let i=0;i<did_len; i++) {
+                if (did_len) {
+                    for (let i = 0; i < did_len; i++) {
                         bet_number.push(i);
                     }
                 }
@@ -226,9 +226,36 @@ $(document).ready(function () {
     update_las_modal.on('hide.bs.modal', function () {
         $(this).find('input').val('');
         $(this).find('select').val('');
+        $('.start_rule:not(:first-of-type)').remove();
     });
     update_las_modal.on('show.bs.modal', function (event) {
         btn_las = $(event.relatedTarget);
+        let las_name = btn_las.parents('td').find('input').val();
+        las_name.replace(/$/g, "");
+        console.log(las_name);
+
+        las_val = las_name.split(/[|+&,-]/);
+        las_f = [];
+        las_val.forEach(function (value) {
+            if (las_name.split(value)[1][0])
+                las_f.push(las_name.split(value)[1][0]);
+        });
+
+        let html = '';
+        las_val.forEach(function (val, index) {
+            html += '<div class="form-group start_rule"><div class="col-sm-6">';
+            html += '<input name="las_' + index + '" class="form-control pull-left" required value="' + val + '"></div>';
+            html += '<div class="col-sm-6"><select class="form-control pull-left las_f" name="las_f_' + index + '">';
+            let f = [['', '请选择'], ['|', '|'], ['-', '-'], ['+', '+'], ['&', '&']];
+            f.forEach(function (value) {
+                if (las_f[index] === value[0]) {
+                    html += '<option selected value="' + value[0] + '">' + value[1] + '</option>';
+                } else
+                    html += '<option value="' + value[0] + '">' + value[1] + '</option>';
+            });
+            html += '</select></div></div>';
+        });
+        $('.parent_rule').html(html);
     });
 
     $(document).on('change', '.las_f', function () {
