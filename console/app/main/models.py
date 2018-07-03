@@ -59,6 +59,7 @@ class ProjectRelation(db.Model):
         db.session.add_all(result)
         db.session.flush()
         result = [v.id for v in result]
+        db.session.commit()
         return result
 
 
