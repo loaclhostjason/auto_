@@ -25,7 +25,7 @@
 				<BitPosition>7</BitPosition>
 				<Parameter ParamDefaultValue="0x1">
 					<ConfData useConfData="true">
-						<ConfigData ConfigExpression="$234|$444+$555" Value="0x1"/>
+						<ConfigData ConfigExpression="$234/$444+$555" Value="0x1"/>
 					</ConfData>
 				</Parameter>
 			</ModificationItem>

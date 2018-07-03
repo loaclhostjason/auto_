@@ -234,7 +234,7 @@ $(document).ready(function () {
         las_name = String(las_name).replace(/[$]/g, '');
         // console.log(String(aa));
 
-        las_val = las_name.split(/[|+&,-]/);
+        las_val = las_name.split(/[/.#+&,-]/);
         las_f = [];
         las_val.forEach(function (value) {
             if (las_name.split(value)[1][0])
@@ -246,7 +246,7 @@ $(document).ready(function () {
             html += '<div class="form-group start_rule"><div class="col-sm-6">';
             html += '<input name="las_' + index + '" class="form-control pull-left" required value="' + val + '"></div>';
             html += '<div class="col-sm-6"><select class="form-control pull-left las_f" name="las_f_' + index + '">';
-            let f = [['', '请选择'], ['|', '|'], ['-', '-'], ['+', '+'], ['&', '&']];
+            let f = [['', '请选择'], ['.', '.'], ['#', '#'], ['/', '/'], ['-', '-'], ['+', '+'], ['&', '&']];
             f.forEach(function (value) {
                 if (las_f[index] === value[0]) {
                     html += '<option selected value="' + value[0] + '">' + value[1] + '</option>';
@@ -264,7 +264,12 @@ $(document).ready(function () {
         let start_rule_len = $('.start_rule').length;
         let rule_html = '';
         rule_html += '<div class="form-group start_rule"><div class="col-sm-6"><input name="las_' + start_rule_len + '" class="form-control pull-left" required></div>';
-        rule_html += '<div class="col-sm-6"><select class="form-control pull-left las_f" name="las_f_' + start_rule_len + '"><option value="">请选择</option> <option value="|">|</option><option value="-">-</option><option value="+">+</option><option value="&">&</option> </select></div></div>';
+        rule_html += '<div class="col-sm-6"><select class="form-control pull-left las_f" name="las_f_' + start_rule_len + '">';
+        let f = [['', '请选择'], ['.', '.'], ['#', '#'], ['/', '/'], ['-', '-'], ['+', '+'], ['&', '&']];
+        f.forEach(function (value) {
+            rule_html += '<option value="' + value[0] + '">' + value[1] + '</option>';
+        });
+        rule_html += '</select></div></div>';
 
 
         if (this_val) {
