@@ -231,8 +231,8 @@ $(document).ready(function () {
     update_las_modal.on('show.bs.modal', function (event) {
         btn_las = $(event.relatedTarget);
         let las_name = btn_las.parents('td').find('input').val();
-        las_name.replace(/$/g, "");
-        console.log(las_name);
+        las_name = String(las_name).replace(/[$]/g, '');
+        // console.log(String(aa));
 
         las_val = las_name.split(/[|+&,-]/);
         las_f = [];
