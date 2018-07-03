@@ -140,6 +140,7 @@ def get_project_children_v2(project_id, last_relation_id):
 
     for v in second_relation:
         d['level_2'] = v.name
+        d['level_2_id'] = v.id
 
         third_relation = ProjectRelation.query.filter_by(parent_id=v.id, level=3).all()
         if third_relation:

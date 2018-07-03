@@ -126,8 +126,8 @@ class ProjectData(db.Model):
             for v in key:
                 d['las'] = request.form.getlist('las')[index]
                 d['name'] = request.form.getlist('name')[index]
-                if request.form.get('%s_%s' % (val, v)):
-                    d['content'][v] = request.form.get('%s_%s' % (val, v))
+                # if request.form.get('%s_%s' % (val, v)):
+                d['content'][v] = request.form.get('%s_%s' % (val, v)) or ''
 
             result.append(d)
         return [v for v in result if v.get('content')]

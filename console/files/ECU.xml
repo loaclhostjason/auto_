@@ -20,14 +20,14 @@
 		</ReadSection>
 		<ModificationSection>
 			<ModificationItem IDREF="C001">
-				<ParameterName>null</ParameterName>
+				<ParameterName>有前雾灯</ParameterName>
 				<BytePosition>1</BytePosition>
 				<BitPosition>5</BitPosition>
 				<BitPosition>6</BitPosition>
 				<BitPosition>7</BitPosition>
-				<Parameter ParamDefaultValue="1">
+				<Parameter ParamDefaultValue="0x1">
 					<ConfData useConfData="true">
-						<ConfigData ConfigExpression="WE" Value="1"/>
+						<ConfigData ConfigExpression="$234|$444+$555+$5555" Value="0x1"/>
 					</ConfData>
 				</Parameter>
 			</ModificationItem>

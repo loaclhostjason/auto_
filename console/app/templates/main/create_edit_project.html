@@ -68,7 +68,8 @@
                         <div class="alert alert-warning" style="margin-top: 10px">
                             <span>
                                 <b>提示：</b>
-                                <span>数据编辑，需要对字节进行勾选！</span>
+                                <span>1）字节数 根据 did配置项【DidLength】</span>
+                                <span>2）数据编辑，需要对字节进行勾选！</span>
                             </span>
                         </div>
                     </div>
@@ -76,79 +77,7 @@
                         <div style="overflow-y: auto;min-height: 200px;">
                             <form method="post" id="project-data-form">
                                 <table class="table table-hover table-bordered table-project-data">
-                                    <thead>
-                                    <tr>
-                                        <th width="160" style="vertical-align: middle; min-width: 160px">项目名称</th>
-                                        <th width="100" style="vertical-align: middle; min-width: 100px">地址</th>
-                                        <th width="100" style="vertical-align: middle; min-width: 100px"></th>
-                                        <th width="100" style="vertical-align: middle; min-width: 100px"></th>
-                                        <th width="120" style="vertical-align: middle; min-width: 120px">LAS</th>
-                                        <th colspan="8">
-                                            <div class="text-center with-bottom-border">
-                                                <span>BYTE00</span>
-                                            </div>
-                                            <div style="width: 172px">
-                                                {% for index in range(8)[::-1] %}
-                                                    <div style="width: 12.5%; float: left">
-                                                        <span>{{ index }}</span>
-                                                        {% if index != 0 %}
-                                                            <i class="resize-line-icon"></i>
-                                                        {% endif %}
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
-                                        </th>
-
-                                        <th colspan="8">
-                                            <div class="text-center with-bottom-border">
-                                                <span>BYTE01</span>
-                                            </div>
-                                            <div style="width: 172px">
-                                                {% for index in range(8)[::-1] %}
-                                                    <div style="width: 12.5%; float: left">
-                                                        <span>{{ index }}</span>
-                                                        {% if index != 0 %}
-                                                            <i class="resize-line-icon"></i>
-                                                        {% endif %}
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
-                                        </th>
-
-                                        <th colspan="8">
-                                            <div class="text-center with-bottom-border">
-                                                <span>BYTE02</span>
-                                            </div>
-                                            <div style="width: 172px">
-                                                {% for index in range(8)[::-1] %}
-                                                    <div style="width: 12.5%; float: left">
-                                                        <span>{{ index }}</span>
-                                                        {% if index != 0 %}
-                                                            <i class="resize-line-icon"></i>
-                                                        {% endif %}
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
-                                        </th>
-
-                                        <th colspan="8">
-                                            <div class="text-center with-bottom-border">
-                                                <span>BYTE03</span>
-                                            </div>
-                                            <div style="width: 172px">
-                                                {% for index in range(8)[::-1] %}
-                                                    <div style="width: 12.5%; float: left">
-                                                        <span>{{ index }}</span>
-                                                        {% if index != 0 %}
-                                                            <i class="resize-line-icon"></i>
-                                                        {% endif %}
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
-                                        </th>
-
-                                    </tr>
-                                    </thead>
+                                    <thead></thead>
 
                                     <tbody></tbody>
 

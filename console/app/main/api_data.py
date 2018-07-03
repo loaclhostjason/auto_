@@ -22,7 +22,15 @@ def option_project_data():
     project_data = ProjectData.query.filter_by(project_id=project_id).all()
     project_data = {v.project_relation_id: v.to_dict(
         extra_dict={'content': json.loads(v.content) if v.content else {}}) for v in project_data}
-    return jsonify({'success': True, 'result': result, 'project_data': project_data})
+
+    did_len = 0
+    if result:
+        did_id = result[0]['level_2_id']
+        attr_content = AttrContent.query.filter_by(project_relation_id=did_id).first()
+        if attr_content and attr_content.real_content:
+            real_content = json.loads(attr_content.real_content)
+            did_len = real_content.get('DidLength') or 0
+    return jsonify({'success': True, 'result': result, 'project_data': project_data, 'did_len': did_len})
 
 
 # main attr content

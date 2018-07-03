@@ -33,14 +33,16 @@ $(document).ready(function () {
                 if (resp.success) {
                     let result = resp['result'];
                     let project_data = resp['project_data'];
-                    $('.table-project-data tbody').html(_this.project_data_html(result, project_data));
+                    let did_len = resp['did_len'];
+                    $('.table-project-data thead').html(_this.project_thead_html(did_len));
+                    $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len));
                 } else {
                     toastr.error(resp.message)
                 }
             });
         };
 
-        this.project_data_html = function (result, project_data) {
+        this.project_data_html = function (result, project_data, did_len) {
             if (!result || !result.length) return '';
 
 
@@ -65,7 +67,13 @@ $(document).ready(function () {
                 html += '<a href="javascript:void(0)" class="show-las-modal pull-right" style="padding-left: 10px" data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a>';
                 html += '<a href="javascript:void(0)" class="del-project-func text-danger pull-right" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a></td>';
 
-                let bet_number = [0, 1, 2, 3];
+
+                let bet_number = [];
+                if (did_len){
+                    for (let i=0;i<did_len; i++) {
+                        bet_number.push(i);
+                    }
+                }
                 bet_number.forEach(function (num) {
                     html += '<td colspan="8"><div class="col-xs-12"><div class="row">';
                     number.forEach(function (value) {
@@ -84,6 +92,35 @@ $(document).ready(function () {
             });
 
             return html
+        };
+
+        this.project_thead_html = function (did_len) {
+            let html = '';
+            html += '<tr>';
+            html += '<th width="160" style="vertical-align: middle; min-width: 160px">项目名称</th>';
+            html += '<th width="100" style="vertical-align: middle; min-width: 100px">地址</th>';
+            html += '<th width="100" style="vertical-align: middle; min-width: 100px"></th>';
+            html += '<th width="100" style="vertical-align: middle; min-width: 100px"></th>';
+            html += '<th width="120" style="vertical-align: middle; min-width: 120px">LAS</th>';
+
+            if (did_len) {
+                for (let i = 0; i < did_len; i++) {
+                    html += '<th colspan="8"><div class="text-center with-bottom-border"><span>BYTE' + i + '</span></div>';
+                    html += '<div style="width: 172px">';
+                    let a = '';
+                    for (let j = 7; j >= 0; j--) {
+                        a += '<div style="width: 12.5%; float: left"><span>' + j + '</span>';
+                        if (j !== 0) {
+                            a += '<i class="resize-line-icon"></i>';
+                        }
+                        a += '</div>';
+                    }
+                    html += a;
+                    html += '</div></th>';
+                }
+            }
+            html += '</tr>';
+            return html;
         }
     }
 
