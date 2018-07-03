@@ -116,7 +116,9 @@ $(document).ready(function () {
 
     // submit content
     let add_content = $('#add-content');
-    $('.submit-content').click(function () {
+    $('.submit-content').click(function (e) {
+        e.preventDefault();
+        
         let params = add_content.find('form').serialize();
         let parent_id = add_content.find('[name="parent_id"]').val();
         let level = add_content.find('[name="level"]').val();
@@ -125,9 +127,9 @@ $(document).ready(function () {
         $.post('/project/content/add/' + project_id, params, function (resp) {
             if (resp.success) {
                 add_content.modal('hide');
-                // if (level >= 4)
-                //     projects.get_project_data(project_id, parent_id);
-                // projects.get_protect_relation(project_id)
+                if (level >= 4)
+                    projects.get_project_data(project_id, parent_id);
+                projects.get_protect_relation(project_id)
             } else
                 toastr.error(resp.message)
         })
