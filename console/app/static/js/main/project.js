@@ -118,7 +118,7 @@ $(document).ready(function () {
     let add_content = $('#add-content');
     $('.submit-content').click(function (e) {
         e.preventDefault();
-        
+
         let params = add_content.find('form').serialize();
         let parent_id = add_content.find('[name="parent_id"]').val();
         let level = add_content.find('[name="level"]').val();
