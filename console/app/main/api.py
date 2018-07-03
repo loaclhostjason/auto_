@@ -105,9 +105,11 @@ def add_file_tree_content(id):
     copy_id = request.args.get('copy_id')
     action = request.args.get('action')
 
-    copy_parent_id = get_copy_parent_id(copy_id)
-    if isinstance(copy_parent_id, dict):
-        return jsonify(copy_parent_id)
+    copy_parent_id = None
+    if copy_id:
+        copy_parent_id = get_copy_parent_id(copy_id)
+        if isinstance(copy_parent_id, dict):
+            return jsonify(copy_parent_id)
 
     if not form_data.get('content'):
         return jsonify({'success': False, 'message': '内容不能为空'})
@@ -118,7 +120,6 @@ def add_file_tree_content(id):
         'level': form_data.get('level'),
     }
 
-    print(form_data.get('level'))
     if form_data.get('level') == '4':
         d['type'] = 'func'
 
