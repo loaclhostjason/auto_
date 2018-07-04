@@ -12,20 +12,44 @@
 				<t>t</t>
 				<DidLength>8</DidLength>
 			</DidItem>
+			<DidItem>
+				<t>2</t>
+				<DidLength>2</DidLength>
+			</DidItem>
 		</DidList>
 		<ReadSection>
 			<ReadItem IDREF="C001"/>
 		</ReadSection>
 		<ModificationSection>
 			<ModificationItem IDREF="C001">
-				<ParameterName>有前雾灯</ParameterName>
-				<BytePosition>1</BytePosition>
+				<ParameterName>无前雾灯</ParameterName>
+				<BytePosition>0</BytePosition>
 				<BitPosition>5</BitPosition>
 				<BitPosition>6</BitPosition>
 				<BitPosition>7</BitPosition>
-				<Parameter ParamDefaultValue="0x1">
+				<Parameter ParamDefaultValue="">
 					<ConfData useConfData="true">
-						<ConfigData ConfigExpression="$234/$444+$555" Value="0x1"/>
+						<ConfigData ConfigExpression="$234/$444+$555" Value="00"/>
+					</ConfData>
+				</Parameter>
+				<ParameterName>有前雾灯</ParameterName>
+				<BytePosition>0</BytePosition>
+				<BitPosition>4</BitPosition>
+				<BitPosition>5</BitPosition>
+				<BitPosition>6</BitPosition>
+				<BitPosition>7</BitPosition>
+				<Parameter ParamDefaultValue="">
+					<ConfData useConfData="true">
+						<ConfigData ConfigExpression="$d444" Value="02"/>
+					</ConfData>
+				</Parameter>
+				<ParameterName>test</ParameterName>
+				<BytePosition>0</BytePosition>
+				<BitPosition>6</BitPosition>
+				<BitPosition>7</BitPosition>
+				<Parameter ParamDefaultValue="">
+					<ConfData useConfData="true">
+						<ConfigData ConfigExpression="$C001" Value="01"/>
 					</ConfData>
 				</Parameter>
 			</ModificationItem>

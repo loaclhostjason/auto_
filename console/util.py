@@ -4,7 +4,7 @@ import json
 from app import create_app
 from app.main.models import Project, ProjectRelation, ProjectData
 from app.manage.models import AttrContent
-from app.main.func import get_project_children
+from app.main.func import get_project_children, get_project_children_v2
 from collections import defaultdict
 from enum import Enum
 
@@ -72,21 +72,30 @@ class ExportXml(object):
 
     def __get_(self, projects):
         d = defaultdict(list)
-        for project in projects:
-            p = ProjectData.query.filter_by(project_id=self.project_id).filter_by(project_relation_id=project['project_relation_id']).first()
+
+        project_relation_ids = [project['project_relation_id'] for project in projects if project.get('project_relation_id')]
+
+        pro = ProjectData.query.filter(ProjectData.project_relation_id.in_(project_relation_ids)).all()
+        print(pro)
+
+        r = defaultdict(list)
+        d['parameter_name'] = [{p.project_relation_id: p.name} for p in pro]
+        for p in pro:
             content = json.loads(p.content) if p and p.content else None
-            d['parameter_name'] = p.name if p else 'null'
 
             if content:
-                for v in ['byte0', 'byte1', 'byte2', 'byte3']:
+                byte = ['byte%d' % index for index in range(100)]
+                bits = ['bit%d_' % index for index in range(100)]
+                for v in byte:
                     if content.get(v):
 
-                        d['byte'].append({'BytePosition': content.get(v)})
+                        r[p.project_relation_id].append({'BytePosition': v.replace('byte', '') if content.get(v) else None})
 
-                        for bit in ['bit0_', 'bit1_', 'bit2_', 'bit3_']:
+                        for bit in bits:
                             for index in range(8):
                                 if content.get('%s%d' % (bit, index)):
-                                    d['byte'].append({'BitPosition': index})
+                                    r[p.project_relation_id].append({'BitPosition': index})
+        d['byte'] = r
         return d
 
     @property
@@ -97,15 +106,17 @@ class ExportXml(object):
             r[v['level_2']].append({'project_relation_id': v['level_4_id']})
 
         new_result = dict()
+        conf_data = defaultdict(list)
         for address, projects in r.items():
             project_query = ProjectData.query.filter_by(project_id=self.project_id)
             project = project_query.all()
-            d = {
-                'conf_data': [(v.conf_data, v.las) for v in project if v.conf_data]
-            }
-            new_result[address] = self.__get_(projects)
-            new_result[address]['conf_data'] = d['conf_data']
+            for pro in project:
+                conf_data[pro.project_relation_id].append((pro.conf_data, pro.las))
 
+            new_result[address] = self.__get_(projects)
+            new_result[address]['conf_data'] = conf_data
+
+        print(22, r)
         print(11, new_result)
         return new_result
 
@@ -157,46 +168,48 @@ class ExportXml(object):
                 node_modification_item.setAttribute('IDREF', key)
 
                 # Parameter
-                node_parameter = doc.createElement('Parameter')
-                try:
-                    # node_parameter.setAttribute('ParamDefaultValue', hex(int(val['conf_data'][0][0])) if val['conf_data'] else '')
-                    node_parameter.setAttribute('ParamDefaultValue', val['conf_data'][0][0] if val['conf_data'] else '')
-                except:
-                    print('error ParamDefaultValue')
-                    pass
+
+
 
                 # ParameterName
-                node_parameter_name = doc.createElement('ParameterName')
-                node_parameter_name.appendChild(doc.createTextNode(str(val['parameter_name'])))
-                node_modification_item.appendChild(node_parameter_name)
+                parameter_name = val['parameter_name']
+                byte = val['byte']
 
-                # bite
-                if val['byte']:
-                    for v in val['byte']:
-                        for k, v in v.items():
-                            node_byte_name = doc.createElement(k)
-                            node_byte_name.appendChild(doc.createTextNode(str(v)))
-                            node_modification_item.appendChild(node_byte_name)
+                for parameter_val in parameter_name:
+                    node_parameter = doc.createElement('Parameter')
+                    node_parameter.setAttribute('ParamDefaultValue', '')
+                    for parameter_k, parameter_v in parameter_val.items():
+                        node_parameter_name = doc.createElement('ParameterName')
+                        node_parameter_name.appendChild(doc.createTextNode(str(parameter_v)))
+                        node_modification_item.appendChild(node_parameter_name)
 
-                # ConfData
-                node_conf_data = doc.createElement('ConfData')
-                node_conf_data.setAttribute('useConfData', 'true')
-                for data in val['conf_data']:
-                    node_config_data = doc.createElement('ConfigData')
-                    try:
-                        # todo 16
-                        # node_config_data.setAttribute('Value', hex(int(data[0])))
-                        node_config_data.setAttribute('Value', data[0])
-                    except:
-                        print('ConfigData value error!')
-                        pass
+                        byte_content = byte.get(parameter_k)
 
-                    node_config_data.setAttribute('ConfigExpression', data[1])
-                    node_conf_data.appendChild(node_config_data)
+                        # bite
+                        if byte_content:
+                            for val_byte in byte_content:
+                                for kk, vv in val_byte.items():
+                                    node_byte_name = doc.createElement(kk)
+                                    node_byte_name.appendChild(doc.createTextNode(str(vv)))
+                                    node_modification_item.appendChild(node_byte_name)
 
-                    node_parameter.appendChild(node_conf_data)
+                        # ConfData
+                        node_conf_data = doc.createElement('ConfData')
+                        node_conf_data.setAttribute('useConfData', 'true')
 
-                node_modification_item.appendChild(node_parameter)
+                        conf_data = val['conf_data'][parameter_k]
+                        if conf_data:
+                            for data in conf_data:
+                                node_config_data = doc.createElement('ConfigData')
+                                node_config_data.setAttribute('Value', data[0])
+
+
+                                node_config_data.setAttribute('ConfigExpression', data[1])
+                                node_conf_data.appendChild(node_config_data)
+
+                                node_parameter.appendChild(node_conf_data)
+
+                    node_modification_item.appendChild(node_parameter)
                 node_modification.appendChild(node_modification_item)
         root.appendChild(node_modification)
 
