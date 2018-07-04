@@ -44,7 +44,7 @@ def get_project_tree():
         return jsonify({'success': False, 'message': '没有获取到配置文件信息'})
 
     project_relations_query = ProjectRelation.query.order_by(ProjectRelation.relation_order, ProjectRelation.id)
-    project_relations = project_relations_query.filter_by(project_id=project_id, type='worker').all()
+    project_relations = project_relations_query.filter_by(project_id=project_id, type='worker').filter(ProjectRelation.level != 4).all()
 
     if not project_relations:
         return jsonify({'success': True, 'data': result})
