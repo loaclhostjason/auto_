@@ -167,10 +167,6 @@ class ExportXml(object):
                 node_modification_item = doc.createElement('ModificationItem')
                 node_modification_item.setAttribute('IDREF', key)
 
-                # Parameter
-
-
-
                 # ParameterName
                 parameter_name = val['parameter_name']
                 byte = val['byte']
@@ -193,6 +189,9 @@ class ExportXml(object):
                                     node_byte_name.appendChild(doc.createTextNode(str(vv)))
                                     node_modification_item.appendChild(node_byte_name)
 
+                        node_byte_len = doc.createElement('BitLength')
+                        node_byte_len.appendChild(doc.createTextNode(str(len(byte_content) - 1)))
+                        node_modification_item.appendChild(node_byte_len)
                         # ConfData
                         node_conf_data = doc.createElement('ConfData')
                         node_conf_data.setAttribute('useConfData', 'true')
@@ -202,7 +201,6 @@ class ExportXml(object):
                             for data in conf_data:
                                 node_config_data = doc.createElement('ConfigData')
                                 node_config_data.setAttribute('Value', data[0])
-
 
                                 node_config_data.setAttribute('ConfigExpression', data[1])
                                 node_conf_data.appendChild(node_config_data)
