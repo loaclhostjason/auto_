@@ -237,8 +237,14 @@ $(document).ready(function () {
         las_val = las_name.split(/[/.#+&,-]/);
         las_f = [];
         las_val.forEach(function (value) {
-            if (las_name.split(value)[1][0])
-                las_f.push(las_name.split(value)[1][0]);
+
+            try {
+                if (las_name.split(value)[1][0])
+                    las_f.push(las_name.split(value)[1][0]);
+            } catch (e){
+                console.log(e);
+            }
+
         });
 
         let html = '';
