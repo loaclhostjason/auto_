@@ -134,7 +134,7 @@ def edit_project_name():
 
     project_relation.name = name
     db.session.add(project_relation)
+    db.session.commit()
 
-    print('level', project_relation.level)
     return jsonify(
         {'success': True, 'message': '更新成功', 'level': project_relation.level, 'parent_id': project_relation.parent_id})
