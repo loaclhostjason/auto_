@@ -159,7 +159,8 @@ class ExportXml(object):
                 # Parameter
                 node_parameter = doc.createElement('Parameter')
                 try:
-                    node_parameter.setAttribute('ParamDefaultValue', hex(int(val['conf_data'][0][0])) if val['conf_data'] else '')
+                    # node_parameter.setAttribute('ParamDefaultValue', hex(int(val['conf_data'][0][0])) if val['conf_data'] else '')
+                    node_parameter.setAttribute('ParamDefaultValue', val['conf_data'][0][0] if val['conf_data'] else '')
                 except:
                     print('error ParamDefaultValue')
                     pass
@@ -184,7 +185,8 @@ class ExportXml(object):
                     node_config_data = doc.createElement('ConfigData')
                     try:
                         # todo 16
-                        node_config_data.setAttribute('Value', hex(int(data[0])))
+                        # node_config_data.setAttribute('Value', hex(int(data[0])))
+                        node_config_data.setAttribute('Value', data[0])
                     except:
                         print('ConfigData value error!')
                         pass

@@ -9,7 +9,7 @@ let attr_html = function (data, content, id, level) {
     form_html += '<input name="level" type="hidden" value="' + level + '">';
     data.forEach(function (value) {
         form_html += '<div class="form-group">';
-        form_html += '<div class="col-sm-2"><label class="control-label pull-right">' + required_html(value['item_required']) + value['item_zh'] + '</label></div>';
+        form_html += '<div class="col-sm-3"><label class="control-label pull-right">' + required_html(value['item_required']) + value['item_zh'] + '</label></div>';
         form_html += '<div class="col-sm-8">' + required_input(value['item'], value['item_required'], content) + '</div>';
         form_html += '</div>';
     });
