@@ -49,6 +49,7 @@ class ExportXml(object):
             return result
 
         content = json.loads(attr_content.real_content)
+        print(content)
         return content
 
     @property
@@ -73,7 +74,8 @@ class ExportXml(object):
     def __get_(self, projects):
         d = defaultdict(list)
 
-        project_relation_ids = [project['project_relation_id'] for project in projects if project.get('project_relation_id')]
+        project_relation_ids = [project['project_relation_id'] for project in projects if
+                                project.get('project_relation_id')]
 
         pro = ProjectData.query.filter(ProjectData.project_relation_id.in_(project_relation_ids)).all()
         print(pro)
@@ -89,7 +91,8 @@ class ExportXml(object):
                 for v in byte:
                     if content.get(v):
 
-                        r[p.project_relation_id].append({'BytePosition': v.replace('byte', '') if content.get(v) else None})
+                        r[p.project_relation_id].append(
+                            {'BytePosition': v.replace('byte', '') if content.get(v) else None})
 
                         for bit in bits:
                             for index in range(8):
@@ -106,17 +109,20 @@ class ExportXml(object):
             r[v['level_2']].append({'project_relation_id': v['level_4_id']})
 
         new_result = dict()
-        conf_data = defaultdict(list)
+
         for address, projects in r.items():
             project_query = ProjectData.query.filter_by(project_id=self.project_id)
             project = project_query.all()
+            conf_data = defaultdict(list)
             for pro in project:
                 conf_data[pro.project_relation_id].append((pro.conf_data, pro.las))
 
-            new_result[address] = self.__get_(projects)
-            new_result[address]['conf_data'] = conf_data
+            conf_data = {k: v for k, v in conf_data.items()}
+            conf_data = {
+                'conf_data': conf_data
+            }
+            new_result[address] = dict(conf_data, **self.__get_(projects))
 
-        print(22, r)
         print(11, new_result)
         return new_result
 
@@ -131,9 +137,25 @@ class ExportXml(object):
         manager_dict = self.xml_header_attr
         header_manager = doc.createElement('Header')
         if manager_dict:
+            protocols = [{k.split('-')[0]: [k.split('-')[1], v]} for k, v in manager_dict.items() if '-' in k]
+            new_protocols = defaultdict(list)
+            for pt in protocols:
+                for kkk, vvv in pt.items():
+                    new_protocols[kkk].append(vvv)
+            print(121, protocols)
+
             for key, val in manager_dict.items():
-                node_name = doc.createElement(key)
-                node_name.appendChild(doc.createTextNode(str(val)))
+                if '-' in key:
+                    node_name = doc.createElement('Protocol')
+                    node_protocol_k = doc.createElement(key.split('-')[0])
+                    for np_val in new_protocols[key.split('-')[0]]:
+                        node_protocol_k_name = doc.createElement(np_val[0])
+                        node_protocol_k_name.appendChild(doc.createTextNode(str(np_val[1])))
+                        node_protocol_k.appendChild(node_protocol_k_name)
+                    node_name.appendChild(node_protocol_k)
+                else:
+                    node_name = doc.createElement(key)
+                    node_name.appendChild(doc.createTextNode(str(val)))
                 header_manager.appendChild(node_name)
         root.appendChild(header_manager)
 
@@ -169,11 +191,17 @@ class ExportXml(object):
 
                 # ParameterName
                 parameter_name = val['parameter_name']
-                byte = val['byte']
+                byte = dict(val['byte'])
 
                 for parameter_val in parameter_name:
                     node_parameter = doc.createElement('Parameter')
-                    node_parameter.setAttribute('ParamDefaultValue', '')
+
+                    try:
+                        default_val = val['conf_data'].get(list(parameter_val.keys())[0])[0][0][0]
+                    except Exception:
+                        default_val = ''
+
+                    node_parameter.setAttribute('ParamDefaultValue', default_val)
                     for parameter_k, parameter_v in parameter_val.items():
                         node_parameter_name = doc.createElement('ParameterName')
                         node_parameter_name.appendChild(doc.createTextNode(str(parameter_v)))
@@ -190,7 +218,7 @@ class ExportXml(object):
                                     node_modification_item.appendChild(node_byte_name)
 
                         node_byte_len = doc.createElement('BitLength')
-                        node_byte_len.appendChild(doc.createTextNode(str(len(byte_content) - 1)))
+                        node_byte_len.appendChild(doc.createTextNode(str((len(byte_content or []) or 1) - 1)))
                         node_modification_item.appendChild(node_byte_len)
                         # ConfData
                         node_conf_data = doc.createElement('ConfData')
@@ -231,5 +259,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(2)
+    export_xml = ExportXml(1)
     export_xml.run()

@@ -32,6 +32,7 @@
                         <thead>
                         <tr>
                             <th>属性字段</th>
+                            <th>前缀</th>
                             <th>显示名称</th>
                             <th>必需字段</th>
                             <th>操作</th>
@@ -44,6 +45,9 @@
                                     <tr>
                                         <td>
                                             <input name="item" class="td-input" required value="{{ attr['item'] }}"/>
+                                        </td>
+                                        <td>
+                                            <input name="item_protocol" class="td-input" value="{{ attr['item_protocol'] }}"/>
                                         </td>
                                         <td>
                                             <input name="item_zh" class="td-input" required

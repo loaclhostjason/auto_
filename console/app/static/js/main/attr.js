@@ -10,7 +10,7 @@ let attr_html = function (data, content, id, level) {
     data.forEach(function (value) {
         form_html += '<div class="form-group">';
         form_html += '<div class="col-sm-3"><label class="control-label pull-right">' + required_html(value['item_required']) + value['item_zh'] + '</label></div>';
-        form_html += '<div class="col-sm-8">' + required_input(value['item'], value['item_required'], content) + '</div>';
+        form_html += '<div class="col-sm-8">' + required_input(value['item'], value['item_required'], content, value['item_protocol']) + '</div>';
         form_html += '</div>';
     });
     form_html += '<div class="form-group"><div class="col-sm-2"></div><div class="col-sm-8"><button type="button" class="btn btn-primary submit-add-attr">保存</button></div></div>';
@@ -27,8 +27,8 @@ function required_html(required) {
 
 }
 
-function required_input(field, required, content) {
-    let html = '<input class="form-control pull-left" name="' + field + '" type="text" value="' + (content ? content[field] : "") + '">';
+function required_input(field, required, content, field_protocol) {
+    let html = '<input class="form-control pull-left" name="' + (field_protocol ? field_protocol + '-' : '') + field + '" type="text" value="' + (content ? content[field] : "") + '">';
     if (required)
         html = '<input class="form-control pull-left" name="' + field + '" type="text" value="' + (content ? content[field] : "") + '" required>';
 

@@ -3,6 +3,7 @@ $(document).ready(function () {
 
     html_tr += '<tr>';
     html_tr += '<td><input name="item" class="td-input" required/></td>';
+    html_tr += '<td><input name="item_protocol" class="td-input"/></td>';
     html_tr += '<td><input name="item_zh" class="td-input" required/></td>';
     html_tr += '<td><input name="item_required" type="checkbox" class="td-input" value="y"/></td>';
     html_tr += '<td><a href="javascript:void(0);" class="td-remove">移除</a></td>';

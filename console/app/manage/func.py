@@ -4,6 +4,7 @@ from flask import request
 def get_content():
     field_key = [
         'item',
+        'item_protocol',
         'item_zh',
         'item_required',
     ]
