@@ -78,12 +78,22 @@ $(document).ready(function () {
                     html += '<td colspan="8"><div class="col-xs-12"><div class="row">';
                     number.forEach(function (value) {
                         html += '<div style="width: 12.5%; float: left">';
-                        html += '<input type="checkbox" name="' + prid + '_bit' + num + '_' + value + '" value="y"' + (content['bit' + num + '_' + value] === 'y' ? 'checked' : '') + '>';
+                        if (content['bit' + num + '_' + value] === 'y') {
+                            html += '<input type="checkbox" name="' + prid + '_bit' + num + '_' + value + '" value="y" checked>';
+                        } else {
+                            html += '<input type="checkbox" name="' + prid + '_bit' + num + '_' + value + '" value="y" disabled>';
+
+                        }
                         html += '</div>';
                     });
                     html += '</div></div><div class="bline col-xs-12" style="margin:  10px 0"></div>';
                     html += '<div class="col-xs-12"><div class="row">';
-                    html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="' + (content['byte' + num] || '') + '">';
+                    if (content['byte' + num]) {
+                        html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="' + (content['byte' + num] || '') + '">';
+                    } else {
+                        html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="" disabled>';
+                    }
+
                     html += '</div></div></td>';
                 });
 
@@ -178,6 +188,7 @@ $(document).ready(function () {
         let form_data = $('form#attr-form').serialize();
         $.post('/manage/attr/content/add?project_id=' + project_id, form_data, function (resp) {
             if (resp.success) {
+                projects.get_project_data(project_id, $('[name="project_relation_id"]').val());
                 toastr.success(resp['message'])
             } else
                 toastr.error(resp['message'])
@@ -241,7 +252,7 @@ $(document).ready(function () {
             try {
                 if (las_name.split(value)[1][0])
                     las_f.push(las_name.split(value)[1][0]);
-            } catch (e){
+            } catch (e) {
                 console.log(e);
             }
 

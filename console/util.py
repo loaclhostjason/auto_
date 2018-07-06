@@ -77,28 +77,19 @@ class ExportXml(object):
         project_relation_ids = [project['project_relation_id'] for project in projects if
                                 project.get('project_relation_id')]
 
-        pro = ProjectData.query.filter(ProjectData.project_relation_id.in_(project_relation_ids)).all()
-        print(pro)
+        attr_content = AttrContent.query.filter(AttrContent.project_relation_id.in_(project_relation_ids)).all()
+        pro = ProjectRelation.query.filter(ProjectRelation.id.in_(project_relation_ids)).all()
+        # print(pro)
 
         r = defaultdict(list)
-        d['parameter_name'] = [{p.project_relation_id: p.name} for p in pro]
-        for p in pro:
-            content = json.loads(p.content) if p and p.content else None
-
+        d['parameter_name'] = [{p.id: p.name} for p in pro]
+        for ac in attr_content:
+            content = json.loads(ac.real_content) if ac and ac.real_content else None
             if content:
-                byte = ['byte%d' % index for index in range(100)]
-                bits = ['bit%d_' % index for index in range(100)]
-                for v in byte:
-                    if content.get(v):
-
-                        r[p.project_relation_id].append(
-                            {'BytePosition': v.replace('byte', '') if content.get(v) else None})
-
-                        for bit in bits:
-                            for index in range(8):
-                                if content.get('%s%d' % (bit, index)):
-                                    r[p.project_relation_id].append({'BitPosition': index})
+                print(111111111111111, content)
+                r[ac.project_relation_id].append(content)
         d['byte'] = r
+        print('byte', r)
         return d
 
     @property
@@ -106,16 +97,18 @@ class ExportXml(object):
         r = defaultdict(list)
         result = get_project_children(self.project_id)
         for v in result:
-            r[v['level_2']].append({'project_relation_id': v['level_4_id']})
+            r[v['level_2']].append({'project_relation_id': v['level_3_id']})
 
         new_result = dict()
+        print(22, r)
 
         for address, projects in r.items():
             project_query = ProjectData.query.filter_by(project_id=self.project_id)
             project = project_query.all()
             conf_data = defaultdict(list)
             for pro in project:
-                conf_data[pro.project_relation_id].append((pro.conf_data, pro.las))
+                parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
+                conf_data[parent_relation.parent_id].append((pro.conf_data, pro.las))
 
             conf_data = {k: v for k, v in conf_data.items()}
             conf_data = {
@@ -217,9 +210,6 @@ class ExportXml(object):
                                     node_byte_name.appendChild(doc.createTextNode(str(vv)))
                                     node_modification_item.appendChild(node_byte_name)
 
-                        node_byte_len = doc.createElement('BitLength')
-                        node_byte_len.appendChild(doc.createTextNode(str((len(byte_content or []) or 1) - 1)))
-                        node_modification_item.appendChild(node_byte_len)
                         # ConfData
                         node_conf_data = doc.createElement('ConfData')
                         node_conf_data.setAttribute('useConfData', 'true')
@@ -259,5 +249,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(1)
+    export_xml = ExportXml(2)
     export_xml.run()

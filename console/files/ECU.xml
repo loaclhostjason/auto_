@@ -22,37 +22,20 @@
 		</ReadSection>
 		<ModificationSection>
 			<ModificationItem IDREF="C001">
-				<ParameterName>无前雾灯</ParameterName>
-				<BytePosition>0</BytePosition>
-				<BitPosition>5</BitPosition>
-				<BitPosition>6</BitPosition>
-				<BitPosition>7</BitPosition>
-				<BitLength>3</BitLength>
-				<Parameter ParamDefaultValue="">
-					<ConfData useConfData="true">
-						<ConfigData ConfigExpression="$234/$444+$555" Value="00"/>
-					</ConfData>
-				</Parameter>
-				<ParameterName>有前雾灯</ParameterName>
-				<BytePosition>0</BytePosition>
+				<ParameterName>前雾灯</ParameterName>
+				<BytePosition>1</BytePosition>
 				<BitPosition>4</BitPosition>
-				<BitPosition>5</BitPosition>
-				<BitPosition>6</BitPosition>
-				<BitPosition>7</BitPosition>
-				<BitLength>4</BitLength>
-				<Parameter ParamDefaultValue="">
+				<BitLength>8</BitLength>
+				<Parameter ParamDefaultValue="2">
 					<ConfData useConfData="true">
-						<ConfigData ConfigExpression="$d444" Value="02"/>
+						<ConfigData ConfigExpression="$234/$444+$555" Value="2"/>
+						<ConfigData ConfigExpression="$d444" Value="3"/>
 					</ConfData>
 				</Parameter>
-				<ParameterName>test</ParameterName>
-				<BytePosition>0</BytePosition>
-				<BitPosition>6</BitPosition>
-				<BitPosition>7</BitPosition>
-				<BitLength>2</BitLength>
-				<Parameter ParamDefaultValue="">
+				<ParameterName>行车灯</ParameterName>
+				<Parameter ParamDefaultValue="0">
 					<ConfData useConfData="true">
-						<ConfigData ConfigExpression="$C001" Value="01"/>
+						<ConfigData ConfigExpression="$C001" Value="0"/>
 					</ConfData>
 				</Parameter>
 			</ModificationItem>

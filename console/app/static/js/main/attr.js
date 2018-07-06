@@ -13,7 +13,7 @@ let attr_html = function (data, content, id, level) {
         form_html += '<div class="col-sm-8">' + required_input(value['item'], value['item_required'], content, value['item_protocol']) + '</div>';
         form_html += '</div>';
     });
-    form_html += '<div class="form-group"><div class="col-sm-2"></div><div class="col-sm-8"><button type="button" class="btn btn-primary submit-add-attr">保存</button></div></div>';
+    form_html += '<div class="form-group"><div class="col-sm-3"></div><div class="col-sm-8"><button type="button" class="btn btn-primary submit-add-attr">保存</button></div></div>';
     attr_form.html(form_html);
 
 };
@@ -28,10 +28,34 @@ function required_html(required) {
 }
 
 function required_input(field, required, content, field_protocol) {
-    let html = '<input class="form-control pull-left" name="' + (field_protocol ? field_protocol + '-' : '') + field + '" type="text" value="' + (content ? content[field] : "") + '">';
+    let html = '<input class="form-control pull-left" name="' + (field_protocol ? field_protocol + '-' : '') + field + '" type="text" value="' + (content ? content[field] || '' : "") + '">';
     if (required)
-        html = '<input class="form-control pull-left" name="' + field + '" type="text" value="' + (content ? content[field] : "") + '" required>';
+        html = '<input class="form-control pull-left" name="' + field + '" type="text" value="' + (content ? content[field] || '' : "") + '" required>';
 
     return html
 
 }
+
+$(document).ready(function () {
+
+    $(document).on('keyup', $('[name="BytePosition"]'), function () {
+        let byte = $('[name="BytePosition"]');
+        let tmptxt = byte.val();
+        byte.val(tmptxt.replace(/[\D]/g, ''));
+    }).bind("paste", function () {
+        let byte = $('[name="BytePosition"]');
+        let tmptxt = byte.val();
+        byte.val(tmptxt.replace(/\D/g, ''));
+    }).css("ime-mode", "disabled");
+
+
+    $(document).on('keyup', $('[name="BitPosition"]'), function () {
+        let bite = $('[name="BitPosition"]');
+        let tmptxt = bite.val();
+        bite.val(tmptxt.replace(/\D/g, ''));
+    }).bind("paste", function () {
+        let bite = $('[name="BitPosition"]');
+        let tmptxt = bite.val();
+        bite.val(tmptxt.replace(/\D/g, ''));
+    }).css("ime-mode", "disabled");
+});
