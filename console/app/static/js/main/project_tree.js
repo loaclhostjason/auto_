@@ -309,6 +309,8 @@ myDiagram.nodeTemplateMap.add("ThirdNode",
                 let parent_id = node['key'];
                 let level = node['level'];
                 console.log(level);
+
+                $.g_parent_id = parent_id;
                 $.g_projects.get_project_data(project_id, parent_id);
                 $.g_projects.get_attr_input(project_id, level, parent_id)
             }

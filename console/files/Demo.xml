@@ -1,19 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 	<ConfigurationModule Demo-CONFIG-SCHEMA-VERSION="1.0">
 		<Header/>
-		<DidList/>
+		<DidList>
+			<DidItem>
+				<t>2222</t>
+				<DidLength>10</DidLength>
+			</DidItem>
+		</DidList>
 		<ReadSection>
 			<ReadItem IDREF="A001"/>
 		</ReadSection>
 		<ModificationSection>
 			<ModificationItem IDREF="A001">
-				<ParameterName>null</ParameterName>
-				<BytePosition>0</BytePosition>
-				<BitPosition>6</BitPosition>
-				<BitPosition>7</BitPosition>
+				<ParameterName>前灯</ParameterName>
+				<BytePosition>1</BytePosition>
+				<BitPosition>1</BitPosition>
+				<BitLength>1</BitLength>
 				<Parameter ParamDefaultValue="0">
 					<ConfData useConfData="true">
-						<ConfigData ConfigExpression="H001" Value="0"/>
+						<ConfigData ConfigExpression="H001" Value="01"/>
+						<ConfigData ConfigExpression="eeee" Value="02"/>
+						<ConfigData ConfigExpression="2111" Value="0"/>
+					</ConfData>
+				</Parameter>
+				<ParameterName>后灯</ParameterName>
+				<BytePosition>0</BytePosition>
+				<BitPosition>2</BitPosition>
+				<BitLength>2</BitLength>
+				<Parameter ParamDefaultValue="0">
+					<ConfData useConfData="true">
+						<ConfigData ConfigExpression="$2111" Value="0"/>
+						<ConfigData ConfigExpression="$2001" Value="0"/>
+						<ConfigData ConfigExpression="" Value="0"/>
+						<ConfigData ConfigExpression="$2111" Value="0"/>
 					</ConfData>
 				</Parameter>
 			</ModificationItem>

@@ -222,6 +222,7 @@ $(document).ready(function () {
         $.post('/project/data/submit/' + project_id, params, function (resp) {
             if (resp.success) {
                 toastr.success(resp.message);
+                projects.get_project_data(project_id, $.g_parent_id);
             } else
                 toastr.error(resp.message);
         })

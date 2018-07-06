@@ -40,7 +40,6 @@ def option_project_data():
                 t[byte_c] = c.get(byte_c) or ''
                 for kkk, vvv in t.items():
                     if kkk.startswith('byte'):
-                        t[byte_c] = vvv or '0'
                         if kkk != byte_c:
                             t[kkk] = ''
 
