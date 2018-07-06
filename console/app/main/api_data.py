@@ -37,7 +37,7 @@ def option_project_data():
                 byte_c = 'byte%s' % real_content['BytePosition']
                 bite_c = 'bit%s_%s' % (real_content['BytePosition'], real_content['BitPosition'])
                 t[bite_c] = 'y'
-                t[byte_c] = c.get(byte_c) or ''
+                t[byte_c] = c.get(byte_c) or '0'
                 for kkk, vvv in t.items():
                     if kkk.startswith('byte'):
                         if kkk != byte_c:

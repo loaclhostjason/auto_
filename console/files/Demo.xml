@@ -12,17 +12,6 @@
 		</ReadSection>
 		<ModificationSection>
 			<ModificationItem IDREF="A001">
-				<ParameterName>前灯</ParameterName>
-				<BytePosition>1</BytePosition>
-				<BitPosition>1</BitPosition>
-				<BitLength>1</BitLength>
-				<Parameter ParamDefaultValue="0">
-					<ConfData useConfData="true">
-						<ConfigData ConfigExpression="H001" Value="01"/>
-						<ConfigData ConfigExpression="eeee" Value="02"/>
-						<ConfigData ConfigExpression="2111" Value="0"/>
-					</ConfData>
-				</Parameter>
 				<ParameterName>后灯</ParameterName>
 				<BytePosition>0</BytePosition>
 				<BitPosition>2</BitPosition>
@@ -30,9 +19,7 @@
 				<Parameter ParamDefaultValue="0">
 					<ConfData useConfData="true">
 						<ConfigData ConfigExpression="$2111" Value="0"/>
-						<ConfigData ConfigExpression="$2001" Value="0"/>
-						<ConfigData ConfigExpression="" Value="0"/>
-						<ConfigData ConfigExpression="$2111" Value="0"/>
+						<ConfigData ConfigExpression="11111" Value=""/>
 					</ConfData>
 				</Parameter>
 			</ModificationItem>
