@@ -43,6 +43,10 @@ class ExportXml(object):
     def xml_header_attr(self):
         result = dict()
         project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, parent_id=None).first()
+
+        if not project_relation:
+            return result
+
         attr_content = AttrContent.query.filter_by(project_relation_id=project_relation.id).first()
 
         if not attr_content or not attr_content.real_content:
@@ -79,44 +83,42 @@ class ExportXml(object):
 
         attr_content = AttrContent.query.filter(AttrContent.project_relation_id.in_(project_relation_ids)).all()
         pro = ProjectRelation.query.filter(ProjectRelation.id.in_(project_relation_ids)).all()
-        # print(pro)
 
         r = defaultdict(list)
         d['parameter_name'] = [{p.id: p.name} for p in pro]
-        for ac in attr_content:
-            content = json.loads(ac.real_content) if ac and ac.real_content else None
-            if content:
-                print(111111111111111, content)
-                r[ac.project_relation_id].append(content)
+        if attr_content:
+            for ac in attr_content:
+                content = json.loads(ac.real_content) if ac and ac.real_content else None
+                if content:
+                    r[ac.project_relation_id].append(content)
         d['byte'] = r
-        print('byte', r)
         return d
 
     @property
     def modification(self):
         r = defaultdict(list)
         result = get_project_children(self.project_id)
-        for v in result:
-            r[v['level_2']].append({'project_relation_id': v['level_3_id']})
+        if result:
+            for v in result:
+                r[v['level_2']].append({'project_relation_id': v['level_3_id']})
 
         new_result = dict()
-        print(22, r)
 
-        for address, projects in r.items():
-            project_query = ProjectData.query.filter_by(project_id=self.project_id)
-            project = project_query.all()
-            conf_data = defaultdict(list)
-            for pro in project:
-                parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
-                conf_data[parent_relation.parent_id].append((pro.conf_data, pro.las))
+        if r:
+            for address, projects in r.items():
+                project_query = ProjectData.query.filter_by(project_id=self.project_id)
+                project = project_query.all()
+                conf_data = defaultdict(list)
+                for pro in project:
+                    parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
+                    conf_data[parent_relation.parent_id].append((pro.conf_data, pro.las))
 
-            conf_data = {k: v for k, v in conf_data.items()}
-            conf_data = {
-                'conf_data': conf_data
-            }
-            new_result[address] = dict(conf_data, **self.__get_(projects))
+                conf_data = {k: v for k, v in conf_data.items()}
+                conf_data = {
+                    'conf_data': conf_data
+                }
+                new_result[address] = dict(conf_data, **self.__get_(projects))
 
-        print(11, new_result)
         return new_result
 
     def set_xml(self):
@@ -249,5 +251,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(2)
+    export_xml = ExportXml(1)
     export_xml.run()
