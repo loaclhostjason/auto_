@@ -34,7 +34,8 @@ $(document).ready(function () {
                     let result = resp['result'];
                     let project_data = resp['project_data'];
                     let did_len = resp['did_len'];
-                    $('.table-project-data thead').html(_this.project_thead_html(did_len));
+                    let bit_position = resp['bit_position'];
+                    $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position));
                     $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len));
                 } else {
                     toastr.error(resp.message)
@@ -57,15 +58,10 @@ $(document).ready(function () {
                 html += '<input type="hidden" name="project_relation_id" value="' + data['level_4_id'] + '">';
                 html += '<input type="hidden" name="name" value="' + data['level_4'] + '">';
 
-                if (index === 0) {
-                    html += '<td class="text-center" rowspan="' + result.length + '">' + data['level_1'] + '</td>';
-                }
-                html += '<td class="text-center">' + data['level_2'] + '</td>';
-                html += '<td class="text-center">' + data['level_3'] + '</td>';
-                html += '<td class="text-center">' + data['level_4'] + '</td>';
-                html += '<td class="text-center"><input name="las" class="tc-search-words" value="' + (data_info['las'] || '') + '">';
-                html += '<a href="javascript:void(0)" class="show-las-modal pull-right" style="padding-left: 10px" data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a>';
-                html += '<a href="javascript:void(0)" class="del-project-func text-danger pull-right" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a></td>';
+                html += '<td class="text-center"><a href="javascript:void(0)" class="del-project-func text-danger pull-left" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a>' + data['level_4'] + '</td>';
+                html += '<td class="text-center"><div style="display: inline-flex"><div style="float: left"><input name="las" class="tc-search-words" value="' + (data_info['las'] || '') + '"></div>';
+                html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
+                html += '</td>';
 
 
                 let bet_number = [];
@@ -75,18 +71,17 @@ $(document).ready(function () {
                     }
                 }
                 bet_number.forEach(function (num) {
-                    html += '<td colspan="8"><div class="col-xs-12"><div class="row">';
-                    number.forEach(function (value) {
-                        html += '<div style="width: 12.5%; float: left">';
-                        if (content['bit' + num + '_' + value] === 'y') {
-                            html += '<input type="checkbox" name="' + prid + '_bit' + num + '_' + value + '" value="y" checked>';
-                        } else {
-                            html += '<input type="checkbox" name="' + prid + '_bit' + num + '_' + value + '" value="y" disabled>';
-
-                        }
-                        html += '</div>';
-                    });
-                    html += '</div></div><div class="bline col-xs-12" style="margin:  10px 0"></div>';
+                    html += '<td colspan="8">';
+                    // number.forEach(function (value) {
+                    //     html += '<div style="width: 12.5%; float: left">';
+                    //     if (content['bit' + num + '_' + value] === 'y') {
+                    //         html += '<input type="checkbox" name="' + prid + '_bit' + num + '_' + value + '" value="y" checked>';
+                    //     } else {
+                    //         html += '<input type="checkbox" name="' + prid + '_bit' + num + '_' + value + '" value="y" disabled>';
+                    //
+                    //     }
+                    //     html += '</div>';
+                    // });
                     html += '<div class="col-xs-12"><div class="row">';
                     if (content['byte' + num]) {
                         html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="' + (content['byte' + num] || '') + '">';
@@ -104,12 +99,9 @@ $(document).ready(function () {
             return html
         };
 
-        this.project_thead_html = function (did_len) {
+        this.project_thead_html = function (did_len, bit_position) {
             let html = '';
             html += '<tr>';
-            html += '<th width="160" style="vertical-align: middle; min-width: 160px">项目名称</th>';
-            html += '<th width="100" style="vertical-align: middle; min-width: 100px">地址</th>';
-            html += '<th width="100" style="vertical-align: middle; min-width: 100px"></th>';
             html += '<th width="100" style="vertical-align: middle; min-width: 100px"></th>';
             html += '<th width="120" style="vertical-align: middle; min-width: 120px">LAS</th>';
 
@@ -119,9 +111,10 @@ $(document).ready(function () {
                     html += '<div style="width: 172px">';
                     let a = '';
                     for (let j = 7; j >= 0; j--) {
-                        a += '<div style="width: 12.5%; float: left"><span>' + j + '</span>';
-                        if (j !== 0) {
-                            a += '<i class="resize-line-icon"></i>';
+                        if ($.inArray(j, bit_position) > -1) {
+                            a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
+                        } else {
+                            a += '<div style="width: 12.5%; float: left;text-align: center"><span>' + j + '</span>';
                         }
                         a += '</div>';
                     }
