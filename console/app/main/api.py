@@ -148,8 +148,11 @@ def delete_project_tree(id):
 @main.route('/project/delete/<int:id>', methods=['POST'])
 @login_required
 def delete_project(id):
+    from other import del_DF
     project = Project.query.get_or_404(id)
     db.session.delete(project)
+
+    del_DF('%s.xml' % project.name, project.name)
     return jsonify({'success': True, 'message': '删除成功'})
 
 

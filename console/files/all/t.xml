@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<ConfigurationModule t-CONFIG-SCHEMA-VERSION="1.0">
+		<Header/>
+		<DidList>
+			<DidItem>
+				<t>1</t>
+				<DidLength>1</DidLength>
+			</DidItem>
+		</DidList>
+		<ReadSection>
+			<ReadItem IDREF="d"/>
+		</ReadSection>
+		<ModificationSection>
+			<ModificationItem IDREF="d">
+				<ParameterName>f</ParameterName>
+				<BytePosition>1</BytePosition>
+				<BitPosition>1</BitPosition>
+				<BitLength>1</BitLength>
+				<Parameter ParamDefaultValue="">
+					<ConfData useConfData="true">
+						<ConfigData ConfigExpression="$2222" Value=""/>
+					</ConfData>
+				</Parameter>
+			</ModificationItem>
+		</ModificationSection>
+		<WriteSection>
+			<WriteItem DelayForMS="0" DidWriteScope="All" IDREF="d"/>
+		</WriteSection>
+	</ConfigurationModule>

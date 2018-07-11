@@ -27,7 +27,7 @@ class ExportXml(object):
 
     def set_path(self):
         path = os.path.abspath(os.path.dirname(__file__))
-        real_path = os.path.join(path, 'files')
+        real_path = os.path.join(path, 'files', 'all')
         files_path = os.path.join(real_path, '%s.xml' % self.xml_managers_attr)
 
         if not os.path.exists(real_path):
