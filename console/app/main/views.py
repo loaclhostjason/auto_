@@ -110,6 +110,7 @@ def download_file():
     project_id = request.args.get('project_id')
     project = Project.query.get_or_404(project_id)
     export_xml = ExportXml(project_id)
+    export_xml.mk_dir()
     export_xml.run()
     return download_files(project.name)
 

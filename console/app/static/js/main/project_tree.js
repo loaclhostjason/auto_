@@ -42,17 +42,6 @@ let firstContextMenu =
             app_common.show_modal(add_content, $(this));
             add_content.find('[name="parent_id"]').val(parent_id);
             add_content.find('[name="level"]').val(Number(level) + 1);
-        }),
-        makeButton('修改名称', function (e, obj) {
-            let node = obj.part.adornedPart;
-            if (node === null) return false;
-
-            let thisemp = node.data;
-            let id = thisemp['key'];
-
-            let update_name = $('#update-name-modal');
-            app_common.show_modal(update_name);
-            update_name.find('[name="id"]').val(id);
         })
     );
 

@@ -34,6 +34,15 @@ class ExportXml(object):
             os.makedirs(real_path)
         return files_path
 
+    def set_dir_path(self):
+        path = os.path.abspath(os.path.dirname(__file__))
+        real_path = os.path.join(path, 'files', self.xml_managers_attr)
+        files_path = os.path.join(real_path, '%s.xml' % self.xml_managers_attr)
+
+        if not os.path.exists(real_path):
+            os.makedirs(real_path)
+        return files_path
+
     @property
     def xml_managers_attr(self):
         project = Project.query.get_or_404(self.project_id)
@@ -216,7 +225,7 @@ class ExportXml(object):
                         node_conf_data = doc.createElement('ConfData')
                         node_conf_data.setAttribute('useConfData', 'true')
 
-                        conf_data = val['conf_data'][parameter_k]
+                        conf_data = val['conf_data'].get(parameter_k)
                         if conf_data:
                             for data in conf_data:
                                 node_config_data = doc.createElement('ConfigData')
@@ -245,6 +254,12 @@ class ExportXml(object):
 
     def run(self):
         files_path = self.set_path()
+        doc = self.set_xml()
+        fp = open(files_path, 'w', encoding='utf-8')
+        doc.writexml(fp, indent='\t', addindent='\t', newl='\n', encoding="utf-8")
+
+    def mk_dir(self):
+        files_path = self.set_dir_path()
         doc = self.set_xml()
         fp = open(files_path, 'w', encoding='utf-8')
         doc.writexml(fp, indent='\t', addindent='\t', newl='\n', encoding="utf-8")
