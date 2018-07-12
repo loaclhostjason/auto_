@@ -107,8 +107,11 @@ def after_request(response):
 @main.route('/download_file')
 @login_required
 def download_file():
-    file_name = request.args.get('file_name')
-    return download_files(file_name)
+    project_id = request.args.get('project_id')
+    project = Project.query.get_or_404(project_id)
+    export_xml = ExportXml(project_id)
+    export_xml.run()
+    return download_files(project.name)
 
 
 @main.route('/project/edit/name', methods=['POST'])

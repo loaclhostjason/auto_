@@ -177,3 +177,14 @@ jQuery.cachedScript = function (url, options) {
 
     return jQuery.ajax(options);
 };
+
+function downloadFile(url) {
+    try {
+        let elemIF = document.createElement("iframe");
+        elemIF.src = url;
+        elemIF.style.display = "none";
+        document.body.appendChild(elemIF);
+    } catch (e) {
+        console.log(e);
+    }
+}
