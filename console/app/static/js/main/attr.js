@@ -41,21 +41,42 @@ $(document).ready(function () {
     $(document).on('keyup', $('[name="BytePosition"]'), function () {
         let byte = $('[name="BytePosition"]');
         let tmptxt = byte.val();
-        byte.val(tmptxt.replace(/[\D]/g, ''));
+
+        try {
+            byte.val(tmptxt.replace(/\D/g, ''));
+        } catch (e) {
+            console.log(e)
+        }
+
     }).bind("paste", function () {
         let byte = $('[name="BytePosition"]');
         let tmptxt = byte.val();
-        byte.val(tmptxt.replace(/\D/g, ''));
+
+         try {
+            byte.val(tmptxt.replace(/\D/g, ''));
+        } catch (e) {
+            console.log(e)
+        }
     }).css("ime-mode", "disabled");
 
 
     $(document).on('keyup', $('[name="BitPosition"]'), function () {
         let bite = $('[name="BitPosition"]');
         let tmptxt = bite.val();
-        bite.val(tmptxt.replace(/\D/g, ''));
+
+        try {
+            bite.val(tmptxt.replace(/\D/g, ''));
+        } catch (e) {
+            console.log(e)
+        }
     }).bind("paste", function () {
         let bite = $('[name="BitPosition"]');
         let tmptxt = bite.val();
-        bite.val(tmptxt.replace(/\D/g, ''));
+
+        try {
+            bite.val(tmptxt.replace(/\D/g, ''));
+        } catch (e) {
+            console.log(e)
+        }
     }).css("ime-mode", "disabled");
 });

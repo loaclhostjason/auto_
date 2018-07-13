@@ -40,7 +40,7 @@
                                     <div>
                                         <input type="checkbox" name="publish_project" class="publish_project"
                                                value="{{ project.id }}">
-                                        <a href="{{ url_for('.edit_file', project_id=project.id) }}">编辑结构</a>
+                                        <a target="_blank" href="{{ url_for('.edit_file', project_id=project.id) }}">编辑结构</a>
                                         <span class="text-explode">|</span>
                                         <a href="javascript:void (0)" class="delete-project"
                                            data-id="{{ project.id }}">删除</a>

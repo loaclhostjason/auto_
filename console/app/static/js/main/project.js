@@ -35,7 +35,8 @@ $(document).ready(function () {
                     let project_data = resp['project_data'];
                     let did_len = resp['did_len'];
                     let bit_position = resp['bit_position'];
-                    $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position));
+                    let byte_position = resp['byte_position'];
+                    $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position));
                     $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len));
                 } else {
                     toastr.error(resp.message)
@@ -99,7 +100,7 @@ $(document).ready(function () {
             return html
         };
 
-        this.project_thead_html = function (did_len, bit_position) {
+        this.project_thead_html = function (did_len, bit_position, byte_position) {
             let html = '';
             html += '<tr>';
             html += '<th width="100" style="vertical-align: middle; min-width: 100px"></th>';
@@ -111,7 +112,7 @@ $(document).ready(function () {
                     html += '<div style="width: 172px">';
                     let a = '';
                     for (let j = 7; j >= 0; j--) {
-                        if ($.inArray(j, bit_position) > -1) {
+                        if ($.inArray(j, bit_position) > -1 && byte_position == i) {
                             a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
                         } else {
                             a += '<div style="width: 12.5%; float: left;text-align: center"><span>' + j + '</span>';

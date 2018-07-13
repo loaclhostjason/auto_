@@ -21,7 +21,8 @@ def option_project_data():
     # this is byte len
     project_relation = ProjectRelation.query.get_or_404(parent_id)
     prev_attr_content = AttrContent.query.filter_by(project_relation_id=project_relation.id).first()
-    real_content = json.loads(prev_attr_content.real_content) if prev_attr_content and prev_attr_content.real_content else {}
+    real_content = json.loads(
+        prev_attr_content.real_content) if prev_attr_content and prev_attr_content.real_content else {}
 
     result = get_project_children_v2(project_id, int(parent_id))
     project_data = ProjectData.query.filter_by(project_id=project_id).all()
@@ -58,6 +59,7 @@ def option_project_data():
             did_len = real_content.get('DidLength') or 0
 
     bit_position = list()
+    print(cot)
     if cot.get('BitPosition') and cot.get('BitLength'):
         bit_start = int(cot['BitPosition'])
         len = int(cot['BitLength'])
@@ -66,7 +68,8 @@ def option_project_data():
             bit_position.append(bit_start)
             bit_start += 1
 
-    return jsonify({'success': True, 'result': result, 'project_data': project_dict, 'did_len': did_len, 'bit_position': bit_position})
+    return jsonify({'success': True, 'result': result, 'project_data': project_dict, 'did_len': did_len,
+                    'bit_position': bit_position, 'byte_position': cot.get('BytePosition')})
 
 
 # main attr content
