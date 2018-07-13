@@ -20,7 +20,8 @@
                 <table class="table table-hover project-table">
                     <thead>
                     <tr>
-                        <th>产品</th>
+                        <th width="120" class="text-center" style="border-right: 1px solid #dddddd">项目</th>
+                        <th>文件名</th>
                         <th width="100">拥有者</th>
                         <th width="150">最后修改时间</th>
                         <th width="180" class="text-right">操作</th>
@@ -30,6 +31,14 @@
                     {% if projects %}
                         {% for project in projects %}
                             <tr>
+                                {% set num = group_project.get(project.id) %}
+                                {% if num %}
+                                    <td class="text-center" rowspan="{{ num }}"
+                                        style="border-right: 1px solid #dddddd">
+                                        <span>{{ project.project_name }}</span>
+                                    </td>
+                                {% endif %}
+
                                 <td>
                                     <a href="{{ url_for('.edit_file', project_id=project.id) }}">{{ project.name or '--' }}</a>
                                 </td>

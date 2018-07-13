@@ -34,9 +34,9 @@ class ExportXml(object):
             os.makedirs(real_path)
         return files_path
 
-    def set_dir_path(self):
+    def set_dir_path(self, project_name):
         path = os.path.abspath(os.path.dirname(__file__))
-        real_path = os.path.join(path, 'files', self.xml_managers_attr)
+        real_path = os.path.join(path, 'files', project_name)
         files_path = os.path.join(real_path, '%s.xml' % self.xml_managers_attr)
 
         if not os.path.exists(real_path):
@@ -258,8 +258,8 @@ class ExportXml(object):
         fp = open(files_path, 'w', encoding='utf-8')
         doc.writexml(fp, indent='\t', addindent='\t', newl='\n', encoding="utf-8")
 
-    def mk_dir(self):
-        files_path = self.set_dir_path()
+    def mk_dir(self, project_name):
+        files_path = self.set_dir_path(project_name)
         doc = self.set_xml()
         fp = open(files_path, 'w', encoding='utf-8')
         doc.writexml(fp, indent='\t', addindent='\t', newl='\n', encoding="utf-8")

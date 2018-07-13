@@ -13,15 +13,16 @@ class ProjectRelationType(Enum):
 class Project(db.Model):
     __tablename__ = 'project'
     id = db.Column(db.Integer, primary_key=True)
-    # 名称
+    # 文件名称
     name = db.Column(db.String(68), index=True)
+    # 项目名称
     project_name = db.Column(db.String(68), index=True)
 
     first_time = db.Column(db.DateTime, default=datetime.now)
     last_time = db.Column(db.DateTime, default=datetime.now)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    user = db.relationship('User', backref=db.backref("project", cascade="all,delete"))
+    user = db.relationship('User', backref=db.backref("project", cascade="all, delete"))
 
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)

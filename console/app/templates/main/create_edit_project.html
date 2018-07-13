@@ -6,6 +6,7 @@
 
 {% block main_content %}
     {% include 'main/modals/create_project.html' %}
+    {% include 'main/modals/create_project_file.html' %}
     {% include 'main/modals/add_content.html' %}
     {% include "main/modals/update_name.html" %}
     {% include "main/modals/update_las.html" %}
@@ -31,12 +32,15 @@
 
                 <div class="panel-border">
                     <div class="charttable-title">
-                        <span class="title-text">项目--工作区
+                        <span class="title-text" style="margin-right: 5px">项目--工作区
                             {% if not project %}
-                                <a href="javascript:void (0)"
-                                   class="btn btn-primary btn-xs pull-right add-project">添加项目</a>
-                                <a href="javascript:void (0)"
-                                   class="btn btn-primary btn-xs pull-right add-project-file">添加项目文件</a>
+                                <label class="pull-right">
+                                    <a href="javascript:void (0)"
+                                       class="btn btn-primary btn-xs add-project">添加项目</a>
+                                    <span class="text-explode">|</span>
+                                    <a href="javascript:void (0)"
+                                       class="btn btn-primary btn-xs add-project-file">添加项目文件</a>
+                                </label>
                             {% endif %}
 
                         </span>
@@ -106,9 +110,11 @@
     <script src="{{ url_for('static', filename='js/main/attr.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main/project_tree.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main/project.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main/project_file.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main/content.js') }}"></script>
 
     <script>
-        project_id = "{{ project.id if project else '' }}"
+        project_id = "{{ project.id if project else '' }}";
+        user_id = "{{ current_user.id }}"
     </script>
 {% endblock %}

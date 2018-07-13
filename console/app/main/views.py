@@ -12,6 +12,8 @@ from datetime import datetime
 from .models import *
 from collections import defaultdict
 from .func import *
+from ..models import User
+from sqlalchemy import or_, func
 
 import json
 from util import ExportXml
@@ -21,12 +23,21 @@ from util import ExportXml
 @main.route('/projects', methods=['GET', 'POST'])
 @login_required
 def projects():
-    project_query = Project.query.order_by(Project.id)
+    user = User.query.get_or_404(current_user.id)
+    group_user = user.users
+
+    project_query = Project.query.order_by(Project.project_name)
     if current_user.is_admin:
-        projects = project_query.all()
+        project_list = project_query.all()
     else:
-        projects = Project.query.filter_by(user_id=current_user.id).all()
-    return render_template('main/projects.html', projects=projects)
+        project_list = Project.query.filter(
+            or_(User.user_id == current_user.id, User.id.in_(group_user) if group_user else False)
+        ).all()
+
+    group_project = db.session.query(Project.id, func.count(Project.id).label('project_num')).group_by(
+        Project.project_name).all()
+    group_project = {project_id: num for project_id, num in group_project}
+    return render_template('main/projects.html', projects=project_list, group_project=group_project)
 
 
 @main.route('/project/data/edit/<int:project_id>', methods=['GET', 'POST'])
@@ -110,7 +121,7 @@ def download_file():
     project_id = request.args.get('project_id')
     project = Project.query.get_or_404(project_id)
     export_xml = ExportXml(project_id)
-    export_xml.mk_dir()
+    export_xml.mk_dir(project.project_name)
     export_xml.run()
     return download_files(project.name)
 

@@ -1,4 +1,4 @@
-<div tabindex="-1" class="modal fade" id="create_project_modal">
+<div tabindex="-1" class="modal fade" id="create_project_file_modal">
     <div class="modal-dialog">
         <div class="modal-content">
             <div>
@@ -9,7 +9,7 @@
 
                 <div class="modal-body clearfix">
                     <div class="row">
-                        <form class="form-horizontal" name="form">
+                        <form class="form-horizontal" name="form" id="create_file_form">
                             <div class="form-group">
                                 <div class="col-sm-3">
                                     <label class="control-label pull-right">
@@ -17,9 +17,7 @@
                                     </label>
                                 </div>
                                 <div class="col-sm-6">
-                                    <select name="project" class="form-control">
-                                        <option value=""></option>
-                                    </select>
+                                    <select name="project_name" class="form-control"></select>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -37,7 +35,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-primary submit_project">确定</button>
+                    <button class="btn btn-primary submit_project_file">确定</button>
                     <button class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </div>
