@@ -84,7 +84,7 @@
 
             $('.download-file').click(function () {
                 let project_id = [];
-                $('.project-table').find('.publish_project').each(function () {
+                $('.project-table').find('.publish_project:checked').each(function () {
                     project_id.push($(this).val())
                 });
                 if (project_id) {
