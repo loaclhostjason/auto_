@@ -15,6 +15,7 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # 名称
     name = db.Column(db.String(68), index=True)
+    project_name = db.Column(db.String(68), index=True)
 
     first_time = db.Column(db.DateTime, default=datetime.now)
     last_time = db.Column(db.DateTime, default=datetime.now)

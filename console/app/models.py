@@ -13,7 +13,7 @@ from enum import Enum
 class RoleType(Enum):
     admin = '超级管理员'
     user = '普通用户'
-    test = '测试以后'
+    project_user = '项目管理员'
 
 
 class User(UserMixin, db.Model):
@@ -29,6 +29,9 @@ class User(UserMixin, db.Model):
     role = db.Column(db.Enum(RoleType), nullable=False)
 
     expiry_time = db.Column(db.DateTime)
+
+    group_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User', remote_side='User.id', backref=db.backref("users", cascade="all, delete-orphan"))
 
     def __init__(self, *args, **kwargs):
         super(User, self).__init__(*args, **kwargs)

@@ -31,6 +31,8 @@ def get_user_info(id):
 @role_required
 def create_users():
     users_params = request.form.to_dict()
+    user_role = request.form.get('role')
+    group_user_id = request.form.get('group_user_id')
 
     form = UserForm()
     error_message = Check(form).get_error_message()
@@ -45,7 +47,7 @@ def create_users():
     if old_user:
         return jsonify({'success': False, 'message': '用户名重复'})
 
-    add_user_dict = form.get_user_form()
+    add_user_dict = form.get_user_form(user_role, group_user_id)
     user = User(**add_user_dict)
     db.session.add(user)
     return jsonify({'success': True, 'message': '创建用户成功'})

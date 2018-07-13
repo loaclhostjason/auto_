@@ -18,12 +18,13 @@ class UserForm(UserPasswordForm):
     expiry_time = StringField('过期时间:', validators=[DataRequired('过期时间不能为空')])
     submit = SubmitField('确认')
 
-    def get_user_form(self):
+    def get_user_form(self, user_role=None, group_user_id=None):
         d = {
             'username': self.username.data,
             'expiry_time': '{} {}'.format(self.expiry_time.data, '23:59:59'),
             'password': self.upw.data,
-            'role': 'user'
+            'role': user_role or 'project_user',
+            'group_user_id': group_user_id
         }
         return d
 

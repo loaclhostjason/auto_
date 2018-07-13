@@ -16,7 +16,12 @@ $(document).ready(function () {
     user_modal.on('hide.bs.modal', function () {
         users.hide_modal($(this));
     });
-    user_modal.on('show.bs.modal', function () {
+    let user_role;
+    let user_group_id;
+    user_modal.on('show.bs.modal', function (event) {
+        let btn = $(event.relatedTarget);
+        user_role = btn.data('role');
+        user_group_id = btn.data('id');
         laydate.render({
             elem: '#expiry_time',
             min: moment().format('YYYY-MM-DD'),
@@ -34,6 +39,12 @@ $(document).ready(function () {
 
     $('.submit_user').click(function () {
         let params = user_modal.find('form').serialize();
+        if (user_role) {
+            params += '&role=' + user_role;
+        }
+        if (user_group_id) {
+            params += '&group_user_id=' + user_group_id;
+        }
         console.log(params);
         $.post('/users/create', params, function (resp) {
             if (resp.success) {
@@ -96,5 +107,23 @@ $(document).ready(function () {
         })
     });
 
-    // update_password
+    // create com user
+    $('.create_com_user').click(function () {
+        users.show_modal(user_modal, $(this));
+        user_modal.find('.modal-title').text('项目管理员【' + $(this).data('username') + '】，分配普通用户');
+    });
+
+
+});
+
+$(document).ready(function () {
+    let selection_summary = $('.selection-summary');
+    selection_summary.click(function () {
+        $(this).toggleClass('open');
+        if ($(this).is('.open')) {
+            $(this).next().show();
+        } else {
+            $(this).next().hide();
+        }
+    });
 });

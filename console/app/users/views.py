@@ -18,5 +18,5 @@ from ..decorators import role_required
 @role_required
 def users_list():
     form = UserForm()
-    users = User.query.all()
+    users = User.query.filter(User.group_user_id.is_(None)).all()
     return render_template('users/users_list.html', users=users, form=form)

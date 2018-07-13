@@ -114,3 +114,24 @@ b.no {
 b.warn {
     background-position: -61px -52px !important;
 }
+
+.selection-summary .icon {
+    background-image: url(/static/img/selection-right.png);
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    margin: 0 16px -3px 0;
+}
+
+tr.selection-summary.open {
+    background-color: #ebf3ff;
+}
+
+tr.selection-summary.open .icon {
+    background-image: url(/static/img/selection-down.png);
+}
+
+tr.selection-info,
+tr.selection-info:hover {
+    background-color: #f9fbff;
+}
