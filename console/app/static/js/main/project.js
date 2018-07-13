@@ -37,23 +37,22 @@ $(document).ready(function () {
                     let bit_position = resp['bit_position'];
                     let byte_position = resp['byte_position'];
                     $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position));
-                    $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len));
+                    $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position));
                 } else {
                     toastr.error(resp.message)
                 }
             });
         };
 
-        this.project_data_html = function (result, project_data, did_len) {
+        this.project_data_html = function (result, project_data, did_len, byte_position) {
             if (!result || !result.length) return '';
 
 
             let html = '';
-            result.forEach(function (data, index) {
+            result.forEach(function (data) {
                 let prid = data['level_4_id'];
                 let data_info = project_data[data['level_4_id']] || {};
                 let content = data_info['content'] || {};
-                let number = [7, 6, 5, 4, 3, 2, 1, 0];
 
                 html += '<tr class="data-class">';
                 html += '<input type="hidden" name="project_relation_id" value="' + data['level_4_id'] + '">';
@@ -73,21 +72,14 @@ $(document).ready(function () {
                 }
                 bet_number.forEach(function (num) {
                     html += '<td colspan="8">';
-                    // number.forEach(function (value) {
-                    //     html += '<div style="width: 12.5%; float: left">';
-                    //     if (content['bit' + num + '_' + value] === 'y') {
-                    //         html += '<input type="checkbox" name="' + prid + '_bit' + num + '_' + value + '" value="y" checked>';
-                    //     } else {
-                    //         html += '<input type="checkbox" name="' + prid + '_bit' + num + '_' + value + '" value="y" disabled>';
-                    //
-                    //     }
-                    //     html += '</div>';
-                    // });
                     html += '<div class="col-xs-12"><div class="row">';
                     if (content['byte' + num]) {
                         html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="' + (content['byte' + num] || '') + '">';
                     } else {
-                        html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="" disabled>';
+                        if (num == byte_position) {
+                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="">';
+                        }  else
+                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="" disabled>';
                     }
 
                     html += '</div></div></td>';
