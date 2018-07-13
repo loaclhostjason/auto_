@@ -30,10 +30,15 @@ class Attr(db.Model):
 
     @classmethod
     def init_attr(cls):
+        _content = [{"item_zh": "BytePosition:", "item": "BytePosition", "item_required": "y"},
+                    {"item_zh": "BitPosition:", "item": "BitPosition", "item_required": "y"},
+                    {"item_zh": "BitLength:", "item": "BitLength", "item_required": "y"}]
+
+        _did_len = [{"item_zh": "DidLength", "item": "DidLength"}]
         r = [
             {'name': 'ECU属性配置', 'level': 1, 'type': 'worker'},
-            {'name': 'DID属性配置', 'level': 2, 'type': 'worker'},
-            {'name': '装配项属性配置', 'level': 3, 'type': 'worker'},
+            {'name': 'DID属性配置', 'level': 2, 'type': 'worker', 'content': json.dumps(_did_len)},
+            {'name': '装配项属性配置', 'level': 3, 'type': 'worker', 'content': json.dumps(_content)},
         ]
         attr = Attr.query.all()
         if attr:
