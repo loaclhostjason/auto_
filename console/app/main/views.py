@@ -24,14 +24,14 @@ from util import ExportXml
 @login_required
 def projects():
     user = User.query.get_or_404(current_user.id)
-    group_user = user.users
+    group_user = [v.id for v in user.users]
 
     project_query = Project.query.order_by(Project.project_name)
     if current_user.is_admin:
         project_list = project_query.all()
     else:
         project_list = Project.query.filter(
-            or_(User.user_id == current_user.id, User.id.in_(group_user) if group_user else False)
+            or_(Project.user_id == current_user.id, Project.user_id.in_(group_user) if group_user else False)
         ).all()
 
     group_project = db.session.query(Project.id, func.count(Project.id).label('project_num')).group_by(

@@ -120,10 +120,12 @@ $(document).ready(function () {
     let selection_summary = $('.selection-summary');
     selection_summary.click(function () {
         $(this).toggleClass('open');
-        if ($(this).is('.open')) {
-            $(this).next().show();
+        let loop = $(this).data('loop');
+        let elm = $(this).parents('tbody').find('.selection-info');
+        if ($(this).is('.open') && elm.data('loop') === loop) {
+            elm.show()
         } else {
-            $(this).next().hide();
+            elm.hide();
         }
     });
 });

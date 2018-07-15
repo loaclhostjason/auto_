@@ -99,7 +99,8 @@
                     <tbody>
                     {% if users %}
                         {% for user in users %}
-                            <tr class="selection-summary">
+                            {% set loopxx =  loop.index0 %}
+                            <tr class="selection-summary"  data-loop="{{ loopxx }}">
                                 <td class="text-left">
                                     {% if user.users %}
                                         <i class="icon"></i>
@@ -109,16 +110,17 @@
                                 </td>
                                 {{ table_content(user) }}
                             </tr>
-                            <tr class="selection-info" style="display: none;">
-                                {% if user.users %}
-                                    {% for u in user.users %}
+
+                            {% if user.users %}
+                                {% for u in user.users %}
+                                    <tr class="selection-info" style="display: none;"  data-loop="{{ loopxx }}">
                                         <td class="text-center"><i class="glyphicon glyphicon-triangle-right"></i></td>
                                         {{ table_content(u) }}
-                                    {% endfor %}
-                                {% endif %}
-                            </tr>
-                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
 
+                        {% endfor %}
                     {% else %}
                         <tr>
                             <td style="padding: 50px 0" colspan="9" align="center">
