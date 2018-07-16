@@ -21,7 +21,7 @@ def add_attr_content():
     # this is byte len
     project_relation = ProjectRelation.query.get_or_404(project_relation_id)
     prev_pr = ProjectRelation.query.filter_by(id=project_relation.parent_id).first()
-    prev_attr_content = AttrContent.query.filter_by(project_relation_id=prev_pr.id).first()
+    prev_attr_content = AttrContent.query.filter_by(project_relation_id=prev_pr.id if prev_pr else 0).first()
     did_byte_len = json.loads(prev_attr_content.real_content).get('DidLength', 0) if prev_attr_content and prev_attr_content.real_content else 0
 
     form_data = request.form.to_dict()
