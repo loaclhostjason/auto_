@@ -146,21 +146,28 @@ class ExportXml(object):
             for pt in protocols:
                 for kkk, vvv in pt.items():
                     new_protocols[kkk].append(vvv)
-            print(121, protocols)
+            print(121, new_protocols)
+            print(1, manager_dict)
 
+            node_name_protocol = doc.createElement('Protocol')
+            inter_val = True
             for key, val in manager_dict.items():
-                if '-' in key:
-                    node_name = doc.createElement('Protocol')
-                    node_protocol_k = doc.createElement(key.split('-')[0])
-                    for np_val in new_protocols[key.split('-')[0]]:
-                        node_protocol_k_name = doc.createElement(np_val[0])
-                        node_protocol_k_name.appendChild(doc.createTextNode(str(np_val[1])))
-                        node_protocol_k.appendChild(node_protocol_k_name)
-                    node_name.appendChild(node_protocol_k)
+                if '-' in key and inter_val:
+                    inter_val = False
+                    for nk, nv in new_protocols.items():
+                        node_protocol_k = doc.createElement(nk)
+                        for nvv in nv:
+                            node_protocol_k_name = doc.createElement(nvv[0])
+                            node_protocol_k_name.appendChild(doc.createTextNode(str(nvv[1])))
+                            node_protocol_k.appendChild(node_protocol_k_name)
+                        node_name_protocol.appendChild(node_protocol_k)
+                    header_manager.appendChild(node_name_protocol)
+
                 else:
-                    node_name = doc.createElement(key)
-                    node_name.appendChild(doc.createTextNode(str(val)))
-                header_manager.appendChild(node_name)
+                    if '-' not in key:
+                        node_name = doc.createElement(key)
+                        node_name.appendChild(doc.createTextNode(str(val)))
+                        header_manager.appendChild(node_name)
         root.appendChild(header_manager)
 
         # did list
