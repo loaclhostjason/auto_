@@ -4,9 +4,9 @@ import json
 from app import create_app
 from app.main.models import Project, ProjectRelation, ProjectData
 from app.manage.models import AttrContent, Attr
-from app.main.func import get_project_children
 from collections import defaultdict, OrderedDict
 from enum import Enum
+import datetime
 
 app = create_app()
 app.app_context().push()
@@ -287,6 +287,30 @@ class ExportXml(object):
                 node_write_item.setAttribute('IDREF', val)
                 node_write_section.appendChild(node_write_item)
         root.appendChild(node_write_section)
+
+        # RevisionLog
+        node_log = doc.createElement('RevisionLog')
+        node_log_entry = doc.createElement('RevisionLogEntry')
+
+        log_file_number = doc.createElement('ConfigurationFileNumber')
+        log_file_number.appendChild(doc.createTextNode(str(manager_dict.get('ConfigurationFileNumber'))))
+        node_log_entry.appendChild(log_file_number)
+
+        node_log_date = doc.createElement('RevisionDate')
+        node_log_date.appendChild(doc.createTextNode(datetime.datetime.now().strftime('%Y-%m-%d')))
+        node_log_entry.appendChild(node_log_date)
+
+        node_log_description = doc.createElement('RevisionDescription')
+        node_log_description.appendChild(doc.createTextNode('intinal version'))
+        node_log_entry.appendChild(node_log_description)
+
+        node_log_author = doc.createElement('RevisionAuthor')
+        project_user = Project.query.get_or_404(self.project_id)
+        node_log_author.appendChild(doc.createTextNode(project_user.user.username))
+        node_log_entry.appendChild(node_log_author)
+
+        node_log.appendChild(node_log_entry)
+        root.appendChild(node_log)
 
         return doc
 
