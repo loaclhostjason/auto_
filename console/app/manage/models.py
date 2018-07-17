@@ -30,13 +30,29 @@ class Attr(db.Model):
 
     @classmethod
     def init_attr(cls):
+        _ecu = [{"item_required": "y", "item_zh": "EcuName", "item": "EcuName"},
+                {"item_required": "y", "item_zh": "RequestId", "item": "RequestId"},
+                {"item_required": "y", "item_zh": "ResponseId", "item": "ResponseId"},
+                {"item_required": "y", "item_zh": "ConfigurationFileNumber", "item": "ConfigurationFileNumber"},
+                {"item_zh": "ApplicationLayerSpec", "item_protocol": "ApplicationLayer",
+                 "item": "ApplicationLayerSpec"}, {"item_zh": "P2", "item_protocol": "ApplicationLayer", "item": "P2"},
+                {"item_zh": "P2Star", "item_protocol": "ApplicationLayer", "item": "P2Star"},
+                {"item_zh": "S3", "item_protocol": "ApplicationLayer", "item": "S3"},
+                {"item_zh": "Baudrate", "item_protocol": "PhysicalLayer", "item": "Baudrate"},
+                {"item_zh": "PhysicalLayerSpec", "item_protocol": "PhysicalLayer", "item": "PhysicalLayerSpec"},
+                {"item_zh": "SecurityLevel", "item": "SecurityLevel"},
+                {"item_zh": "AlgorithmNumber", "item": "AlgorithmNumber"},
+                {"item_zh": "ConfigurationIndex", "item": "ConfigurationIndex"}]
+
         _content = [{"item_zh": "BytePosition:", "item": "BytePosition", "item_required": "y"},
                     {"item_zh": "BitPosition:", "item": "BitPosition", "item_required": "y"},
                     {"item_zh": "BitLength:", "item": "BitLength", "item_required": "y"}]
 
-        _did_len = [{"item_zh": "DidLength", "item": "DidLength"}]
+        _did_len = [{"item_zh": "DidNo", "item": "DidNo"}, {"item_zh": "DidIndicator", "item": "DidIndicator"},
+                    {"item_zh": "Name", "item": "Name"}, {"item_zh": "DidLength", "item": "DidLength"},
+                    {"item_zh": "DefaultValue", "item": "DefaultValue"}]
         r = [
-            {'name': 'ECU属性配置', 'level': 1, 'type': 'worker'},
+            {'name': 'ECU属性配置', 'level': 1, 'type': 'worker', 'content': json.dumps(_ecu)},
             {'name': 'DID属性配置', 'level': 2, 'type': 'worker', 'content': json.dumps(_did_len)},
             {'name': '装配项属性配置', 'level': 3, 'type': 'worker', 'content': json.dumps(_content)},
         ]

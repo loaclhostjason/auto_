@@ -3,9 +3,9 @@ import os
 import json
 from app import create_app
 from app.main.models import Project, ProjectRelation, ProjectData
-from app.manage.models import AttrContent
+from app.manage.models import AttrContent, Attr
 from app.main.func import get_project_children, get_project_children_v2
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from enum import Enum
 
 app = create_app()
@@ -48,9 +48,23 @@ class ExportXml(object):
         project = Project.query.get_or_404(self.project_id)
         return project.name
 
+    @staticmethod
+    def __ecu_order():
+        attr = Attr.query.filter_by(level=1).first()
+        if not attr or not attr.content:
+            return list()
+        content = json.loads(attr.content)
+        result = list()
+        for c in content:
+            if c.get('item_protocol'):
+                result.append('%s-%s' % (c['item_protocol'], c['item']))
+            else:
+                result.append(c['item'])
+        return result
+
     @property
     def xml_header_attr(self):
-        result = dict()
+        result = OrderedDict()
         project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, parent_id=None).first()
 
         if not project_relation:
@@ -62,8 +76,13 @@ class ExportXml(object):
             return result
 
         content = json.loads(attr_content.real_content)
-        print(content)
-        return content
+
+        order_content = self.__ecu_order()
+        if order_content:
+            for oc in order_content:
+                result[oc] = content.get(oc)
+        print('result:', dict(result))
+        return dict(result)
 
     @property
     def xml_did_list(self):
