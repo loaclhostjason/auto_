@@ -20,35 +20,44 @@ def option_project_data():
 
     # this is byte len
     project_relation = ProjectRelation.query.get_or_404(parent_id)
+    child_project_relation = ProjectRelation.query.filter_by(parent_id=parent_id).all()
+    cpr_ids = [v.id for v in child_project_relation]
+
     prev_attr_content = AttrContent.query.filter_by(project_relation_id=project_relation.id).first()
-    real_content = json.loads(
-        prev_attr_content.real_content) if prev_attr_content and prev_attr_content.real_content else {}
+
+    if prev_attr_content and prev_attr_content.real_content:
+        real_content = json.loads(prev_attr_content.real_content)
+    else:
+        real_content = {}
 
     result = get_project_children_v2(project_id, int(parent_id))
-    project_data = ProjectData.query.filter_by(project_id=project_id).all()
+    project_data = ProjectData.query.filter(ProjectData.project_id == project_id,
+                                            ProjectData.project_relation_id.in_(cpr_ids) if cpr_ids else False).all()
 
     project_dict = dict()
     cot = real_content.copy()
-    if real_content.get('BytePosition') and real_content.get('BitPosition'):
-        for v in project_data:
-            if v.content:
-                vv = {k: v for k, v in v.to_dict().items() if k != 'content'}
-                c = json.loads(v.content)
-                t = {k: v for k, v in c.items() if not k.startswith('bit')}
-                byte_c = 'byte%s' % real_content['BytePosition']
-                bite_c = 'bit%s_%s' % (real_content['BytePosition'], real_content['BitPosition'])
-                t[bite_c] = 'y'
-                t[byte_c] = c.get(byte_c) or '0'
-                for kkk, vvv in t.items():
-                    if kkk.startswith('byte'):
-                        if kkk != byte_c:
-                            t[kkk] = ''
+    if not real_content.get('BytePosition') or not real_content.get('BitPosition') or not project_data:
+        return jsonify({'success': True, 'result': result, 'project_data': project_dict,
+                        'byte_position': cot.get('BytePosition')})
+    
+    for v in project_data:
+        if v.content:
+            vv = {k: v for k, v in v.to_dict().items() if k != 'content'}
+            c = json.loads(v.content)
+            t = {k: v for k, v in c.items() if not k.startswith('bit')}
+            byte_c = 'byte%s' % real_content['BytePosition']
+            bite_c = 'bit%s_%s' % (real_content['BytePosition'], real_content['BitPosition'])
+            t[bite_c] = 'y'
+            t[byte_c] = c.get(byte_c) or '0'
+            for kkk, vvv in t.items():
+                if kkk.startswith('byte'):
+                    if kkk != byte_c:
+                        t[kkk] = ''
+            vv['content'] = t
+            project_dict[v.project_relation_id] = vv
 
-                vv['content'] = t
-                project_dict[v.project_relation_id] = vv
-
-                v.content = json.dumps(t)
-                db.session.add(v)
+            v.content = json.dumps(t)
+            db.session.add(v)
 
     did_len = 0
     if result:
@@ -59,12 +68,10 @@ def option_project_data():
             did_len = real_content.get('DidLength') or 0
 
     bit_position = list()
-    print(cot)
     if cot.get('BitPosition') and cot.get('BitLength'):
         bit_start = int(cot['BitPosition'])
-        len = int(cot['BitLength'])
-        print(len)
-        for index in range(len):
+        len_x = int(cot['BitLength'])
+        for index in range(len_x):
             bit_position.append(bit_start)
             bit_start += 1
 
