@@ -44,7 +44,8 @@ class Attr(db.Model):
                 {"item_zh": "AlgorithmNumber", "item": "AlgorithmNumber"},
                 {"item_zh": "ConfigurationIndex", "item": "ConfigurationIndex"}]
 
-        _content = [{"item_zh": "BytePosition:", "item": "BytePosition", "item_required": "y"},
+        _content = [{"item_zh": "ParameterName:", "item": "ParameterName", "item_required": "y"},
+                    {"item_zh": "BytePosition:", "item": "BytePosition", "item_required": "y"},
                     {"item_zh": "BitPosition:", "item": "BitPosition", "item_required": "y"},
                     {"item_zh": "BitLength:", "item": "BitLength", "item_required": "y"}]
 

@@ -4,7 +4,7 @@ import json
 from app import create_app
 from app.main.models import Project, ProjectRelation, ProjectData
 from app.manage.models import AttrContent, Attr
-from app.main.func import get_project_children, get_project_children_v2
+from app.main.func import get_project_children
 from collections import defaultdict, OrderedDict
 from enum import Enum
 
@@ -81,7 +81,6 @@ class ExportXml(object):
         if order_content:
             for oc in order_content:
                 result[oc] = content.get(oc)
-        print('result:', dict(result))
         return dict(result)
 
     @property
@@ -100,8 +99,16 @@ class ExportXml(object):
 
     @property
     def read_section(self):
-        result = get_project_children(self.project_id)
-        return list(set([v['level_2'] for v in result if v.get('level_2')]))
+        attr_content = AttrContent.query.filter_by(project_id=self.project_id).all()
+        result = list()
+        if attr_content:
+            for ac in attr_content:
+                real_content = json.loads(ac.real_content) if ac.real_content else None
+                if real_content:
+                    for key, val in real_content.items():
+                        if key == 'DidNo':
+                            result.append(val)
+        return result
 
     def __get_(self, projects):
         d = defaultdict(list)
@@ -124,17 +131,22 @@ class ExportXml(object):
 
     @property
     def modification(self):
+        did = self.read_section
         r = defaultdict(list)
-        result = get_project_children(self.project_id)
-        if result:
-            for v in result:
-                r[v['level_2']].append({'project_relation_id': v['level_3_id']})
+        if did:
+            for v in did:
+                project_relation = ProjectRelation.query.filter_by(name=v).first()
+                if project_relation:
+                    project_relation_child = ProjectRelation.query.filter_by(parent_id=project_relation.id).all()
+                    if project_relation_child:
+                        for pc in project_relation_child:
+                            r[v].append({'project_relation_id': pc.id})
 
         new_result = dict()
 
         if r:
             for address, projects in r.items():
-                project_query = ProjectData.query.filter_by(project_id=self.project_id)
+                project_query = ProjectData.query.filter_by(project_id=self.project_id).order_by(ProjectData.id.desc())
                 project = project_query.all()
                 conf_data = defaultdict(list)
                 for pro in project:
@@ -165,8 +177,6 @@ class ExportXml(object):
             for pt in protocols:
                 for kkk, vvv in pt.items():
                     new_protocols[kkk].append(vvv)
-            print(121, new_protocols)
-            print(1, manager_dict)
 
             node_name_protocol = doc.createElement('Protocol')
             inter_val = True
@@ -227,16 +237,14 @@ class ExportXml(object):
                     node_parameter = doc.createElement('Parameter')
 
                     try:
-                        default_val = val['conf_data'].get(list(parameter_val.keys())[0])[0][0][0]
+                        default_val = val['conf_data'].get(list(parameter_val.keys())[0])[0][0]
                     except Exception:
                         default_val = ''
 
                     node_parameter.setAttribute('ParamDefaultValue', default_val)
                     for parameter_k, parameter_v in parameter_val.items():
-                        node_parameter_name = doc.createElement('ParameterName')
-                        node_parameter_name.appendChild(doc.createTextNode(str(parameter_v)))
-                        node_modification_item.appendChild(node_parameter_name)
 
+                        # parameter and byte bit bit_len
                         byte_content = byte.get(parameter_k)
 
                         # bite
@@ -249,10 +257,14 @@ class ExportXml(object):
 
                         # ConfData
                         node_conf_data = doc.createElement('ConfData')
-                        node_conf_data.setAttribute('useConfData', 'true')
-
                         conf_data = val['conf_data'].get(parameter_k)
+
+                        if not conf_data:
+                            node_conf_data.setAttribute('useConfData', 'no')
+                            node_parameter.appendChild(node_conf_data)
+
                         if conf_data:
+                            node_conf_data.setAttribute('useConfData', 'true')
                             for data in conf_data:
                                 node_config_data = doc.createElement('ConfigData')
                                 node_config_data.setAttribute('Value', data[0])
@@ -267,12 +279,12 @@ class ExportXml(object):
         root.appendChild(node_modification)
 
         node_write_section = doc.createElement('WriteSection')
-        if modification_section:
-            for key, val in modification_section.items():
+        if self.read_section:
+            for val in self.read_section:
                 node_write_item = doc.createElement('WriteItem')
-                node_write_item.setAttribute('IDREF', key)
-                node_write_item.setAttribute('DidWriteScope', 'All')
                 node_write_item.setAttribute('DelayForMS', '0')
+                node_write_item.setAttribute('DidWriteScope', 'All')
+                node_write_item.setAttribute('IDREF', val)
                 node_write_section.appendChild(node_write_item)
         root.appendChild(node_write_section)
 

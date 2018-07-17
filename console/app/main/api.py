@@ -216,12 +216,18 @@ def submit_attr_content():
         return jsonify({'success': False, 'message': '参数不对'})
 
     data = None
-    content = None
     if attr.content:
         data = json.loads(attr.content)
 
     attr_content = AttrContent.query.filter_by(project_id=project_id, project_relation_id=project_relation_id).first()
 
+    r = dict()
     if attr_content and attr_content.real_content:
         content = json.loads(attr_content.real_content)
-    return jsonify({'success': True, 'data': data, 'content': content})
+
+        for k, v in content.items():
+            if '-' in k:
+                r[k.split('-')[1]] = v
+            else:
+                r[k] = v
+    return jsonify({'success': True, 'data': data, 'content': r})

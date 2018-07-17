@@ -135,11 +135,13 @@ def edit_project_name():
         return jsonify({'success': False, 'message': '名称不能为空'})
 
     project_relation = ProjectRelation.query.filter_by(id=id).first()
+    level = project_relation.level
+
     if not project_relation:
         return jsonify({'success': False, 'message': '没有此记录'})
 
     if not project_relation.parent_id:
-        old_project = Project.query.filter_by(name=name).first()
+        old_project = Project.query.filter_by(name=name, level=level).first()
         if old_project:
             return jsonify({'success': False, 'message': '名称已经存在'})
 
