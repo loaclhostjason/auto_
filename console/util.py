@@ -191,14 +191,15 @@ class ExportXml(object):
             for value in manager_list:
                 if '-' in value[0] and inter_val:
                     inter_val = False
-                    print(new_protocols)
                     for nk in self.header_order:
                         node_protocol_k = doc.createElement(nk)
                         nv = new_protocols.get(nk) or []
-                        for nvv in nv:
-                            node_protocol_k_name = doc.createElement(nvv[0])
-                            node_protocol_k_name.appendChild(doc.createTextNode(str(nvv[1])))
-                            node_protocol_k.appendChild(node_protocol_k_name)
+                        print(nv)
+                        if nv:
+                            for nvv in nv:
+                                node_protocol_k_name = doc.createElement(nvv[0])
+                                node_protocol_k_name.appendChild(doc.createTextNode(str(nvv[1])))
+                                node_protocol_k.appendChild(node_protocol_k_name)
                         if nk == 'PhysicalLayer':
                             node_pin1 = doc.createElement('Pin')
                             node_pin1.setAttribute('PinDefinition', 'CAN_H')
@@ -267,7 +268,6 @@ class ExportXml(object):
 
                         # parameter and byte bit bit_len
                         byte_content = byte.get(parameter_k)
-                        print(byte_content)
 
                         # bite
                         if byte_content:
