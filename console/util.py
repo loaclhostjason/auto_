@@ -250,6 +250,7 @@ class ExportXml(object):
             for v in self.read_section:
                 node_name = doc.createElement('ReadItem')
                 node_name.setAttribute('IDREF', v)
+                node_name.setAttribute('OverrideDefault', 'false')
                 section_manager.appendChild(node_name)
         root.appendChild(section_manager)
 
@@ -318,6 +319,7 @@ class ExportXml(object):
                 node_write_item = doc.createElement('WriteItem')
                 node_write_item.setAttribute('DelayForMS', '0')
                 node_write_item.setAttribute('DidWriteScope', 'All')
+                node_write_item.setAttribute('ReadBackCompare', 'true')
                 node_write_item.setAttribute('IDREF', val)
                 node_write_section.appendChild(node_write_item)
         root.appendChild(node_write_section)
