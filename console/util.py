@@ -239,7 +239,7 @@ class ExportXml(object):
                 if val:
                     for k in self.__did_order:
                         did_item_s = doc.createElement(k)
-                        did_item_s.appendChild(doc.createTextNode(str(val.get(k))))
+                        did_item_s.appendChild(doc.createTextNode(str(val.get(k) or '')))
                         node_did_item.appendChild(did_item_s)
                     node_did_list.appendChild(node_did_item)
         root.appendChild(node_did_list)
