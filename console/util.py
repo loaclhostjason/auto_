@@ -98,9 +98,19 @@ class ExportXml(object):
         for pr in project_relation:
             attr_content = AttrContent.query.filter_by(project_relation_id=pr.id).first()
             real_content = json.loads(attr_content.real_content) if attr_content and attr_content.real_content else {}
-            result[pr.name] = list(zip(real_content.keys(), real_content.values())) if real_content else {}
+            result[pr.name] = real_content or {}
 
-        print(result)
+        return result
+
+    @property
+    def __did_order(self):
+        attr = Attr.query.filter_by(level=2).first()
+        if not attr or not attr.content:
+            return []
+        content = json.loads(attr.content)
+        result = list()
+        for v in content:
+            result.append(v['item'])
         return result
 
     @property
@@ -233,9 +243,9 @@ class ExportXml(object):
         if did_list:
             for key, val in did_list.items():
                 node_did_item = doc.createElement('DidItem')
-                for v in val:
-                    did_item_s = doc.createElement(v[0])
-                    did_item_s.appendChild(doc.createTextNode(str(v[1])))
+                for k in self.__did_order:
+                    did_item_s = doc.createElement(k)
+                    did_item_s.appendChild(doc.createTextNode(str(val[k])))
                     node_did_item.appendChild(did_item_s)
                 node_did_list.appendChild(node_did_item)
         root.appendChild(node_did_list)
