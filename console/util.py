@@ -81,7 +81,10 @@ class ExportXml(object):
         if order_content:
             for oc in order_content:
                 result[oc] = content.get(oc)
-        return dict(result)
+
+        result = {key: result[key] for key in result}
+        print(result)
+        return result
 
     @property
     def xml_did_list(self):
