@@ -90,15 +90,17 @@ class ExportXml(object):
     @property
     def xml_did_list(self):
         result = dict()
-        project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, level=2).all()
+        project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, level=2). \
+            order_by(ProjectRelation.relation_order).all()
         if not project_relation:
             return result
 
         for pr in project_relation:
             attr_content = AttrContent.query.filter_by(project_relation_id=pr.id).first()
-            real_content = json.loads(attr_content.real_content) if attr_content and attr_content.real_content else None
-            result[pr.name] = real_content or {}
+            real_content = json.loads(attr_content.real_content) if attr_content and attr_content.real_content else {}
+            result[pr.name] = list(zip(real_content.keys(), real_content.values())) if real_content else {}
 
+        print(result)
         return result
 
     @property
@@ -181,6 +183,10 @@ class ExportXml(object):
         header_manager = doc.createElement('Header')
         if manager_dict:
             protocols = [{v[0].split('-')[0]: [v[0].split('-')[1], v[1]]} for v in manager_list if '-' in v[0]]
+            order_protocols_list = [v[0].split('-')[0] for v in manager_list if '-' in v[0]]
+            order_protocols = list(set(order_protocols_list))
+            order_protocols.sort(key=order_protocols_list.index)
+
             new_protocols = defaultdict(list)
             for pt in protocols:
                 for kkk, vvv in pt.items():
@@ -191,10 +197,10 @@ class ExportXml(object):
             for value in manager_list:
                 if '-' in value[0] and inter_val:
                     inter_val = False
-                    for nk in new_protocols.keys():
+                    for nk in order_protocols:
                         node_protocol_k = doc.createElement(nk)
                         nv = new_protocols.get(nk) or []
-                        print(new_protocols)
+
                         if nv:
                             for nvv in nv:
                                 node_protocol_k_name = doc.createElement(nvv[0])
@@ -225,11 +231,11 @@ class ExportXml(object):
         did_list = {k: v for k, v in self.xml_did_list.items() if v}
         node_did_list = doc.createElement('DidList')
         if did_list:
-            for cid, val in did_list.items():
+            for key, val in did_list.items():
                 node_did_item = doc.createElement('DidItem')
-                for k in val.keys():
-                    did_item_s = doc.createElement(k)
-                    did_item_s.appendChild(doc.createTextNode(str(val[k])))
+                for v in val:
+                    did_item_s = doc.createElement(v[0])
+                    did_item_s.appendChild(doc.createTextNode(str(v[1])))
                     node_did_item.appendChild(did_item_s)
                 node_did_list.appendChild(node_did_item)
         root.appendChild(node_did_list)
