@@ -191,7 +191,7 @@ class ExportXml(object):
             for value in manager_list:
                 if '-' in value[0] and inter_val:
                     inter_val = False
-                    for nk in self.header_order:
+                    for nk in new_protocols.keys():
                         node_protocol_k = doc.createElement(nk)
                         nv = new_protocols.get(nk) or []
                         print(new_protocols)
@@ -227,9 +227,9 @@ class ExportXml(object):
         if did_list:
             for cid, val in did_list.items():
                 node_did_item = doc.createElement('DidItem')
-                for k, v in val.items():
+                for k in val.keys():
                     did_item_s = doc.createElement(k)
-                    did_item_s.appendChild(doc.createTextNode(str(v)))
+                    did_item_s.appendChild(doc.createTextNode(str(val[k])))
                     node_did_item.appendChild(did_item_s)
                 node_did_list.appendChild(node_did_item)
         root.appendChild(node_did_list)
