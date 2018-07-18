@@ -25,6 +25,8 @@ class ExportXml(object):
     def __init__(self, project_id):
         self.project_id = project_id
 
+        self.header_order = ['ApplicationLayer', 'PhysicalLayer']
+
     def set_path(self):
         path = os.path.abspath(os.path.dirname(__file__))
         real_path = os.path.join(path, 'files', 'all')
@@ -190,8 +192,9 @@ class ExportXml(object):
                 if '-' in value[0] and inter_val:
                     inter_val = False
                     print(new_protocols)
-                    for nk, nv in new_protocols.items():
+                    for nk in self.header_order:
                         node_protocol_k = doc.createElement(nk)
+                        nv = new_protocols.get(nk) or []
                         for nvv in nv:
                             node_protocol_k_name = doc.createElement(nvv[0])
                             node_protocol_k_name.appendChild(doc.createTextNode(str(nvv[1])))
