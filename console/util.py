@@ -89,7 +89,7 @@ class ExportXml(object):
 
     @property
     def xml_did_list(self):
-        result = dict()
+        result = OrderedDict()
         project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, level=2). \
             order_by(ProjectRelation.relation_order).all()
         if not project_relation:
@@ -238,16 +238,16 @@ class ExportXml(object):
         root.appendChild(header_manager)
 
         # did list
-        did_list = {k: v for k, v in self.xml_did_list.items() if v}
         node_did_list = doc.createElement('DidList')
-        if did_list:
-            for key, val in did_list.items():
+        if self.xml_did_list:
+            for key, val in self.xml_did_list.items():
                 node_did_item = doc.createElement('DidItem')
-                for k in self.__did_order:
-                    did_item_s = doc.createElement(k)
-                    did_item_s.appendChild(doc.createTextNode(str(val[k])))
-                    node_did_item.appendChild(did_item_s)
-                node_did_list.appendChild(node_did_item)
+                if val:
+                    for k in self.__did_order:
+                        did_item_s = doc.createElement(k)
+                        did_item_s.appendChild(doc.createTextNode(str(val.get(k))))
+                        node_did_item.appendChild(did_item_s)
+                    node_did_list.appendChild(node_did_item)
         root.appendChild(node_did_list)
 
         # ReadSection
