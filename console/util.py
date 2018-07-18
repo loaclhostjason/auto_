@@ -180,7 +180,7 @@ class ExportXml(object):
         manager_list, manager_dict = self.xml_header_attr
         header_manager = doc.createElement('Header')
         if manager_dict:
-            protocols = [{k.split('-')[0]: [k.split('-')[1], v]} for k, v in manager_dict.items() if '-' in k]
+            protocols = [{v[0].split('-')[0]: [v[0].split('-')[1], v[1]]} for v in manager_list if '-' in v[0]]
             new_protocols = defaultdict(list)
             for pt in protocols:
                 for kkk, vvv in pt.items():
@@ -194,7 +194,7 @@ class ExportXml(object):
                     for nk in self.header_order:
                         node_protocol_k = doc.createElement(nk)
                         nv = new_protocols.get(nk) or []
-                        print(nv)
+                        print(new_protocols)
                         if nv:
                             for nvv in nv:
                                 node_protocol_k_name = doc.createElement(nvv[0])
