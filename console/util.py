@@ -82,9 +82,8 @@ class ExportXml(object):
             for oc in order_content:
                 result[oc] = content.get(oc)
 
-        result = {key: result[key] for key in result}
-        print(result)
-        return result
+        result_list = [(key, val) for key, val in result.items()]
+        return result_list, dict(result)
 
     @property
     def xml_did_list(self):
@@ -172,7 +171,7 @@ class ExportXml(object):
         doc.appendChild(root)
 
         # header
-        manager_dict = self.xml_header_attr
+        manager_list, manager_dict = self.xml_header_attr
         header_manager = doc.createElement('Header')
         if manager_dict:
             protocols = [{k.split('-')[0]: [k.split('-')[1], v]} for k, v in manager_dict.items() if '-' in k]
@@ -183,8 +182,8 @@ class ExportXml(object):
 
             node_name_protocol = doc.createElement('Protocol')
             inter_val = True
-            for key, val in manager_dict.items():
-                if '-' in key and inter_val:
+            for value in manager_list:
+                if '-' in value[0] and inter_val:
                     inter_val = False
                     for nk, nv in new_protocols.items():
                         node_protocol_k = doc.createElement(nk)
@@ -196,9 +195,9 @@ class ExportXml(object):
                     header_manager.appendChild(node_name_protocol)
 
                 else:
-                    if '-' not in key:
-                        node_name = doc.createElement(key)
-                        node_name.appendChild(doc.createTextNode(str(val)))
+                    if '-' not in value[0]:
+                        node_name = doc.createElement(value[0])
+                        node_name.appendChild(doc.createTextNode(str(value[1])))
                         header_manager.appendChild(node_name)
         root.appendChild(header_manager)
 
