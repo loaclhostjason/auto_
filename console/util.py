@@ -115,15 +115,9 @@ class ExportXml(object):
 
     @property
     def read_section(self):
-        attr_content = AttrContent.query.filter_by(project_id=self.project_id).all()
-        result = list()
-        if attr_content:
-            for ac in attr_content:
-                real_content = json.loads(ac.real_content) if ac.real_content else None
-                if real_content:
-                    for key, val in real_content.items():
-                        if key == 'DidNo':
-                            result.append(val)
+        project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, level=2). \
+            order_by(ProjectRelation.relation_order).all()
+        result = [v.name for v in project_relation]
         return result
 
     def __get_(self, projects):
@@ -263,57 +257,59 @@ class ExportXml(object):
         modification_section = self.modification
         node_modification = doc.createElement('ModificationSection')
         if modification_section:
-            for key, val in modification_section.items():
-                node_modification_item = doc.createElement('ModificationItem')
-                node_modification_item.setAttribute('IDREF', key)
+            for key in self.read_section:
+                val = modification_section.get(key)
+                if val:
+                    node_modification_item = doc.createElement('ModificationItem')
+                    node_modification_item.setAttribute('IDREF', key)
 
-                # ParameterName
-                parameter_name = val['parameter_name']
-                byte = dict(val['byte'])
+                    # ParameterName
+                    parameter_name = val['parameter_name']
+                    byte = dict(val['byte'])
 
-                for parameter_val in parameter_name:
-                    node_parameter = doc.createElement('Parameter')
+                    for parameter_val in parameter_name:
+                        node_parameter = doc.createElement('Parameter')
 
-                    try:
-                        default_val = val['conf_data'].get(list(parameter_val.keys())[0])[0][0]
-                    except Exception:
-                        default_val = ''
+                        try:
+                            default_val = val['conf_data'].get(list(parameter_val.keys())[0])[0][0]
+                        except Exception:
+                            default_val = ''
 
-                    node_parameter.setAttribute('ParamDefaultValue', default_val)
-                    for parameter_k, parameter_v in parameter_val.items():
+                        node_parameter.setAttribute('ParamDefaultValue', default_val)
+                        for parameter_k, parameter_v in parameter_val.items():
 
-                        # parameter and byte bit bit_len
-                        byte_content = byte.get(parameter_k)
+                            # parameter and byte bit bit_len
+                            byte_content = byte.get(parameter_k)
 
-                        # bite
-                        if byte_content:
-                            byte_content = byte_content[0]
-                            for p_key in self.__parameter_order():
-                                node_byte_name = doc.createElement(p_key)
-                                node_byte_name.appendChild(doc.createTextNode(str(byte_content.get(p_key))))
-                                node_modification_item.appendChild(node_byte_name)
+                            # bite
+                            if byte_content:
+                                byte_content = byte_content[0]
+                                for p_key in self.__parameter_order():
+                                    node_byte_name = doc.createElement(p_key)
+                                    node_byte_name.appendChild(doc.createTextNode(str(byte_content.get(p_key))))
+                                    node_modification_item.appendChild(node_byte_name)
 
-                        # ConfData
-                        node_conf_data = doc.createElement('ConfData')
-                        conf_data = val['conf_data'].get(parameter_k)
+                            # ConfData
+                            node_conf_data = doc.createElement('ConfData')
+                            conf_data = val['conf_data'].get(parameter_k)
 
-                        if not conf_data:
-                            node_conf_data.setAttribute('useConfData', 'no')
-                            node_parameter.appendChild(node_conf_data)
-
-                        if conf_data:
-                            node_conf_data.setAttribute('useConfData', 'true')
-                            for data in conf_data:
-                                node_config_data = doc.createElement('ConfigData')
-                                node_config_data.setAttribute('Value', data[0])
-
-                                node_config_data.setAttribute('ConfigExpression', data[1])
-                                node_conf_data.appendChild(node_config_data)
-
+                            if not conf_data:
+                                node_conf_data.setAttribute('useConfData', 'no')
                                 node_parameter.appendChild(node_conf_data)
 
-                    node_modification_item.appendChild(node_parameter)
-                node_modification.appendChild(node_modification_item)
+                            if conf_data:
+                                node_conf_data.setAttribute('useConfData', 'true')
+                                for data in conf_data:
+                                    node_config_data = doc.createElement('ConfigData')
+                                    node_config_data.setAttribute('Value', data[0])
+
+                                    node_config_data.setAttribute('ConfigExpression', data[1])
+                                    node_conf_data.appendChild(node_config_data)
+
+                                    node_parameter.appendChild(node_conf_data)
+
+                        node_modification_item.appendChild(node_parameter)
+                    node_modification.appendChild(node_modification_item)
         root.appendChild(node_modification)
 
         node_write_section = doc.createElement('WriteSection')
