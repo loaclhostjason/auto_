@@ -131,6 +131,10 @@ class ExportXml(object):
         d['byte'] = r
         return d
 
+    @staticmethod
+    def __parameter_order():
+        return ['ParameterName', 'BytePosition', 'BitPosition', 'BitLength']
+
     @property
     def modification(self):
         did = self.read_section
@@ -248,14 +252,15 @@ class ExportXml(object):
 
                         # parameter and byte bit bit_len
                         byte_content = byte.get(parameter_k)
+                        print(byte_content)
 
                         # bite
                         if byte_content:
-                            for val_byte in byte_content:
-                                for kk, vv in val_byte.items():
-                                    node_byte_name = doc.createElement(kk)
-                                    node_byte_name.appendChild(doc.createTextNode(str(vv)))
-                                    node_modification_item.appendChild(node_byte_name)
+                            byte_content = byte_content[0]
+                            for p_key in self.__parameter_order():
+                                node_byte_name = doc.createElement(p_key)
+                                node_byte_name.appendChild(doc.createTextNode(str(byte_content.get(p_key))))
+                                node_modification_item.appendChild(node_byte_name)
 
                         # ConfData
                         node_conf_data = doc.createElement('ConfData')
