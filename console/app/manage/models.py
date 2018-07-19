@@ -44,10 +44,10 @@ class Attr(db.Model):
                 {"item_zh": "AlgorithmNumber", "item": "AlgorithmNumber"},
                 {"item_zh": "ConfigurationIndex", "item": "ConfigurationIndex"}]
 
-        _content = [{"item_zh": "ParameterName:", "item": "ParameterName", "item_required": "y"},
-                    {"item_zh": "BytePosition:", "item": "BytePosition", "item_required": "y"},
-                    {"item_zh": "BitPosition:", "item": "BitPosition", "item_required": "y"},
-                    {"item_zh": "BitLength:", "item": "BitLength", "item_required": "y"}]
+        _content = [{"item_zh": "DidNo", "item": "DidNo"}, {"item_zh": "DidIndicator", "item": "DidIndicator"},
+                    {"item_zh": "Name", "item": "Name"}, {"item_zh": "DidLength", "item": "DidLength"},
+                    {"item_zh": "FeatureCode", "item": "FeatureCode"},
+                    {"item_zh": "DefaultValue", "item": "DefaultValue"}]
 
         _did_len = [{"item_zh": "DidNo", "item": "DidNo"}, {"item_zh": "DidIndicator", "item": "DidIndicator"},
                     {"item_zh": "Name", "item": "Name"}, {"item_zh": "DidLength", "item": "DidLength"},
@@ -108,3 +108,16 @@ class AttrContent(db.Model):
 
         cls.update_model(is_have_content, data)
         return
+
+
+class ExtraAttrContent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_relation_id = db.Column(db.Integer, db.ForeignKey('project_relation.id'))
+
+    real_content = db.Column(db.Text)
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+
+    project = db.relationship('Project', backref=db.backref("extra_attr_content", cascade="all, delete-orphan"))
+    project_relation = db.relationship('ProjectRelation',
+                                       backref=db.backref("extra_attr_content", cascade="all, delete-orphan"))

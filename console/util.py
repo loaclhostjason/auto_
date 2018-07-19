@@ -141,7 +141,13 @@ class ExportXml(object):
 
     @staticmethod
     def __parameter_order():
-        return ['ParameterName', 'BytePosition', 'BitPosition', 'BitLength']
+        attr = Attr.query.filter_by(level=3).first()
+        if not attr:
+            return list()
+        result = list()
+        for ar in attr:
+            result.append(ar['item'])
+        return result
 
     @property
     def modification(self):
@@ -353,7 +359,7 @@ class ExportXml(object):
     def run(self):
         files_path = self.set_path()
         doc = self.set_xml()
-        with open(files_path, 'w+', encoding='utf-8') as f:
+        with open(files_path, 'w', encoding='utf-8') as f:
             doc.writexml(f, indent='', addindent='  ', newl='\r\n', encoding="utf-8")
 
     def mk_dir(self, project_name):
