@@ -353,14 +353,14 @@ class ExportXml(object):
     def run(self):
         files_path = self.set_path()
         doc = self.set_xml()
-        fp = open(files_path, 'w', encoding='utf-8')
-        doc.writexml(fp, indent='\t', addindent='\t', newl='\n', encoding="utf-8")
+        with open(files_path, 'w+', encoding='utf-8') as f:
+            doc.writexml(f, indent='', addindent='  ', newl='\r\n', encoding="utf-8")
 
     def mk_dir(self, project_name):
         files_path = self.set_dir_path(project_name)
         doc = self.set_xml()
-        fp = open(files_path, 'w', encoding='utf-8')
-        doc.writexml(fp, indent='\t', addindent='\t', newl='\n', encoding="utf-8")
+        with open(files_path, 'w', encoding='utf-8') as f:
+            doc.writexml(f, indent='', addindent='  ', newl='\r\n', encoding="utf-8")
 
 
 if __name__ == '__main__':
