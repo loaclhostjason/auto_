@@ -113,6 +113,7 @@ def edit_extra_attr_file(project_id):
             content = get_extra_content2()
             extra_attr.content_val = json.dumps(content)
         db.session.add(extra_attr)
+        return redirect(url_for('.edit_file', project_id=project_id))
     if level == 1:
         return render_template('main/create_edit_extra_attr_file.html', project=project, extra_attr=extra_attr)
     else:
