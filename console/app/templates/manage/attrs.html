@@ -34,7 +34,18 @@
                                 <td>{{ attr.username }}</td>
 
                                 <td class="text-right">
-                                    <a href="{{ url_for('.edit_attr', id=attr.id) }}">编辑</a>
+                                    {% if attr.level != 3 %}
+                                        <div>
+                                            <a href="{{ url_for('.edit_extra_attr', id=attr.id) }}">
+                                                <i class="fa fa-edit"></i> 默认参数
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <a href="{{ url_for('.edit_attr', id=attr.id) }}">
+                                            <i class="fa fa-edit"></i> 常规参数
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}

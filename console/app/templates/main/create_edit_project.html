@@ -35,9 +35,11 @@
                         <span class="title-text" style="margin-right: 5px">项目--工作区
                             {% if not project %}
                                 <label class="pull-right">
+                                {% if current_user.role.name != 'user' %}
                                     <a href="javascript:void (0)"
                                        class="btn btn-primary btn-xs add-project">添加项目</a>
                                     <span class="text-explode">|</span>
+                                {% endif %}
                                     <a href="javascript:void (0)"
                                        class="btn btn-primary btn-xs add-project-file">添加项目文件</a>
                                 </label>

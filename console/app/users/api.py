@@ -74,6 +74,7 @@ def edit_users(id):
             return jsonify({'success': False, 'message': '用户名重复了'})
 
         users_params['expiry_time'] = '{} {}'.format(users_params['expiry_time'], '23:59:59')
+        User.update_model(user, users_params)
 
     else:
         user_message = UserForm().validate_user_pwd()
@@ -83,7 +84,9 @@ def edit_users(id):
         if error_message:
             return jsonify({'success': False, 'message': error_message})
 
-    User.update_model(user, users_params)
+        user.password = users_params.get('upw')
+        db.session.add(user)
+
     return jsonify({'success': True, 'message': '更新成功'})
 
 

@@ -112,12 +112,14 @@ class AttrContent(db.Model):
 
 class ExtraAttrContent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    project_relation_id = db.Column(db.Integer, db.ForeignKey('project_relation.id'))
+    attr_id = db.Column(db.Integer, db.ForeignKey('attr.id'))
 
-    real_content = db.Column(db.Text)
+    content = db.Column(db.Text)
 
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    attr = db.relationship('Attr', backref=db.backref("extra_attr_content", cascade="all, delete-orphan"))
 
-    project = db.relationship('Project', backref=db.backref("extra_attr_content", cascade="all, delete-orphan"))
-    project_relation = db.relationship('ProjectRelation',
-                                       backref=db.backref("extra_attr_content", cascade="all, delete-orphan"))
+    @classmethod
+    def edit(cls, form_data, attr):
+        cls.update_model(attr, form_data)
+        db.session.add(attr)
+        return
