@@ -17,6 +17,8 @@ from sqlalchemy import or_, func
 
 import json
 from util import ExportXml
+from ..manage.models import Attr, ExtraAttrContent
+from .func_extra import *
 
 
 @main.route('/', methods=['GET', 'POST'])
@@ -88,6 +90,33 @@ def create_edit_project():
 def edit_file(project_id):
     project = Project.query.get_or_404(project_id)
     return render_template('main/create_edit_project.html', project=project)
+
+
+@main.route('/project/edit/<int:project_id>/extra', methods=['GET', 'POST'])
+@login_required
+def edit_extra_attr_file(project_id):
+    project = Project.query.get_or_404(project_id)
+    level = request.args.get('level')
+    attr = Attr.query.filter_by(level=level).first()
+    extra_attr = attr.extra_attr_content
+    if not attr or not extra_attr:
+        abort(404)
+
+    if request.method == 'POST':
+        pin_num = request.form.get('pin_num')
+        if pin_num:
+            content = get_extra_content()
+            print(content)
+            content.append({'pin_num': pin_num})
+            extra_attr.content_val = json.dumps([v for v in content if v])
+        else:
+            content = get_extra_content2()
+            extra_attr.content_val = json.dumps(content)
+        db.session.add(extra_attr)
+    if level == 1:
+        return render_template('main/create_edit_extra_attr_file.html', project=project, extra_attr=extra_attr)
+    else:
+        return render_template('main/create_edit_extra_attr_file2.html', project=project, extra_attr=extra_attr)
 
 
 @main.after_request

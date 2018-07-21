@@ -258,7 +258,11 @@ myDiagram.nodeTemplateMap.add("FirstNode",
                 let parent_id = node['key'];
                 let level = node['level'];
                 $.g_projects.get_project_data(project_id, parent_id);
-                $.g_projects.get_attr_input(project_id, level, parent_id)
+                $.g_projects.get_attr_input(project_id, level, parent_id);
+
+                // extra config
+                $('.add-extra-config').show();
+                $('.add-extra-config').attr('level', 1);
             }
         }, {
             contextMenu: firstContextMenu
@@ -278,7 +282,11 @@ myDiagram.nodeTemplateMap.add("SecondNode",
                 let parent_id = node['key'];
                 let level = node['level'];
                 $.g_projects.get_project_data(project_id, parent_id);
-                $.g_projects.get_attr_input(project_id, level, parent_id)
+                $.g_projects.get_attr_input(project_id, level, parent_id);
+
+                // extra config
+                $('.add-extra-config').show();
+                $('.add-extra-config').attr('level', 2);
             }
         }, {
             contextMenu: secondContextMenu
@@ -301,7 +309,10 @@ myDiagram.nodeTemplateMap.add("ThirdNode",
 
                 $.g_parent_id = parent_id;
                 $.g_projects.get_project_data(project_id, parent_id);
-                $.g_projects.get_attr_input(project_id, level, parent_id)
+                $.g_projects.get_attr_input(project_id, level, parent_id);
+
+                // extra config
+                $('.add-extra-config').hide();
             }
         }, {
             contextMenu: thirdContextMenu

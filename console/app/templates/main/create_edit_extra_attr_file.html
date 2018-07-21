@@ -1,0 +1,96 @@
+{% extends "main.html" %}
+{% import "macro/macro_content.html" as content %}}
+
+{% set active = 'file' %}
+{% set menu_open = 'file' %}
+
+{% block main_content %}
+
+    <div class="col-sm-12 console-title clearfix">
+        <div class="pull-left">
+            <h4>编辑项目文件额外属性</h4>
+            <a href="{{ url_for('.edit_file', project_id=project.id) }}" class="btn btn-xs btn-toinstlist">
+                <span class="icon-toinstlist"></span>
+                <span>返回</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-sm-12" style="margin-top: 10px">
+        <form method="post" class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-2"><label for="" class="control-label pull-right"><span>PIN数目:</span></label></div>
+                <div class="col-sm-3">
+                    {% set extra_content = extra_attr.content | loads_jason if extra_attr and extra_attr.content %}
+                    {% set extra_content_val = extra_attr.content_val | loads_jason if extra_attr and extra_attr.content_val %}
+                    <input class="form-control pull-left" name="pin_num" value="{{ extra_content[-1].get('pin_num') or '' }}" type="number" readonly>
+                    <div>注：暂时不支持配置 有管理员配置</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2"><label class="control-label pull-right">PIN属性:</label></div>
+                <div class="col-sm-10" style="color: #666">
+
+                    <table class="table table-hover table-extra-filter">
+                        <thead>
+                        <tr>
+                            <th>PIN_ID</th>
+                            <th>显示名称</th>
+                            <th>值</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            {% if extra_attr and extra_attr.content %}
+                                {% set extra_attr_pin_num =  extra_content[-1].get('pin_num') or 0 %}
+                                {% for index in range(1, extra_attr_pin_num | int + 1) %}
+
+                                    {% set loop_root = loop.index %}
+                                    {% for attr in extra_attr.content | loads_jason %}
+                                        {% if 'pin_num' not in attr.keys() %}
+                                            <tr>
+                                                {% if loop.index0 == 0 %}
+                                                    <td rowspan="{{ extra_attr_pin_num | int }}">
+                                                        {{ 'Pin_%d' % index }}
+                                                    </td>
+                                                {% endif %}
+
+                                                <td>{{ attr['item_zh'] }}</td>
+                                                <td>
+                                                    <input name="item" value="{{ attr['item'] }}" type="hidden"/>
+                                                    <input name="item_value" class="td-input" required
+                                                           value="{{ extra_content_val[loop_root * 2+ loop.index0 - 2]['item_value'] }}"/>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+
+                                    {% endfor %}
+
+                                {% endfor %}
+
+
+
+                            {% endif %}
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-3">
+                    <button class="btn btn-primary">保存</button>
+                    <a href="{{ url_for('.edit_file', project_id=project.id) }}" class="btn btn-default" style="margin-left: 20px">取消</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ super() }}
+{% endblock %}

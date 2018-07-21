@@ -115,8 +115,9 @@ class ExtraAttrContent(db.Model):
     attr_id = db.Column(db.Integer, db.ForeignKey('attr.id'))
 
     content = db.Column(db.Text)
+    content_val = db.Column(db.Text)
 
-    attr = db.relationship('Attr', backref=db.backref("extra_attr_content", cascade="all, delete-orphan"))
+    attr = db.relationship('Attr', backref=db.backref("extra_attr_content", uselist=False, cascade="all, delete-orphan"))
 
     @classmethod
     def edit(cls, form_data, attr):

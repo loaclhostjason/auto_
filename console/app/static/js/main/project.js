@@ -78,7 +78,7 @@ $(document).ready(function () {
                     } else {
                         if (num == byte_position) {
                             html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="">';
-                        }  else
+                        } else
                             html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="" disabled>';
                     }
 
@@ -310,5 +310,13 @@ $(document).ready(function () {
                 })
             }
         })
+    })
+});
+
+// extra config
+$(document).ready(function () {
+    $('.add-extra-config').click(function () {
+        let level = $(this).attr('level');
+        window.location.href = '/project/edit/' + project_id + '/extra?level=' + level || 0
     })
 });
