@@ -214,36 +214,34 @@ class ExportXml(object):
 
         read_section = content.get('readsection')
         write_section = content.get('writsection')
-        reset_section = content.get('resetsection')
 
         result = {
             'read_section': read_section,
             'write_section': write_section,
-            'reset_section': reset_section,
         }
         return result[type_result]
 
     @property
     def xml_reset_section(self):
-        attr = Attr.query.filter_by(level=2).first()
+        attr = Attr.query.filter_by(level=1).first()
         if not attr or not attr.extra_attr_content:
-            return list()
-        content = json.loads(attr.extra_attr_content.content_val) if attr.extra_attr_content else {}
-        result = defaultdict(list)
-        reset_section = []
-        if content:
-            for key, val in content.items():
-                reset_section = val.get('resetsection')
-                for v in reset_section:
-                    result[v['project_id']].append(key)
-        result = {k: list(set(v)) for k, v in result.items() if v}
+            return list(), list()
+        content = json.loads(attr.extra_attr_content.content_section_val) if attr.extra_attr_content else {}
+        content = content.get(str(self.project_id))
 
+        attr2 = Attr.query.filter_by(level=2).first()
+        if not attr or not attr.extra_attr_content:
+            return list(), list()
+        content2 = json.loads(attr2.extra_attr_content.content_val) if attr.extra_attr_content else {}
         new_reset_section = []
-        for v in reset_section:
-            del v['project_id']
-            new_reset_section.append(v)
-        print(new_reset_section)
-        return result.get(self.project_id) or [], new_reset_section
+        for k, v in content2.items():
+            resetsection = v.get('resetsection')
+            if resetsection:
+                for vv in resetsection:
+                    if vv.get('project_id') == self.project_id:
+                        new_reset_section.append(k)
+        print(content, new_reset_section)
+        return content, new_reset_section
 
     def set_xml(self):
         doc = xml.dom.minidom.Document()
@@ -396,13 +394,19 @@ class ExportXml(object):
         root.appendChild(node_write_section)
 
         # ResetSection
-        # node_reset_section = doc.createElement('ResetSection')
-        # print(self.xml_reset_section)
-        # reset_section = self.xml_resetsection_attr.get('resetsection')
-        # if reset_section:
-        #     for v in reset_section:
-        #         node_reset_section.setAttribute(v['item'], v['item_value'])
-        # root.appendChild(node_reset_section)
+        node_reset_section = doc.createElement('ResetSection')
+        reset_section_attr, read_section_val = self.xml_reset_section
+        if reset_section_attr:
+            for v in reset_section_attr:
+                node_reset_section.setAttribute(v['resetsection_item'], v['resetsection_item_value'])
+        if read_section_val:
+            for v in self.read_section:
+                if v in read_section_val:
+                    node_reset_section_v = doc.createElement('ReadItem')
+                    node_reset_section_v.setAttribute('IDREF', v)
+                    node_reset_section.appendChild(node_reset_section_v)
+
+        root.appendChild(node_reset_section)
 
         # RevisionLog
         node_log = doc.createElement('RevisionLog')

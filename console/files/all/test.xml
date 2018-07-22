@@ -27,6 +27,10 @@
     <WriteItem IDREF="C123" c="5" d="6"/>
     <WriteItem IDREF="C234" c="56456" d="46456"/>
   </WriteSection>
+  <ResetSection 23123="23" sdasd="35">
+    <ReadItem IDREF="C123"/>
+    <ReadItem IDREF="C234"/>
+  </ResetSection>
   <RevisionLog>
     <RevisionLogEntry>
       <ConfigurationFileNumber>4</ConfigurationFileNumber>
