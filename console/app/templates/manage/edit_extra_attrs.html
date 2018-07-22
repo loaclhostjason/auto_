@@ -26,8 +26,8 @@
             <div class="form-group">
                 <div class="col-sm-2"><label for="" class="control-label pull-right"><span>PIN数目:</span></label></div>
                 <div class="col-sm-3">
-                    {% set extra_content = extra_attr.content | loads_jason if extra_attr and extra_attr.content %}
-                    <input class="form-control pull-left" name="pin_num" value="{{ extra_content[-1].get('pin_num') or '' }}" type="number" required>
+                    {% set extra_content = extra_attr.content | loads_jason if extra_attr and extra_attr.content else [] %}
+                    <input class="form-control pull-left" name="pin_num" value="{{ extra_content[-1].get('pin_num') or '' if extra_content}}" type="number" required>
                 </div>
             </div>
 
