@@ -126,7 +126,27 @@ def edit_extra_attr_file(project_id):
 
         else:
             name = request.args.get('name')
+            reset_section = request.form.get('reset_section')
+
+            c_all = content_val.values()
+            resetsection = [v['resetsection'] for v in c_all if v['resetsection']]
+            resetsection_name = [v['name'] for v in sum(resetsection, []) if v['name'] and v['project_id'] == project_id]
+
             content = get_extra_content2(project_id)
+            content['resetsection'] = [{'project_id': v['project_id'],
+                                        'name': v['name']} for v in sum(resetsection, []) if v['name']
+                                       ]
+            if reset_section and name not in resetsection_name:
+                content['resetsection'].append({
+                    'project_id': project_id,
+                    'name': name
+                })
+            else:
+                content['resetsection'] = [
+                    {'project_id': v['project_id'],
+                     'name': v['name']} for v in sum(resetsection, []) if v['name'] != name and v['project_id'] == project_id
+                ]
+
             if not name:
                 abort(404)
             if not content_val.get(name):

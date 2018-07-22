@@ -56,7 +56,6 @@ def get_extra_content2(project_id=None):
     field_keys = {
         'readsection': field_key,
         'writsection': field_key,
-        'resetsection': field_key,
     }
 
     result = defaultdict(list)

@@ -106,6 +106,15 @@
             <div class="form-group">
                 <div class="col-sm-2"></div>
                 <div class="col-sm-3">
+                    {% set resetsection = extra_content_val.get('resetsection') %}
+                    <input name="reset_section" value="y" type="checkbox"
+                           {% if resetsection | selectattr('name', 'equalto', request.args.get('name')) | list %}checked{% endif %}> 使用reset_section
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-3">
                     <button class="btn btn-primary">保存</button>
                     <a href="{{ url_for('.edit_file', project_id=project.id) }}" class="btn btn-default" style="margin-left: 20px">取消</a>
                 </div>
