@@ -17,4 +17,17 @@ $(document).ready(function () {
     });
 
 
+    let html_tr2 = '';
+
+    html_tr2 += '<tr>';
+    html_tr2 += '<td><input name="resetsection_item" class="td-input" required/></td>';
+    html_tr2 += '<td><input name="resetsection_item_zh" class="td-input" required/></td>';
+    html_tr2 += '<td><a href="javascript:void(0);" class="td-remove">移除</a></td>';
+
+    html_tr2 += '</tr>';
+
+    $('.td-add2').click(function () {
+        $(this).parents('tr').before(html_tr2);
+    });
+
 });

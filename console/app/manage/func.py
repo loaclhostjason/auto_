@@ -50,6 +50,29 @@ def get_extra_content():
     return result
 
 
+def get_extra_reset_content():
+    field_key = [
+        'resetsection_item',
+        'resetsection_item_zh',
+    ]
+    items = request.form.getlist('resetsection_item')
+    if not items:
+        return
+
+    result = list()
+    for index, val in enumerate(items):
+        d = dict()
+        for k in field_key:
+            try:
+                dict_value = request.form.getlist(k)[index]
+                if dict_value:
+                    d[k] = dict_value
+            except Exception:
+                pass
+        result.append(d)
+    return result
+
+
 def get_extra_content2():
     field_key = [
         'item',

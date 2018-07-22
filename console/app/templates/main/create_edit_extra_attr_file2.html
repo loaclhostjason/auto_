@@ -6,6 +6,7 @@
 
 {% set attr_extra_content  = extra_attr.content | loads_jason if extra_attr and extra_attr.content  else {} %}
 {% set attr_extra_content_val  = extra_attr.content_val | loads_jason if extra_attr and extra_attr.content_val  else {} %}
+{% set extra_content_val  = attr_extra_content_val.get(request.args.get('name') or '') or {} %}
 {% block main_content %}
 
     <div class="col-sm-12 console-title clearfix">
@@ -23,6 +24,12 @@
 
 
             <div class="form-group">
+                <div class="form-group">
+                    <div class="col-sm-2"><label for="" class="control-label pull-right"><span>DID地址名称:</span></label></div>
+                    <div class="col-sm-3">
+                        <label style="position: relative; top: 10px;left: 20px">{{ request.args.get('name') }}</label>
+                    </div>
+                </div>
                 <div class="col-sm-2"><label class="control-label pull-right">ReadSection:</label></div>
                 <div class="col-sm-10" style="color: #666">
 
@@ -35,7 +42,7 @@
                         </thead>
                         <tbody>
                         <tr>
-                            {% set readsection = attr_extra_content_val['readsection'] %}
+                            {% set readsection = extra_content_val.get('readsection') %}
 
                             {% if attr_extra_content.get('readsection') %}
                                 {% for attr in attr_extra_content['readsection'] %}
@@ -46,7 +53,7 @@
                                         <td>
                                             <input name="readsection_item" value="{{ attr['item'] }}" type="hidden"/>
                                             <input name="readsection_item_value" class="td-input" required
-                                                   value="{{ readsection[loop.index0]['item_value'] }}"/>
+                                                   value="{{ readsection[loop.index0]['item_value'] if readsection }}"/>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -71,7 +78,7 @@
                         </thead>
                         <tbody>
                         <tr>
-                            {% set writsection = attr_extra_content_val['writsection'] %}
+                            {% set writsection = extra_content_val.get('writsection') %}
 
                             {% if attr_extra_content.get('writsection') %}
                                 {% for attr in attr_extra_content.get('writsection') %}
@@ -83,7 +90,7 @@
                                         <td>
                                             <input name="writsection_item" value="{{ attr['item'] }}" type="hidden"/>
                                             <input name="writsection_item_value" class="td-input" required
-                                                   value="{{ writsection[loop.index0]['item_value'] }}"/>
+                                                   value="{{ writsection[loop.index0]['item_value'] if writsection }}"/>
                                         </td>
 
                                     </tr>
@@ -95,46 +102,6 @@
                     </table>
                 </div>
             </div>
-
-
-            <div class="form-group">
-                <div class="col-sm-2"><label class="control-label pull-right">ResetSection:</label></div>
-                <div class="col-sm-10" style="color: #666">
-
-                    <table class="table table-hover table-extra-resetsection">
-                        <thead>
-                        <tr>
-                            <th>属性字段</th>
-                            <th>值</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            {% set resetsection = attr_extra_content_val['resetsection'] %}
-
-                            {% if attr_extra_content.get('resetsection') %}
-                                {% for attr in attr_extra_content.get('resetsection') %}
-                                    <tr>
-                                        <td>
-                                            {{ attr['item_zh'] }}
-                                        </td>
-                                        <td>
-                                            <input name="resetsection_item" value="{{ attr['item'] }}" type="hidden"/>
-                                            <input name="resetsection_item_value" class="td-input" required
-                                                   value="{{ resetsection[loop.index0]['item_value'] }}"/>
-                                        </td>
-                                    </tr>
-
-
-                                {% endfor %}
-
-                            {% endif %}
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
 
             <div class="form-group">
                 <div class="col-sm-2"></div>

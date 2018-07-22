@@ -287,6 +287,7 @@ myDiagram.nodeTemplateMap.add("SecondNode",
                 // extra config
                 $('.add-extra-config').show();
                 $('.add-extra-config').attr('level', 2);
+                $('.add-extra-config').attr('name', node['name']);
             }
         }, {
             contextMenu: secondContextMenu

@@ -317,6 +317,7 @@ $(document).ready(function () {
 $(document).ready(function () {
     $('.add-extra-config').click(function () {
         let level = $(this).attr('level');
-        window.location.href = '/project/edit/' + project_id + '/extra?level=' + level || 0
+        let name = $(this).attr('name');
+        window.location.href = '/project/edit/' + project_id + '/extra?level=' + (level || 0) + '&name=' + name || '';
     })
 });

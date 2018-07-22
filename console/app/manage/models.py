@@ -117,6 +117,8 @@ class ExtraAttrContent(db.Model):
     content = db.Column(db.Text)
     content_val = db.Column(db.Text)
 
+    content_section = db.Column(db.Text)
+    content_section_val = db.Column(db.Text)
     attr = db.relationship('Attr', backref=db.backref("extra_attr_content", uselist=False, cascade="all, delete-orphan"))
 
     @classmethod

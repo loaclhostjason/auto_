@@ -96,25 +96,47 @@ def edit_file(project_id):
 @login_required
 def edit_extra_attr_file(project_id):
     project = Project.query.get_or_404(project_id)
-    level = request.args.get('level')
+    level = request.args.get('level') or 0
     attr = Attr.query.filter_by(level=level).first()
     extra_attr = attr.extra_attr_content
     if not attr or not extra_attr:
         abort(404)
 
     if request.method == 'POST':
+        content_val = json.loads(extra_attr.content_val) if extra_attr.content_val else {}
+        content_section_val = json.loads(extra_attr.content_section_val) if extra_attr.content_section_val else {}
+
         pin_num = request.form.get('pin_num')
         if pin_num:
             content = get_extra_content()
-            print(content)
             content.append({'pin_num': pin_num})
-            extra_attr.content_val = json.dumps([v for v in content if v])
+            content = {project_id: [v for v in content if v]}
+
+            content_section = get_extra_section_content()
+            content_section = {project_id: [v for v in content_section if v]}
+            if not content_val.get(str(project_id)):
+                content_val = dict(content, **content_val)
+                content_section_val = dict(content_section, **content_section_val)
+            else:
+                content_val[str(project_id)] = content[project_id]
+                content_section_val[str(project_id)] = content_section[project_id]
+
+            extra_attr.content_val = json.dumps(content_val)
+            extra_attr.content_section_val = json.dumps(content_section_val)
+
         else:
-            content = get_extra_content2()
-            extra_attr.content_val = json.dumps(content)
+            name = request.args.get('name')
+            content = get_extra_content2(project_id)
+            if not name:
+                abort(404)
+            if not content_val.get(name):
+                content_val = dict({name: content}, **content_val)
+            else:
+                content_val[name] = content
+            extra_attr.content_val = json.dumps(content_val)
         db.session.add(extra_attr)
         return redirect(url_for('.edit_file', project_id=project_id))
-    if level == 1:
+    if int(level) == 1:
         return render_template('main/create_edit_extra_attr_file.html', project=project, extra_attr=extra_attr)
     else:
         return render_template('main/create_edit_extra_attr_file2.html', project=project, extra_attr=extra_attr)

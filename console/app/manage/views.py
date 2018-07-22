@@ -46,10 +46,12 @@ def edit_extra_attr(id):
     if request.method == 'POST':
         if level == 1:
             content = get_extra_content()
+            content_section = get_extra_reset_content()
             pin_num = request.form.get('pin_num')
             content.append({'pin_num': pin_num})
             data = {
-                'content': json.dumps([v for v in content if v])
+                'content': json.dumps([v for v in content if v]),
+                'content_section': json.dumps([v for v in content_section if v])
             }
             ExtraAttrContent.edit(data, extra_attr)
         else:

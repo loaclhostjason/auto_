@@ -50,6 +50,30 @@ class ExportXml(object):
         project = Project.query.get_or_404(self.project_id)
         return project.name
 
+    @property
+    def xml_pin(self):
+        attr = Attr.query.filter_by(level=1).first()
+        if not attr or not attr.extra_attr_content:
+            return list()
+        content = json.loads(attr.extra_attr_content.content_val) if attr.extra_attr_content else {}
+        content = content.get(str(self.project_id)) or []
+        result = {
+            'pin_num': 0,
+            'data': list()
+        }
+        for c in content:
+            if 'pin_num' in c.keys():
+                result['pin_num'] = int(c['pin_num'])
+            else:
+                result['data'].append(c)
+
+        pin_num = result['pin_num']
+        pin_num = int(pin_num)
+        data = result['data']
+        result = [data[i:i + pin_num] for i in range(0, len(data), pin_num)]
+
+        return result
+
     @staticmethod
     def __ecu_order():
         attr = Attr.query.filter_by(level=1).first()
@@ -70,12 +94,12 @@ class ExportXml(object):
         project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, parent_id=None).first()
 
         if not project_relation:
-            return result
+            return list(), dict()
 
         attr_content = AttrContent.query.filter_by(project_relation_id=project_relation.id).first()
 
         if not attr_content or not attr_content.real_content:
-            return result
+            return list(), dict()
 
         content = json.loads(attr_content.real_content)
 
@@ -181,6 +205,46 @@ class ExportXml(object):
 
         return new_result
 
+    def xml_section_attr(self, did_name, type_result):
+        attr = Attr.query.filter_by(level=2).first()
+        if not attr or not attr.extra_attr_content:
+            return list()
+        content = json.loads(attr.extra_attr_content.content_val) if attr.extra_attr_content else {}
+        content = content.get(did_name) or {}
+
+        read_section = content.get('readsection')
+        write_section = content.get('writsection')
+        reset_section = content.get('resetsection')
+
+        result = {
+            'read_section': read_section,
+            'write_section': write_section,
+            'reset_section': reset_section,
+        }
+        return result[type_result]
+
+    @property
+    def xml_reset_section(self):
+        attr = Attr.query.filter_by(level=2).first()
+        if not attr or not attr.extra_attr_content:
+            return list()
+        content = json.loads(attr.extra_attr_content.content_val) if attr.extra_attr_content else {}
+        result = defaultdict(list)
+        reset_section = []
+        if content:
+            for key, val in content.items():
+                reset_section = val.get('resetsection')
+                for v in reset_section:
+                    result[v['project_id']].append(key)
+        result = {k: list(set(v)) for k, v in result.items() if v}
+
+        new_reset_section = []
+        for v in reset_section:
+            del v['project_id']
+            new_reset_section.append(v)
+        print(new_reset_section)
+        return result.get(self.project_id) or [], new_reset_section
+
     def set_xml(self):
         doc = xml.dom.minidom.Document()
         root = doc.createElement('ConfigurationModule')
@@ -217,16 +281,14 @@ class ExportXml(object):
                                 node_protocol_k_name.appendChild(doc.createTextNode(str(nvv[1])))
                                 node_protocol_k.appendChild(node_protocol_k_name)
                         if nk == 'PhysicalLayer':
-                            node_pin1 = doc.createElement('Pin')
-                            node_pin1.setAttribute('PinDefinition', 'CAN_H')
-                            node_pin1.setAttribute('PinNumber', '6')
-                            node_protocol_k.appendChild(node_pin1)
-
-                            node_pin2 = doc.createElement('Pin')
-                            node_pin2.setAttribute('PinDefinition', 'CAN_L')
-                            node_pin2.setAttribute('PinNumber', '14')
-                            node_protocol_k.appendChild(node_pin2)
-                        node_name_protocol.appendChild(node_protocol_k)
+                            pin_data = self.xml_pin
+                            if pin_data:
+                                for v in pin_data:
+                                    node_pin = doc.createElement('Pin')
+                                    for cv in v:
+                                        node_pin.setAttribute(cv['item'], cv['item_value'])
+                                    node_protocol_k.appendChild(node_pin)
+                                    node_name_protocol.appendChild(node_protocol_k)
 
                     header_manager.appendChild(node_name_protocol)
 
@@ -256,7 +318,10 @@ class ExportXml(object):
             for v in self.read_section:
                 node_name = doc.createElement('ReadItem')
                 node_name.setAttribute('IDREF', v)
-                node_name.setAttribute('OverrideDefault', 'false')
+
+                read_section_attr = self.xml_section_attr(v, 'read_section')
+                for rs in read_section_attr:
+                    node_name.setAttribute(rs['item'], rs['item_value'])
                 section_manager.appendChild(node_name)
         root.appendChild(section_manager)
 
@@ -324,11 +389,20 @@ class ExportXml(object):
             for val in self.read_section:
                 node_write_item = doc.createElement('WriteItem')
                 node_write_item.setAttribute('IDREF', val)
-                node_write_item.setAttribute('DidWriteScope', 'All')
-                node_write_item.setAttribute('ReadBackCompare', 'true')
-                node_write_item.setAttribute('DelayForMS', '0')
+                read_section_attr = self.xml_section_attr(val, 'write_section')
+                for rs in read_section_attr:
+                    node_write_item.setAttribute(rs['item'], rs['item_value'])
                 node_write_section.appendChild(node_write_item)
         root.appendChild(node_write_section)
+
+        # ResetSection
+        # node_reset_section = doc.createElement('ResetSection')
+        # print(self.xml_reset_section)
+        # reset_section = self.xml_resetsection_attr.get('resetsection')
+        # if reset_section:
+        #     for v in reset_section:
+        #         node_reset_section.setAttribute(v['item'], v['item_value'])
+        # root.appendChild(node_reset_section)
 
         # RevisionLog
         node_log = doc.createElement('RevisionLog')
@@ -370,5 +444,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(1)
+    export_xml = ExportXml(7)
     export_xml.run()

@@ -79,6 +79,55 @@
                 </div>
             </div>
 
+
+            <div class="form-group">
+                <div class="col-sm-2"><label class="control-label pull-right">ResetSection:</label></div>
+                <div class="col-sm-10" style="color: #666">
+
+                    <table class="table table-hover table-extra-resetsection">
+                        <thead>
+                        <tr>
+                            <th>属性字段</th>
+                            <th>显示名称</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            {% set extra_content_section = extra_attr.content_section | loads_jason if extra_attr and extra_attr.content_section else None %}
+                            {% if extra_content_section %}
+                                {% for attr in extra_content_section %}
+                                    <tr>
+                                        <td>
+                                            <input name="resetsection_item" class="td-input" required value="{{ attr['resetsection_item'] }}"/>
+                                        </td>
+                                        <td>
+                                            <input name="resetsection_item_zh" class="td-input" required
+                                                   value="{{ attr['resetsection_item_zh'] }}"/>
+                                        </td>
+
+                                        <td><a href="javascript:void(0);" class="td-remove">移除</a></td>
+                                    </tr>
+
+
+                                {% endfor %}
+
+                            {% endif %}
+                        </tr>
+                        <tr>
+
+                            <td colspan="3" style="font-size: 15px">
+                                <a class="monitor-dialog-add" href="javascript:void(0)">
+                                    <i class="blue-add-icon"></i>
+                                    <span class="td-add2" style="position: relative;top: -1px;">添加</span>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="form-group">
                 <div class="col-sm-2"></div>
                 <div class="col-sm-3">
