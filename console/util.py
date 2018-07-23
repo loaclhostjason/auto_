@@ -20,6 +20,21 @@ class Bite(Enum):
     bite = 'BitPosition'
 
 
+def change_data(data):
+    sty = {
+        '#': '+',
+        '&': '.',
+        '/': '|',
+        '-': '-',
+    }
+    for k, v in sty.items():
+        data = data.replace(k, v)
+    if '-' in data:
+        data = data.split('-')
+        data = ''.join(data[0]) + '-' + ''.join(['(%s)' % v for v in data[1::]])
+    return data
+
+
 class ExportXml(object):
 
     def __init__(self, project_id):
@@ -373,9 +388,10 @@ class ExportXml(object):
                             if conf_data:
                                 node_conf_data.setAttribute('useConfData', 'true')
                                 for data in conf_data:
+                                    # print(change_data(data[1]))
                                     node_config_data = doc.createElement('ConfigData')
                                     node_config_data.setAttribute('Value', data[0])
-                                    node_config_data.setAttribute('ConfigExpression', data[1])
+                                    node_config_data.setAttribute('ConfigExpression', change_data(data[1]))
                                     node_conf_data.appendChild(node_config_data)
 
                                     node_parameter.appendChild(node_conf_data)
