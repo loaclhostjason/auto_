@@ -239,7 +239,7 @@ class ExportXml(object):
             resetsection = v.get('resetsection')
             if resetsection:
                 for vv in resetsection:
-                    if vv.get('project_id') == self.project_id:
+                    if vv.get('project_id') == int(self.project_id):
                         new_reset_section.append(k)
         print(content, new_reset_section)
         return content, new_reset_section
@@ -451,5 +451,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(7)
+    export_xml = ExportXml(2)
     export_xml.run()
