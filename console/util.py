@@ -240,8 +240,7 @@ class ExportXml(object):
             if resetsection:
                 for vv in resetsection:
                     if vv.get('project_id') == int(self.project_id):
-                        new_reset_section.append(k)
-        print(content, new_reset_section)
+                        new_reset_section.append(vv.get('name'))
         return content, new_reset_section
 
     def set_xml(self):
@@ -264,16 +263,18 @@ class ExportXml(object):
             for pt in protocols:
                 for kkk, vvv in pt.items():
                     new_protocols[kkk].append(vvv)
+            protocols_order = OrderedDict()
+            if new_protocols:
+                for nk in order_protocols:
+                    protocols_order[nk] = new_protocols.get(nk)
 
             node_name_protocol = doc.createElement('Protocol')
             inter_val = True
             for value in manager_list:
                 if '-' in value[0] and inter_val:
                     inter_val = False
-                    for nk in order_protocols:
+                    for nk, nv in protocols_order.items():
                         node_protocol_k = doc.createElement(nk)
-                        nv = new_protocols.get(nk) or []
-
                         if nv:
                             for nvv in nv:
                                 node_protocol_k_name = doc.createElement(nvv[0])
@@ -287,7 +288,7 @@ class ExportXml(object):
                                     for cv in v:
                                         node_pin.setAttribute(cv['item'], cv['item_value'])
                                     node_protocol_k.appendChild(node_pin)
-                                    node_name_protocol.appendChild(node_protocol_k)
+                        node_name_protocol.appendChild(node_protocol_k)
 
                     header_manager.appendChild(node_name_protocol)
 
