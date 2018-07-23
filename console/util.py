@@ -360,7 +360,7 @@ class ExportXml(object):
                                 for p_key in self.__parameter_order():
                                     node_byte_name = doc.createElement(p_key)
                                     node_byte_name.appendChild(doc.createTextNode(str(byte_content.get(p_key))))
-                                    node_modification_item.appendChild(node_byte_name)
+                                    node_parameter.appendChild(node_byte_name)
 
                             # ConfData
                             node_conf_data = doc.createElement('ConfData')
@@ -375,7 +375,6 @@ class ExportXml(object):
                                 for data in conf_data:
                                     node_config_data = doc.createElement('ConfigData')
                                     node_config_data.setAttribute('Value', data[0])
-
                                     node_config_data.setAttribute('ConfigExpression', data[1])
                                     node_conf_data.appendChild(node_config_data)
 
