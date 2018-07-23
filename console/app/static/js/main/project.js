@@ -227,39 +227,58 @@ $(document).ready(function () {
         $('.start_rule:not(:first-of-type)').remove();
     });
     update_las_modal.on('show.bs.modal', function (event) {
-        btn_las = $(event.relatedTarget);
-        let las_name = btn_las.parents('td').find('input').val();
-        las_name = String(las_name).replace(/[$]/g, '');
-        // console.log(String(aa));
+        $.get('/las/get').done(function (resp) {
+            let data = resp['data'];
 
-        las_val = las_name.split(/[/.#+&,-]/);
-        las_f = [];
-        las_val.forEach(function (value) {
-
-            try {
-                if (las_name.split(value)[1][0])
-                    las_f.push(las_name.split(value)[1][0]);
-            } catch (e) {
-                console.log(e);
+            function option_html(data, selected_val) {
+                let h = '';
+                data.forEach(function (val) {
+                    for (let k in val) {
+                        if (selected_val == k) {
+                            h += '<option selected value="' + k + '">' + k + ' | ' + val[k] + '</option>'
+                        } else
+                            h += '<option value="' + k + '">' + k + ' | ' + val[k] + '</option>'
+                    }
+                });
+                return h
             }
 
+            btn_las = $(event.relatedTarget);
+            let las_name = btn_las.parents('td').find('input').val();
+            las_name = String(las_name).replace(/[$]/g, '');
+            // console.log(String(aa));
+
+            las_val = las_name.split(/[/.#+&,-]/);
+            las_f = [];
+            las_val.forEach(function (value) {
+
+                try {
+                    if (las_name.split(value)[1][0])
+                        las_f.push(las_name.split(value)[1][0]);
+                } catch (e) {
+                    console.log(e);
+                }
+
+            });
+
+            let html = '';
+            las_val.forEach(function (val, index) {
+                html += '<div class="form-group start_rule"><div class="col-sm-6">';
+                html += '<select name="las_' + index + '" class="form-control pull-left">' + option_html(data, val) + '</select></div>';
+                html += '<div class="col-sm-6"><select class="form-control pull-left las_f" name="las_f_' + index + '">';
+                let f = [['', '请选择'], ['.', '.'], ['#', '#'], ['/', '/'], ['-', '-'], ['+', '+'], ['&', '&']];
+                f.forEach(function (value) {
+                    if (las_f[index] === value[0]) {
+                        html += '<option selected value="' + value[0] + '">' + value[1] + '</option>';
+                    } else
+                        html += '<option value="' + value[0] + '">' + value[1] + '</option>';
+                });
+                html += '</select></div></div>';
+            });
+            $('.parent_rule').html(html);
         });
 
-        let html = '';
-        las_val.forEach(function (val, index) {
-            html += '<div class="form-group start_rule"><div class="col-sm-6">';
-            html += '<input name="las_' + index + '" class="form-control pull-left" required value="' + val + '"></div>';
-            html += '<div class="col-sm-6"><select class="form-control pull-left las_f" name="las_f_' + index + '">';
-            let f = [['', '请选择'], ['.', '.'], ['#', '#'], ['/', '/'], ['-', '-'], ['+', '+'], ['&', '&']];
-            f.forEach(function (value) {
-                if (las_f[index] === value[0]) {
-                    html += '<option selected value="' + value[0] + '">' + value[1] + '</option>';
-                } else
-                    html += '<option value="' + value[0] + '">' + value[1] + '</option>';
-            });
-            html += '</select></div></div>';
-        });
-        $('.parent_rule').html(html);
+
     });
 
     $(document).on('change', '.las_f', function () {

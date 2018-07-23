@@ -107,3 +107,11 @@ def edit_project_data_api(project_id):
     export_xml = ExportXml(project_id)
     export_xml.run()
     return jsonify({'success': True, 'message': '更新成功'})
+
+
+@main.route('/las/get')
+@login_required
+def get_las_info():
+    from read_las_config import read_excel
+    data = read_excel()
+    return jsonify({'data': data})
