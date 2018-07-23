@@ -93,7 +93,7 @@
                         <tbody>
                         <tr>
                             {% set extra_content_section = extra_attr.content_section | loads_jason if extra_attr and extra_attr.content_section else [] %}
-                            {% set extra_content_section_val = extra_attr.content_section_val | loads_jason if extra_attr and extra_attr.content_section_val else [] %}
+                            {% set extra_content_section_val = extra_attr.content_section_val | loads_jason if extra_attr and extra_attr.content_section_val else {} %}
                             {% set content_section_val = extra_content_section_val.get(project.id | string) or [] %}
 
                             {% if extra_content_section %}

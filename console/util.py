@@ -220,7 +220,7 @@ class ExportXml(object):
             'read_section': read_section,
             'write_section': write_section,
         }
-        return result[type_result]
+        return result.get(type_result)
 
     @property
     def xml_reset_section(self):
@@ -319,8 +319,9 @@ class ExportXml(object):
                 node_name.setAttribute('IDREF', v)
 
                 read_section_attr = self.xml_section_attr(v, 'read_section')
-                for rs in read_section_attr:
-                    node_name.setAttribute(rs['item'], rs['item_value'])
+                if read_section_attr:
+                    for rs in read_section_attr:
+                        node_name.setAttribute(rs['item'], rs['item_value'])
                 section_manager.appendChild(node_name)
         root.appendChild(section_manager)
 
@@ -389,8 +390,9 @@ class ExportXml(object):
                 node_write_item = doc.createElement('WriteItem')
                 node_write_item.setAttribute('IDREF', val)
                 read_section_attr = self.xml_section_attr(val, 'write_section')
-                for rs in read_section_attr:
-                    node_write_item.setAttribute(rs['item'], rs['item_value'])
+                if read_section_attr:
+                    for rs in read_section_attr:
+                        node_write_item.setAttribute(rs['item'], rs['item_value'])
                 node_write_section.appendChild(node_write_item)
         root.appendChild(node_write_section)
 
