@@ -166,10 +166,11 @@ class ExportXml(object):
     @staticmethod
     def __parameter_order():
         attr = Attr.query.filter_by(level=3).first()
-        if not attr:
+        if not attr or not attr.content:
             return list()
         result = list()
-        for ar in attr:
+        content = json.loads(attr.content)
+        for ar in content:
             result.append(ar['item'])
         return result
 
