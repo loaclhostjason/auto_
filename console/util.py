@@ -253,10 +253,10 @@ class ExportXml(object):
         for k, v in content2.items():
             resetsection = v.get('resetsection')
             if resetsection:
-                for vv in resetsection:
-                    if vv.get('project_id') == int(self.project_id):
-                        new_reset_section.append(vv.get('name'))
-        return content, new_reset_section
+                for kk, vv in resetsection.items():
+                    if kk == str(self.project_id):
+                        new_reset_section.append(vv)
+        return content, sum(new_reset_section, [])
 
     def set_xml(self):
         doc = xml.dom.minidom.Document()
