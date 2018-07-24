@@ -224,9 +224,11 @@ $(document).ready(function () {
     update_las_modal.on('hide.bs.modal', function () {
         $(this).find('input').val('');
         $(this).find('select').val('');
+        $(this).find('[name="no_las"]').removeAttr('checked');
         $('.start_rule:not(:first-of-type)').remove();
     });
     update_las_modal.on('show.bs.modal', function (event) {
+        $(this).find('[name="no_las"]').val('!');
         $.get('/las/get').done(function (resp) {
             let data = resp['data'];
 
@@ -245,6 +247,11 @@ $(document).ready(function () {
 
             btn_las = $(event.relatedTarget);
             let las_name = btn_las.parents('td').find('input').val();
+            let first_las_name = las_name[0];
+            if (first_las_name === '!') {
+                update_las_modal.find('[name="no_las"]').prop('checked', 'checked');
+            }
+
             las_name = String(las_name).replace(/[$]/g, '');
             // console.log(String(aa));
 
@@ -317,11 +324,16 @@ $(document).ready(function () {
         }
     });
     $('.submit_update_las').click(function () {
+        let no_las = update_las_modal.find('[name="no_las"]:checked').val();
+
         let start_rule_len = $('.start_rule').length;
         let las_name = btn_las.parents('td').find('input');
         let new_las_name = '';
         for (let i = 0; i < start_rule_len; i++) {
             new_las_name += '$' + $('[name="las_' + i + '"]').val() + $('[name="las_f_' + i + '"]').val()
+        }
+        if (no_las) {
+            new_las_name = '!(' + new_las_name + ')';
         }
         las_name.val(new_las_name);
         update_las_modal.modal('hide');

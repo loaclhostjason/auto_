@@ -29,10 +29,23 @@ def change_data(data):
     }
     for k, v in sty.items():
         data = data.replace(k, v)
-    if '-' in data:
-        data = data.split('-')
-        data = ''.join(data[0]) + '-' + ''.join(['(%s)' % v for v in data[1::]])
-    return data
+
+    new_data = ''
+    if '|' in data:
+        data = data.split('|')
+        for index, v in enumerate(data):
+            if index == 0:
+                tmp_s = v[-6]
+                tmp = v.split(tmp_s)
+                tmp = [v for v in tmp if v]
+                print(tmp, tmp_s)
+                new_data += ''.join(tmp[:-1]) + tmp_s + '(' + ''.join(tmp[-1])
+            else:
+                if index < len(data) - 1:
+                    new_data += '|' + v
+                else:
+                    new_data += '|' + v + ')'
+    return new_data
 
 
 class ExportXml(object):
