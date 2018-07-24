@@ -130,22 +130,25 @@ def edit_extra_attr_file(project_id):
 
             c_all = content_val.values()
             resetsection = [v['resetsection'] for v in c_all if v['resetsection']]
-            resetsection_name = [v['name'] for v in sum(resetsection, []) if v['name'] and v['project_id'] == project_id]
+            print(resetsection)
 
             content = get_extra_content2(project_id)
-            content['resetsection'] = [{'project_id': v['project_id'],
-                                        'name': v['name']} for v in sum(resetsection, []) if v['name']
-                                       ]
-            if reset_section and name not in resetsection_name:
-                content['resetsection'].append({
-                    'project_id': project_id,
-                    'name': name
-                })
+
+            reset_section_d = defaultdict(list)
+            if resetsection:
+                for v in resetsection:
+                    for kk, vv in v.items():
+                        reset_section_d[kk].append(vv)
+            print(reset_section_d)
+            reset_section_d = {k: list(set(sum(v, []))) for k, v in reset_section_d.items()}
+            content['resetsection'] = {project_id: reset_section_d.get(project_id) or []}
+
+            r = reset_section_d.get(project_id) or []
+            if reset_section and name not in r:
+                r.append(name)
+                content['resetsection'][project_id].append(name)
             else:
-                content['resetsection'] = [
-                    {'project_id': v['project_id'],
-                     'name': v['name']} for v in sum(resetsection, []) if v['name'] != name and v['project_id'] == project_id
-                ]
+                content['resetsection'][project_id].remove(name)
 
             if not name:
                 abort(404)

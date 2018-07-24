@@ -16,7 +16,6 @@ def read_excel():
                 result.append({str(int(line[0])): line[1]})
             except Exception as e:
                 result.append({str(line[0]): line[1]})
-    print(result)
     return result
 
 

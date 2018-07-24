@@ -106,9 +106,10 @@
             <div class="form-group">
                 <div class="col-sm-2"></div>
                 <div class="col-sm-3">
-                    {% set resetsection = extra_content_val.get('resetsection') %}
+                    {% set resetsection = extra_content_val.get('resetsection') or {} %}
+                    {% set resetsection_v = resetsection.get(project.id | string) or [] %}
                     <input name="reset_section" value="y" type="checkbox"
-                           {% if resetsection | selectattr('name', 'equalto', request.args.get('name')) | list %}checked{% endif %}> 使用reset_section
+                           {% if request.args.get('name') in resetsection_v %}checked{% endif %}> 使用reset_section
                 </div>
             </div>
 
