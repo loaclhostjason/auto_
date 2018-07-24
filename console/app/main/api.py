@@ -71,6 +71,11 @@ def get_project_tree():
 @login_required
 def create_project():
     form_data = request.form.to_dict()
+
+    type_file = request.args.get('type_file')
+    if type_file == 'file' and not form_data.get('project_name'):
+        return jsonify({'success': False, 'message': '项目名称不能为空'})
+
     if not form_data.get('name'):
         return jsonify({'success': False, 'message': '项目名称不能为空'})
 

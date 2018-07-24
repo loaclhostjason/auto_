@@ -26,15 +26,15 @@ from .func_extra import *
 @login_required
 def projects():
     user = User.query.get_or_404(current_user.id)
-    group_user = [v.id for v in user.users]
+    project_name = user.project_name
 
     project_query = Project.query.order_by(Project.project_name)
     if current_user.is_admin:
         project_list = project_query.all()
+    elif current_user.is_pm_admin:
+        project_list = project_query.filter_by(project_name=project_name).all()
     else:
-        project_list = Project.query.filter(
-            or_(Project.user_id == current_user.id, Project.user_id.in_(group_user) if group_user else False)
-        ).all()
+        project_list = project_query.filter_by(user_id=current_user.id).all()
 
     group_project = db.session.query(Project.id, func.count(Project.id).label('project_num')).group_by(
         Project.project_name).all()

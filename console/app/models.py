@@ -30,8 +30,10 @@ class User(UserMixin, db.Model):
 
     expiry_time = db.Column(db.DateTime)
 
-    group_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    user = db.relationship('User', remote_side='User.id', backref=db.backref("users", cascade="all, delete-orphan"))
+    project_name = db.Column(db.String(100))
+
+    # group_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    # user = db.relationship('User', remote_side='User.id', backref=db.backref("users", cascade="all, delete-orphan"))
 
     def __init__(self, *args, **kwargs):
         super(User, self).__init__(*args, **kwargs)
@@ -50,6 +52,10 @@ class User(UserMixin, db.Model):
     @property
     def is_admin(self):
         return bool(self.username == 'admin')
+
+    @property
+    def is_pm_admin(self):
+        return bool(self.role.name == 'project_user')
 
     @property
     def is_expiry(self):

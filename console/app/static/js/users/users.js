@@ -16,12 +16,7 @@ $(document).ready(function () {
     user_modal.on('hide.bs.modal', function () {
         users.hide_modal($(this));
     });
-    let user_role;
-    let user_group_id;
     user_modal.on('show.bs.modal', function (event) {
-        let btn = $(event.relatedTarget);
-        user_role = btn.data('role');
-        user_group_id = btn.data('id');
         laydate.render({
             elem: '#expiry_time',
             min: moment().format('YYYY-MM-DD'),
@@ -39,12 +34,7 @@ $(document).ready(function () {
 
     $('.submit_user').click(function () {
         let params = user_modal.find('form').serialize();
-        if (user_role) {
-            params += '&role=' + user_role;
-        }
-        if (user_group_id) {
-            params += '&group_user_id=' + user_group_id;
-        }
+        params += '&role=user';
         console.log(params);
         $.post('/users/create', params, function (resp) {
             if (resp.success) {
@@ -128,4 +118,66 @@ $(document).ready(function () {
             elm.hide();
         }
     });
+});
+
+
+$(document).ready(function () {
+    function PM() {
+        AppCommonClass.call(this);
+
+        this.get_file_option = function (data) {
+            let project_select_html = '';
+            if (!data || !data.length) {
+                return project_select_html;
+            }
+
+            data.forEach(function (val) {
+                project_select_html += '<option value="' + val + '">' + val + '</option>';
+            });
+            return project_select_html;
+        }
+    }
+
+    PM.prototype = Object.create(AppCommonClass.prototype);
+    PM.prototype.constructor = PM;
+
+    let pm = new PM();
+    let pm_modal = $('#fp-pm-modal');
+
+    let uid = 0;
+    pm_modal.on('hide.bs.modal', function () {
+        pm.hide_modal($(this));
+    });
+    pm_modal.on('show.bs.modal', function (event) {
+        let btn = $(event.relatedTarget);
+        uid = btn.data('uid');
+
+        let modal = $(this);
+        $.get('/project/user/' + g_user_id, function (resp) {
+            let data = resp['data'];
+            let project_select = modal.find('[name="project_name"]');
+            console.log(data);
+            let project_select_html = pm.get_file_option(data);
+            project_select.html(project_select_html);
+        })
+    });
+
+    $('.fp_pm').click(function () {
+        pm.show_modal(pm_modal, $(this));
+
+        let user = $(this).data('user');
+        pm_modal.find('.modal-title').text('分配【' + user + '】项目')
+    });
+
+    $('.submit_pm').click(function () {
+        let params = pm_modal.find('form').serialize();
+        $.post('/users/fp_pm?user_id=' + uid, params, function (resp) {
+            if (resp.success) {
+                pm_modal.modal('hide');
+                sessionStorage.setItem('success', resp.message);
+                window.location.reload();
+            } else
+                toastr.error(resp.message)
+        })
+    })
 });

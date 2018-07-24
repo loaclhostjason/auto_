@@ -12,10 +12,7 @@ def get_project_user(uid):
     if user.is_admin:
         project_list = Project.query.all()
     else:
-        if not user.group_user_id:
-            project_list = Project.query.filter(Project.user_id == uid).all()
-        else:
-            project_list = Project.query.filter(Project.user_id == user.group_user_id).all()
+        project_list = Project.query.filter(Project.name == user.project_name).all()
 
     projects = [v.project_name for v in project_list if v.project_name]
     return jsonify({'data': projects})

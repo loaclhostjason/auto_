@@ -32,7 +32,6 @@ def get_user_info(id):
 def create_users():
     users_params = request.form.to_dict()
     user_role = request.form.get('role')
-    group_user_id = request.form.get('group_user_id')
 
     form = UserForm()
     error_message = Check(form).get_error_message()
@@ -47,7 +46,7 @@ def create_users():
     if old_user:
         return jsonify({'success': False, 'message': '用户名重复'})
 
-    add_user_dict = form.get_user_form(user_role, group_user_id)
+    add_user_dict = form.get_user_form(user_role)
     user = User(**add_user_dict)
     db.session.add(user)
     return jsonify({'success': True, 'message': '创建用户成功'})
@@ -100,3 +99,21 @@ def delete_user(id):
 
     db.session.delete(user)
     return jsonify({'success': True, 'message': '删除成功'})
+
+
+@users.route('/fp_pm', methods=['POST'])
+@login_required
+@role_required
+def fp_pm_users():
+    user_id = request.args.get('user_id')
+
+    project_name = request.form.get('project_name')
+
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return jsonify({'success': False, 'message': '没有记录'})
+
+    user.project_name = project_name
+    db.session.add(user)
+
+    return jsonify({'success': True, 'message': '更新成功'})

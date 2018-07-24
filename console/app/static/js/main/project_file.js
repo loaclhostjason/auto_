@@ -41,7 +41,7 @@ $(document).ready(function () {
 
     $('.submit_project_file').click(function () {
         let params = create_project_file_modal.find('form').serialize();
-        $.post('/project/create', params, function (resp) {
+        $.post('/project/create?type_file=file', params, function (resp) {
             if (resp.success) {
                 create_project_file_modal.modal('hide');
                 toastr.success(resp.message);

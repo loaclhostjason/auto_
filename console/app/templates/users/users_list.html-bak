@@ -28,13 +28,7 @@
     </td>
     <td>{{ user.role.value }}</td>
 
-    <td>
-        {% if user.role.name == 'admin' %}
-            <span>全部</span>
-        {% else %}
-            <span>{{ user.project_name or '--' }}</span>
-        {% endif %}
-    </td>
+    <td></td>
 
     <td class="text-right">
         {% if not user.is_admin %}
@@ -48,9 +42,9 @@
                 <a href="javascript:void (0)" class="update_password"
                    data-id="{{ user.id }}"
                    data-username="{{ user.username }}">修改密码</a>
-                {% if current_user.is_admin or current_user.is_pm_admin and user.id != current_user.id %}
+                {% if current_user.is_admin %}
                     <span class="text-explode">|</span>
-                    <a href="javascript:void (0)" class="fp_pm" data-user="{{ user.username }}" data-uid="{{ user.id }}">分配项目</a>
+                    <a href="javascript:void (0)">分配项目</a>
                 {% endif %}
             </div>
 
@@ -64,7 +58,6 @@
 {% block users_content %}
     {% include "users/modal/user_modal.html" %}
     {% include "users/modal/edit_user_modal.html" %}
-    {% include "users/modal/fp_pm_modal.html" %}
 
     <div class="row">
         <div class="col-sm-12">
@@ -84,25 +77,21 @@
         <div class="col-sm-12">
 
             <div>
-                {% if current_user.is_admin %}
-                    <a href="javascript:void (0)" class="btn btn-primary create_user" data-role="project_user">
-                        <i class="glyphicon glyphicon-plus"></i>
-                        项目管理员
-                    </a>
-                    <span class="text-explode">|</span>
-                {% endif %}
-
-                {% if current_user.is_pm_admin or current_user.is_admin %}
-                    <a href="javascript:void (0)" class="btn btn-primary create_com_user" data-role="user">
-                        <i class="glyphicon glyphicon-plus"></i>
-                        普通用户
-                    </a>
-                {% endif %}
+                <a href="javascript:void (0)" class="btn btn-primary create_user" data-role="project_user">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    项目管理员
+                </a>
+                <span class="text-explode">|</span>
+                <a href="javascript:void (0)" class="btn btn-primary create_com_user" data-role="user">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    普通用户
+                </a>
             </div>
             <div>
                 <table class="table table-hover">
                     <thead>
                     <tr>
+                        <th width="40">#</th>
                         <th width="150">用户名</th>
                         <th width="120">状态</th>
                         <th width="150">登录时间</th>
@@ -117,9 +106,28 @@
                     <tbody>
                     {% if users %}
                         {% for user in users %}
-                            <tr>
+                            {% set loopxx =  loop.index0 %}
+                            <tr class="selection-summary" data-loop="{{ loopxx }}">
+                                <td class="text-left">
+                                    {% if user.users %}
+                                        <i class="icon"></i>
+                                    {% else %}
+                                        <i class="glyphicon glyphicon-minus"></i>
+                                    {% endif %}
+                                </td>
                                 {{ table_content(user) }}
+
+
                             </tr>
+
+                            {% if user.users %}
+                                {% for u in user.users %}
+                                    <tr class="selection-info" style="display: none;" data-loop="{{ loopxx }}">
+                                        <td class="text-center"><i class="glyphicon glyphicon-triangle-right"></i></td>
+                                        {{ table_content(u) }}
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
 
                         {% endfor %}
                     {% else %}
@@ -143,7 +151,4 @@
 
     {{ super() }}
     <script src="{{ url_for('static', filename='js/users/users.js') }}"></script>
-    <script>
-        g_user_id = "{{ current_user.id }}"
-    </script>
 {% endblock %}
