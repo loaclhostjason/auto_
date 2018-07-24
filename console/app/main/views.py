@@ -148,7 +148,8 @@ def edit_extra_attr_file(project_id):
                 r.append(name)
                 content['resetsection'][project_id].append(name)
             else:
-                content['resetsection'][project_id].remove(name)
+                if content['resetsection'].get(project_id):
+                    content['resetsection'][project_id].remove(name)
 
             if not name:
                 abort(404)
