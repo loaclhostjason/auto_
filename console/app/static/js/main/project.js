@@ -280,12 +280,19 @@ $(document).ready(function () {
                 html += '<select name="las_' + index + '" class="form-control pull-left">' + option_html(data, val) + '</select></div>';
                 html += '<div class="col-sm-4"><select class="form-control pull-left las_f" name="las_f_' + index + '">';
                 let f = [['', '请选择'], ['#', '#'], ['/', '/'], ['-', '-'], ['&', '&']];
-                f.forEach(function (value) {
-                    if (las_f[index] === value[0]) {
-                        html += '<option selected value="' + value[0] + '">' + value[1] + '</option>';
-                    } else
+                if (index === las_val.length - 1) {
+                    f.forEach(function (value) {
                         html += '<option value="' + value[0] + '">' + value[1] + '</option>';
-                });
+                    });
+                } else {
+                    f.forEach(function (value) {
+                        if (las_f[index] === value[0]) {
+                            html += '<option selected value="' + value[0] + '">' + value[1] + '</option>';
+                        } else
+                            html += '<option value="' + value[0] + '">' + value[1] + '</option>';
+                    });
+                }
+
                 html += '</select></div>';
                 html += '<div class="col-sm-2">';
                 html += '<i style="position: relative;top: 10px;right: 20px;cursor: pointer" class="text-success glyphicon glyphicon glyphicon-plus add_las"></i>';
@@ -371,7 +378,7 @@ $(document).ready(function () {
                 new_las_name += '$' + $('[name="las_' + i + '"]').val() + $('[name="las_f_' + i + '"]').val()
         }
         if ($.inArray(new_las_name[new_las_name.length - 1], ['#', '&', '-', '/']) > -1) {
-            new_las_name = new_las_name.substring(0, new_las_name.length - 2)
+            new_las_name = new_las_name.substring(0, new_las_name.length - 1)
         }
 
         if (no_las) {
