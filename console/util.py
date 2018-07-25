@@ -114,8 +114,6 @@ class ExportXml(object):
         data = result['data']
         if data:
             result = [data[i:i + pin_num] for i in range(0, len(data), pin_num)]
-        else:
-            result = [{}]
 
         return result
 
@@ -331,7 +329,8 @@ class ExportXml(object):
                                 for v in pin_data:
                                     node_pin = doc.createElement('Pin')
                                     for cv in v:
-                                        node_pin.setAttribute(cv['item'], cv['item_value'])
+                                        if cv and isinstance(cv, dict):
+                                            node_pin.setAttribute(cv['item'], cv['item_value'])
                                     node_protocol_k.appendChild(node_pin)
                         node_name_protocol.appendChild(node_protocol_k)
 
