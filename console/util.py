@@ -54,6 +54,8 @@ def change_data(new_data_init):
                     new_data += '|' + v
                 else:
                     new_data += '|' + v + ')'
+    else:
+        new_data = new_data_init
 
     if hav_i:
         new_data = '!(' + new_data + ')'
