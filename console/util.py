@@ -57,6 +57,8 @@ def change_data(new_data_init):
 
     if hav_i:
         new_data = '!(' + new_data + ')'
+        new_data = new_data.replace('((', '(')
+        new_data = new_data.replace('))', ')')
     return new_data
 
 
@@ -110,7 +112,10 @@ class ExportXml(object):
         pin_num = result['pin_num']
         pin_num = int(pin_num)
         data = result['data']
-        result = [data[i:i + pin_num] for i in range(0, len(data), pin_num)]
+        if data:
+            result = [data[i:i + pin_num] for i in range(0, len(data), pin_num)]
+        else:
+            result = [{}]
 
         return result
 
