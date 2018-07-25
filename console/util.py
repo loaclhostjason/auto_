@@ -20,7 +20,7 @@ class Bite(Enum):
     bite = 'BitPosition'
 
 
-def change_data(new_data):
+def change_data(new_data_init):
     sty = {
         '#': '+',
         '&': '.',
@@ -28,14 +28,21 @@ def change_data(new_data):
         '-': '-',
     }
     for k, v in sty.items():
-        new_data = new_data.replace(k, v)
+        new_data_init = new_data_init.replace(k, v)
 
-    if '|' in new_data:
-        data = new_data.split('|')
+    hav_i = False
+    if "!" in new_data_init:
+        new_data_init = new_data_init[2:-1]
+        hav_i = True
+
+    new_data = ''
+    if '|' in new_data_init:
+        data = new_data_init.split('|')
         for index, v in enumerate(data):
             if index == 0:
                 try:
                     tmp_s = v[-6]
+                    print(tmp_s)
                     tmp = v.split(tmp_s)
                     tmp = [v for v in tmp if v]
                     print(tmp, tmp_s)
@@ -47,6 +54,10 @@ def change_data(new_data):
                     new_data += '|' + v
                 else:
                     new_data += '|' + v + ')'
+
+    print(new_data)
+    if hav_i:
+        new_data = '!' + new_data + ''
     return new_data
 
 
