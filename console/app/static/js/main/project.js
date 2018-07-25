@@ -227,6 +227,7 @@ $(document).ready(function () {
         $(this).find('[name="no_las"]').removeAttr('checked');
         $('.start_rule:not(:first-of-type)').remove();
     });
+    let num = 0;
     update_las_modal.on('show.bs.modal', function (event) {
         $(this).find('[name="no_las"]').val('!');
         $.get('/las/get').done(function (resp) {
@@ -271,9 +272,10 @@ $(document).ready(function () {
 
             let html = '';
             las_val.forEach(function (val, index) {
+                num += index;
                 html += '<div class="form-group start_rule"><div class="col-sm-6">';
                 html += '<select name="las_' + index + '" class="form-control pull-left">' + option_html(data, val) + '</select></div>';
-                html += '<div class="col-sm-6"><select class="form-control pull-left las_f" name="las_f_' + index + '">';
+                html += '<div class="col-sm-4"><select class="form-control pull-left las_f" name="las_f_' + index + '">';
                 let f = [['', '请选择'], ['#', '#'], ['/', '/'], ['-', '-'], ['&', '&']];
                 f.forEach(function (value) {
                     if (las_f[index] === value[0]) {
@@ -281,7 +283,13 @@ $(document).ready(function () {
                     } else
                         html += '<option value="' + value[0] + '">' + value[1] + '</option>';
                 });
-                html += '</select></div></div>';
+                html += '</select></div>';
+                html += '<div class="col-sm-2">';
+                html += '<i style="position: relative;top: 10px;right: 20px;cursor: pointer" class="text-success glyphicon glyphicon glyphicon-plus add_las"></i>';
+                if (index !== 0) {
+                    html += '<i style="position: relative;top: 10px;cursor: pointer" class="text-danger glyphicon glyphicon-minus remove_las"></i>';
+                }
+                html += '</div></div>';
             });
             $('.parent_rule').html(html);
         });
@@ -304,34 +312,56 @@ $(document).ready(function () {
         return h
     }
 
-    $(document).on('change', '.las_f', function () {
-        let this_val = $(this).val();
+    $(document).on('click', '.remove_las', function () {
+        $(this).parents('.start_rule').remove();
+    });
 
-        let start_rule_len = $('.start_rule').length;
+    $(document).on('click', '.add_las', function () {
+        num += 1;
         let rule_html = '';
-        rule_html += '<div class="form-group start_rule"><div class="col-sm-6"><select name="las_' + start_rule_len + '" class="form-control pull-left">' + option_html2(data) + '</select></div>';
-        rule_html += '<div class="col-sm-6"><select class="form-control pull-left las_f" name="las_f_' + start_rule_len + '">';
+        rule_html += '<div class="form-group start_rule"><div class="col-sm-6"><select name="las_' + num + '" class="form-control pull-left">' + option_html2(data) + '</select></div>';
+        rule_html += '<div class="col-sm-4"><select class="form-control pull-left las_f" name="las_f_' + num + '">';
         let f = [['', '请选择'], ['#', '#'], ['/', '/'], ['-', '-'], ['&', '&']];
         f.forEach(function (value) {
             rule_html += '<option value="' + value[0] + '">' + value[1] + '</option>';
         });
-        rule_html += '</select></div></div>';
+        rule_html += '</select></div>';
+        rule_html += '<div class="col-sm-2"><i style="position: relative;top: 10px;right: 20px;cursor: pointer" class="text-success glyphicon glyphicon glyphicon-plus add_las"></i>';
+        rule_html += '<i style="position: relative;top: 10px;cursor: pointer" class="text-danger glyphicon glyphicon-minus remove_las"></i>';
+        rule_html += '</div></div>';
 
-
-        if (this_val) {
-            $(this).parents('.start_rule').after(rule_html)
-        } else {
-            $(this).parents('.start_rule').nextAll().remove();
-        }
+        $(this).parents('.start_rule').after(rule_html)
     });
+
+    // $(document).on('change', '.las_f', function () {
+    //     let this_val = $(this).val();
+    //
+    //     let start_rule_len = $('.start_rule').length;
+    //     let rule_html = '';
+    //     rule_html += '<div class="form-group start_rule"><div class="col-sm-6"><select name="las_' + start_rule_len + '" class="form-control pull-left">' + option_html2(data) + '</select></div>';
+    //     rule_html += '<div class="col-sm-6"><select class="form-control pull-left las_f" name="las_f_' + start_rule_len + '">';
+    //     let f = [['', '请选择'], ['#', '#'], ['/', '/'], ['-', '-'], ['&', '&']];
+    //     f.forEach(function (value) {
+    //         rule_html += '<option value="' + value[0] + '">' + value[1] + '</option>';
+    //     });
+    //     rule_html += '</select></div></div>';
+    //
+    //
+    //     if (this_val) {
+    //         $(this).parents('.start_rule').after(rule_html)
+    //     } else {
+    //         $(this).parents('.start_rule').nextAll().remove();
+    //     }
+    // });
     $('.submit_update_las').click(function () {
         let no_las = update_las_modal.find('[name="no_las"]:checked').val();
 
-        let start_rule_len = $('.start_rule').length;
+        // let start_rule_len = $('.start_rule').length;
         let las_name = btn_las.parents('td').find('input');
         let new_las_name = '';
-        for (let i = 0; i < start_rule_len; i++) {
-            new_las_name += '$' + $('[name="las_' + i + '"]').val() + $('[name="las_f_' + i + '"]').val()
+        for (let i = 0; i <= num; i++) {
+            if ($('[name="las_' + i + '"]').val())
+                new_las_name += '$' + $('[name="las_' + i + '"]').val() + $('[name="las_f_' + i + '"]').val()
         }
         if (no_las) {
             new_las_name = '!(' + new_las_name + ')';
