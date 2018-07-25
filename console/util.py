@@ -55,9 +55,8 @@ def change_data(new_data_init):
                 else:
                     new_data += '|' + v + ')'
 
-    # print(new_data)
     if hav_i:
-        new_data = '!' + new_data + ''
+        new_data = '!(' + new_data + ')'
     return new_data
 
 
