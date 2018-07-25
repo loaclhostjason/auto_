@@ -250,6 +250,7 @@ $(document).ready(function () {
             let first_las_name = las_name[0];
             if (first_las_name === '!') {
                 update_las_modal.find('[name="no_las"]').prop('checked', 'checked');
+                las_name = las_name.substring(2, las_name.length - 1)
             }
 
             las_name = String(las_name).replace(/[$]/g, '');
