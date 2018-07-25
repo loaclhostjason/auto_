@@ -42,10 +42,10 @@ def change_data(new_data_init):
             if index == 0:
                 try:
                     tmp_s = v[-6]
-                    print(tmp_s)
+                    # print(tmp_s)
                     tmp = v.split(tmp_s)
                     tmp = [v for v in tmp if v]
-                    print(tmp, tmp_s)
+                    # print(tmp, tmp_s)
                     new_data += ''.join(tmp[:-1]) + tmp_s + '(' + ''.join(tmp[-1])
                 except Exception as e:
                     new_data += '(' + v
