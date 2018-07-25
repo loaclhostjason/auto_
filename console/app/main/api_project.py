@@ -15,4 +15,5 @@ def get_project_user(uid):
         project_list = Project.query.filter(Project.name == user.project_name).all()
 
     projects = [v.project_name for v in project_list if v.project_name]
+    projects = sorted(set(projects), key=projects.index)
     return jsonify({'data': projects})
