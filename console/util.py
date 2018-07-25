@@ -34,11 +34,14 @@ def change_data(new_data):
         data = new_data.split('|')
         for index, v in enumerate(data):
             if index == 0:
-                tmp_s = v[-6]
-                tmp = v.split(tmp_s)
-                tmp = [v for v in tmp if v]
-                print(tmp, tmp_s)
-                new_data += ''.join(tmp[:-1]) + tmp_s + '(' + ''.join(tmp[-1])
+                try:
+                    tmp_s = v[-6]
+                    tmp = v.split(tmp_s)
+                    tmp = [v for v in tmp if v]
+                    print(tmp, tmp_s)
+                    new_data += ''.join(tmp[:-1]) + tmp_s + '(' + ''.join(tmp[-1])
+                except Exception as e:
+                    new_data += '(' + v
             else:
                 if index < len(data) - 1:
                     new_data += '|' + v
