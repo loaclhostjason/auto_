@@ -208,7 +208,7 @@ class ExportXml(object):
         r = defaultdict(list)
         if did:
             for v in did:
-                project_relation = ProjectRelation.query.filter_by(name=v).first()
+                project_relation = ProjectRelation.query.filter_by(name=v, project_id=self.project_id).first()
                 if project_relation:
                     project_relation_child = ProjectRelation.query.filter_by(parent_id=project_relation.id).all()
                     if project_relation_child:
