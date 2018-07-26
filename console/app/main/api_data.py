@@ -34,11 +34,20 @@ def option_project_data():
     project_data = ProjectData.query.filter(ProjectData.project_id == project_id,
                                             ProjectData.project_relation_id.in_(cpr_ids) if cpr_ids else False).all()
 
+    default_conf = {v.project_relation_id: v.default_conf for v in project_data if v.default_conf}
+
     project_dict = dict()
     cot = real_content.copy()
+
+    r1 = {
+        'success': True,
+        'result': result,
+        'project_data': project_dict,
+        'byte_position': cot.get('BytePosition'),
+        'default_conf': default_conf,
+    }
     if not real_content.get('BytePosition') or not real_content.get('BitPosition'):
-        return jsonify({'success': True, 'result': result, 'project_data': project_dict,
-                        'byte_position': cot.get('BytePosition')})
+        return jsonify(r1)
 
     if project_data:
         for v in project_data:
@@ -76,8 +85,33 @@ def option_project_data():
             bit_position.append(bit_start)
             bit_start += 1
 
-    return jsonify({'success': True, 'result': result, 'project_data': project_dict, 'did_len': did_len,
-                    'bit_position': bit_position, 'byte_position': cot.get('BytePosition')})
+    r2 = {
+        'success': True,
+        'result': result,
+        'project_data': project_dict,
+        'did_len': did_len,
+        'bit_position': bit_position,
+        'byte_position': cot.get('BytePosition'),
+        'default_conf': default_conf,
+    }
+    return jsonify(r2)
+
+
+def get_default_conf():
+    project_relation_id = request.form.getlist('project_relation_id')
+    default_conf = request.form.getlist('default_conf')
+    result = dict()
+    print(111, default_conf)
+    if project_relation_id:
+        for index, v in enumerate(project_relation_id):
+            try:
+                if v in default_conf:
+                    result[v] = True
+                else:
+                    result[v] = False
+            except Exception as e:
+                result[v] = False
+    return result
 
 
 # main attr content
@@ -86,6 +120,8 @@ def option_project_data():
 def edit_project_data_api(project_id):
     # get attr 参数
     data = ProjectData.get_content(project_id)
+    default_conf = get_default_conf()
+
     if not data:
         return jsonify({'success': True, 'message': 'project_id不存在'})
 
@@ -99,11 +135,13 @@ def edit_project_data_api(project_id):
         if old_project_data:
 
             ProjectData.update_model(old_project_data, val)
+            old_project_data.default_conf = default_conf.get(project_relation_id)
+            db.session.add(old_project_data)
         else:
+            val['default_conf'] = default_conf.get(project_relation_id)
             new_project_data = ProjectData(**val)
             db.session.add(new_project_data)
 
-    ProjectData.update_real_content(project_id)
     export_xml = ExportXml(project_id)
     export_xml.run()
     return jsonify({'success': True, 'message': '更新成功'})

@@ -73,9 +73,10 @@ class ProjectData(db.Model):
     name = db.Column(db.String(32))
 
     content = db.Column(db.Text)
-    real_content = db.Column(db.Text)
+    # real_content = db.Column(db.Text)
 
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    default_conf = db.Column(db.Boolean, default=False)
 
     timestamp = db.Column(db.DateTime, default=datetime.now)
     project = db.relationship('Project', backref=db.backref("project_data", cascade="all, delete-orphan"))

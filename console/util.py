@@ -236,13 +236,14 @@ class ExportXml(object):
 
         if r:
             for address, projects in r.items():
-                project_query = ProjectData.query.filter_by(project_id=self.project_id).order_by(ProjectData.id.desc())
-                project = project_query.all()
+                project = ProjectData.query.filter_by(project_id=self.project_id).order_by(ProjectData.project_relation_id).all()
                 conf_data = defaultdict(list)
-                for pro in project:
-                    parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
-                    conf_data[parent_relation.parent_id].append((pro.conf_data, pro.las))
+                if project:
+                    for pro in project:
+                        parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
+                        conf_data[parent_relation.parent_id].append((pro.conf_data, pro.las))
 
+                print(conf_data)
                 conf_data = {k: v for k, v in conf_data.items()}
                 conf_data = {
                     'conf_data': conf_data
@@ -250,6 +251,20 @@ class ExportXml(object):
                 new_result[address] = dict(conf_data, **self.__get_(projects))
 
         return new_result
+
+    @property
+    def __default_conf(self):
+        data = ProjectData.query.filter_by(project_id=self.project_id, default_conf=True).all()
+        default_ = dict()
+        if data:
+            for d in data:
+                parent_relation = ProjectRelation.query.get_or_404(d.project_relation_id)
+                content = json.loads(d.content) if d.content else None
+                if content:
+                    for k, v in content.items():
+                        if 'byte' in k and v:
+                            default_[parent_relation.parent_id] = v
+        return default_
 
     def xml_section_attr(self, did_name, type_result):
         attr = Attr.query.filter_by(level=2).first()
@@ -389,10 +404,18 @@ class ExportXml(object):
                     for parameter_val in parameter_name:
                         node_parameter = doc.createElement('Parameter')
 
-                        try:
-                            default_val = val['conf_data'].get(list(parameter_val.keys())[0])[0][0]
-                        except Exception:
-                            default_val = ''
+                        default_conf = self.__default_conf
+                        if not parameter_val:
+                            parameter_val = {}
+
+                        parameter_val_kk = list(parameter_val.keys())[0] if parameter_val else 0
+                        if default_conf.get(parameter_val_kk):
+                            default_val = default_conf[parameter_val_kk]
+                        else:
+                            try:
+                                default_val = val['conf_data'].get(parameter_val_kk)[0][0]
+                            except Exception:
+                                default_val = ''
 
                         node_parameter.setAttribute('ParamDefaultValue', default_val)
                         for parameter_k, parameter_v in parameter_val.items():

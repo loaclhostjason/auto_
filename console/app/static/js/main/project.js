@@ -36,15 +36,16 @@ $(document).ready(function () {
                     let did_len = resp['did_len'];
                     let bit_position = resp['bit_position'];
                     let byte_position = resp['byte_position'];
+                    let default_conf = resp['default_conf'];
                     $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position));
-                    $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position));
+                    $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf));
                 } else {
                     toastr.error(resp.message)
                 }
             });
         };
 
-        this.project_data_html = function (result, project_data, did_len, byte_position) {
+        this.project_data_html = function (result, project_data, did_len, byte_position, default_conf) {
             if (!result || !result.length) return '';
 
 
@@ -59,6 +60,14 @@ $(document).ready(function () {
                 html += '<input type="hidden" name="name" value="' + data['level_4'] + '">';
 
                 html += '<td class="text-center"><a href="javascript:void(0)" class="del-project-func text-danger pull-left" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a>' + data['level_4'] + '</td>';
+
+                if (default_conf[data['level_4_id']]) {
+                    html += '<td class="text-center"><input checked type="radio" name="default_conf" value="' + data['level_4_id'] + '"></td>';
+                } else {
+                    html += '<td class="text-center"><input type="radio" name="default_conf" value="' + data['level_4_id'] + '"></td>';
+
+                }
+
                 html += '<td class="text-center"><div style="display: inline-flex"><div style="float: left"><input name="las" class="tc-search-words" value="' + (data_info['las'] || '') + '"></div>';
                 html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
                 html += '</td>';
@@ -96,6 +105,7 @@ $(document).ready(function () {
             let html = '';
             html += '<tr>';
             html += '<th width="100" style="vertical-align: middle; min-width: 100px"></th>';
+            html += '<th width="70" style="vertical-align: middle; min-width: 100px">默认值</th>';
             html += '<th width="120" style="vertical-align: middle; min-width: 120px">LAS</th>';
 
             if (did_len) {
