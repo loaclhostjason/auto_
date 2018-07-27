@@ -66,6 +66,7 @@ def change_data(new_data_init):
     new_data = ''
     if '/' in new_data_init:
         data = new_data_init.split('/')
+        print(data)
         for index, v in enumerate(data):
             if index == 0:
                 try:
@@ -79,13 +80,17 @@ def change_data(new_data_init):
                     new_data += '(' + v
             else:
                 if index < len(data) - 1:
-                    new_data += '/' + v
+                    if len(v) > 5:
+                        new_data += '/' + v[:5] + ')' + v[5:-5] + '(' + v[-5:]
+                    else:
+                        new_data += '/' + v
+                    print(new_data)
                 else:
                     new_data += '/' + v + ')'
     else:
         new_data = new_data_init
 
-    #print(new_data)
+    print(new_data)
     if '#' in new_data:
         n = new_data.split('#')
         new_data = ['(%s)' % v for v in n if v]
