@@ -1,5 +1,5 @@
 from . import manage
-from flask import render_template, flash, redirect, url_for, current_app
+from flask import render_template, flash, redirect, url_for, current_app, jsonify
 from flask_login import login_required
 from ..decorators import role_required
 from .models import *
@@ -104,7 +104,7 @@ def create_edit_las_file():
             form_data['file'] = las.file if las else None
             form_data['file_name'] = las.file_name if las else None
         else:
-            form_data['file'], form_data['file_name'] = upload_file(path, file, las)
+            form_data['file'], form_data['file_name'] = upload_file(path, file, las, project_name)
 
         if las:
             form.populate_obj(las)
@@ -116,3 +116,20 @@ def create_edit_las_file():
     if las:
         form.set_form_data(las)
     return render_template('manage/create_las_file.html', form=form)
+
+
+@manage.route('/las/delete', methods=['POST'])
+@login_required
+@role_required
+def delete_las_file():
+    path = os.path.join(current_app.config['LAS_FILE_PATH_ROOT'])
+    project_name = request.args.get('project_name')
+    las = Las.query.filter_by(project_name=project_name).first()
+    if not las:
+        return jsonify({'success': False, 'message': '没有数据'})
+
+    del_os_filename(path, las.file)
+    las.file_name = None
+    las.file = None
+    db.session.add(las)
+    return jsonify({'success': True, 'message': '更新成功'})

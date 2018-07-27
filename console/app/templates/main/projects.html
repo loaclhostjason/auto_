@@ -87,12 +87,12 @@
     <script>
         $(document).ready(function () {
             $('.delete-project').click(function () {
-                let _this_id = $(this).data('id');
+                var _this_id = $(this).data('id');
                 $.update_info_reload('是否删除项目', '/project/delete/' + _this_id, '')
             });
 
             $('.download-file').click(function () {
-                let project_id = [];
+                var project_id = [];
                 $('.project-table').find('.publish_project:checked').each(function () {
                     project_id.push($(this).val())
                 });

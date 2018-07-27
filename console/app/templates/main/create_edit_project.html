@@ -125,6 +125,7 @@
 
     <script>
         project_id = "{{ project.id if project else '' }}";
+        project_name = "{{ project.name if project else '' }}";
         user_id = "{{ current_user.id }}"
     </script>
 {% endblock %}

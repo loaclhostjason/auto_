@@ -5,6 +5,7 @@ from flask_login import login_required, current_user
 from .func import *
 from ..manage.models import *
 import json
+from sqlalchemy import func
 
 
 # func tree has deleted
@@ -156,10 +157,22 @@ def delete_project_tree(id):
 @login_required
 def delete_project(id):
     from other import del_DF
+    from ..manage.func import del_os_filename
+    from ..manage.models import Las
     project = Project.query.get_or_404(id)
     db.session.delete(project)
 
     del_DF('%s.xml' % project.name, project.name)
+
+    project_name = project.name
+    db.session.commit()
+    func_project = Project.query.filter_by(project_name=project_name).all()
+
+    if not func_project:
+        las = Las.query.filter_by(project_name=project_name).first()
+        path = current_app.config['LAS_FILE_PATH_ROOT']
+        if las:
+            del_os_filename(path, las.file)
     return jsonify({'success': True, 'message': '删除成功'})
 
 

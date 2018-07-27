@@ -146,5 +146,13 @@ def edit_project_data_api(project_id):
 @login_required
 def get_las_info():
     from read_las_config import read_excel
-    data = read_excel()
+    project_name = request.args.get('project_name')
+
+    path = current_app.config['LAS_FILE_PATH_ROOT']
+    las = Las.query.filter_by(project_name=project_name).first()
+
+    if las:
+        path = os.path.join(path, las.file)
+
+    data = read_excel(path, las.file if las else None)
     return jsonify({'data': data})

@@ -116,10 +116,10 @@ def del_os_filename(base_path, filename):
                 os.remove(os.path.join(root, name))
 
 
-def upload_file(path, file, data):
+def upload_file(path, file, data, project_name):
     if data:
         del_os_filename(path, data.file)
 
-    save_filename = file.filename
+    save_filename = '[%s]%s' % (project_name, file.filename)
     file.save(os.path.join(path, save_filename))
     return save_filename, file.filename

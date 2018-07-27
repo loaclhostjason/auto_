@@ -236,7 +236,7 @@ $(document).ready(function () {
     var num = 0;
     update_las_modal.on('show.bs.modal', function (event) {
         $(this).find('[name="no_las"]').val('!');
-        $.get('/las/get').done(function (resp) {
+        $.get('/las/get?project_name=' + project_name).done(function (resp) {
             var data = resp['data'];
 
             function option_html(data, selected_val) {
@@ -314,7 +314,7 @@ $(document).ready(function () {
     });
 
     var data = '';
-    $.get('/las/get').done(function (resp) {
+    $.get('/las/get?project_name=' + project_name).done(function (resp) {
         data = resp['data'];
     });
 
