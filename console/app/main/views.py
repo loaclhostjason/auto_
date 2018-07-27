@@ -21,6 +21,11 @@ from ..manage.models import Attr, ExtraAttrContent
 from .func_extra import *
 
 
+@main.route('/sorry')
+def sorry():
+    return render_template('no.html')
+
+
 @main.route('/', methods=['GET', 'POST'])
 @main.route('/projects', methods=['GET', 'POST'])
 @login_required

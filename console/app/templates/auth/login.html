@@ -48,4 +48,22 @@
     {% assets "common_js" %}
         <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
+    <script>
+        $(document).ready(function () {
+            function IEVersion() {
+                var DEFAULT_VERSION = 9.0;
+                var ua = navigator.userAgent.toLowerCase();
+                var isIE = ua.indexOf("msie") > -1;
+                var safariVersion;
+                if (isIE) {
+                    safariVersion = ua.match(/msie ([\d.]+)/)[1];
+                }
+                if (safariVersion <= DEFAULT_VERSION) {
+                    window.location.href = '/sorry';
+                }
+            }
+
+            IEVersion();
+        });
+    </script>
 {% endblock %}

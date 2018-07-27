@@ -1,10 +1,10 @@
-let attr_html = function (data, content, id, level) {
-    let attr_form = $('#attr-form');
+var attr_html = function (data, content, id, level) {
+    var attr_form = $('#attr-form');
     if (!data || !data.length) {
         attr_form.html('');
         return false
     }
-    let form_html = '';
+    var form_html = '';
     form_html += '<input name="project_relation_id" type="hidden" value="' + id + '">';
     form_html += '<input name="level" type="hidden" value="' + level + '">';
     data.forEach(function (value) {
@@ -20,7 +20,7 @@ let attr_html = function (data, content, id, level) {
 
 
 function required_html(required) {
-    let html = '';
+    var html = '';
     if (required)
         html = '<span class="text-danger">*</span>';
     return html
@@ -28,7 +28,7 @@ function required_html(required) {
 }
 
 function required_input(field, required, content, field_protocol) {
-    let html = '<input class="form-control pull-left" name="' + (field_protocol ? field_protocol + '-' : '') + field + '" type="text" value="' + (content ? content[field] || '' : "") + '">';
+    var html = '<input class="form-control pull-left" name="' + (field_protocol ? field_protocol + '-' : '') + field + '" type="text" value="' + (content ? content[field] || '' : "") + '">';
     if (required)
         html = '<input class="form-control pull-left" name="' + field + '" type="text" value="' + (content ? content[field] || '' : "") + '" required>';
 
@@ -39,8 +39,8 @@ function required_input(field, required, content, field_protocol) {
 $(document).ready(function () {
 
     $(document).on('keyup', $('[name="BytePosition"]'), function () {
-        let byte = $('[name="BytePosition"]');
-        let tmptxt = byte.val();
+        var byte = $('[name="BytePosition"]');
+        var tmptxt = byte.val();
 
         try {
             byte.val(tmptxt.replace(/\D/g, ''));
@@ -49,8 +49,8 @@ $(document).ready(function () {
         }
 
     }).bind("paste", function () {
-        let byte = $('[name="BytePosition"]');
-        let tmptxt = byte.val();
+        var byte = $('[name="BytePosition"]');
+        var tmptxt = byte.val();
 
          try {
             byte.val(tmptxt.replace(/\D/g, ''));
@@ -61,8 +61,8 @@ $(document).ready(function () {
 
 
     $(document).on('keyup', $('[name="BitPosition"]'), function () {
-        let bite = $('[name="BitPosition"]');
-        let tmptxt = bite.val();
+        var bite = $('[name="BitPosition"]');
+        var tmptxt = bite.val();
 
         try {
             bite.val(tmptxt.replace(/\D/g, ''));
@@ -70,8 +70,8 @@ $(document).ready(function () {
             console.log(e)
         }
     }).bind("paste", function () {
-        let bite = $('[name="BitPosition"]');
-        let tmptxt = bite.val();
+        var bite = $('[name="BitPosition"]');
+        var tmptxt = bite.val();
 
         try {
             bite.val(tmptxt.replace(/\D/g, ''));

@@ -85,6 +85,7 @@ def change_data(new_data_init):
     else:
         new_data = new_data_init
 
+    #print(new_data)
     if '#' in new_data:
         n = new_data.split('#')
         new_data = ['(%s)' % v for v in n if v]
@@ -553,5 +554,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(1)
+    export_xml = ExportXml(2)
     export_xml.run()

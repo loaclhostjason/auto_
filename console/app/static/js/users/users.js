@@ -6,9 +6,9 @@ $(document).ready(function () {
     Users.prototype = Object.create(AppCommonClass.prototype);
     Users.prototype.constructor = Users;
 
-    let users = new Users();
+    var users = new Users();
 
-    let user_modal = $('#user_modal');
+    var user_modal = $('#user_modal');
     $('.create_user').click(function () {
         users.show_modal(user_modal, $(this));
     });
@@ -33,7 +33,7 @@ $(document).ready(function () {
     });
 
     $('.submit_user').click(function () {
-        let params = user_modal.find('form').serialize();
+        var params = user_modal.find('form').serialize();
         params += '&role=user';
         console.log(params);
         $.post('/users/create', params, function (resp) {
@@ -57,7 +57,7 @@ $(document).ready(function () {
         calendar: true,
         value: new Date()
     });
-    let edit_user_modal = $('#edit_user_modal');
+    var edit_user_modal = $('#edit_user_modal');
     edit_user_modal.on('hide.bs.modal', function () {
         users.hide_modal($(this));
     });
@@ -66,27 +66,27 @@ $(document).ready(function () {
         edit_user_modal.find('.modal-title').text('编辑【' + $(this).data('username') + '】基本信息');
     });
 
-    let edit_btn;
+    var edit_btn;
     edit_user_modal.on('show.bs.modal', function (event) {
         edit_btn = $(event.relatedTarget);
-        let user_id = edit_btn.data('id');
-        let modal = $(this);
+        var user_id = edit_btn.data('id');
+        var modal = $(this);
         if (user_id) {
             $.get('/users/info/' + user_id, function (resp) {
                 if (!resp.success) {
                     toastr.error(resp.message);
                     return false;
                 }
-                let data = resp.data;
-                for (let key in data) {
+                var data = resp.data;
+                for (var key in data) {
                     modal.find('[name="' + key + '"]').val(data[key]);
                 }
             })
         }
     });
     $('.submit_edit_user').click(function () {
-        let user_id = edit_btn.data('id');
-        let params = edit_user_modal.find('form').serialize();
+        var user_id = edit_btn.data('id');
+        var params = edit_user_modal.find('form').serialize();
         $.post('/users/edit/' + user_id, params, function (resp) {
             if (resp.success) {
                 sessionStorage.setItem("success", resp.message);
@@ -107,11 +107,11 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-    let selection_summary = $('.selection-summary');
+    var selection_summary = $('.selection-summary');
     selection_summary.click(function () {
         $(this).toggleClass('open');
-        let loop = $(this).data('loop');
-        let elm = $(this).parents('tbody').find('.selection-info');
+        var loop = $(this).data('loop');
+        var elm = $(this).parents('tbody').find('.selection-info');
         if ($(this).is('.open') && elm.data('loop') === loop) {
             elm.show()
         } else {
@@ -126,7 +126,7 @@ $(document).ready(function () {
         AppCommonClass.call(this);
 
         this.get_file_option = function (data) {
-            let project_select_html = '';
+            var project_select_html = '';
             if (!data || !data.length) {
                 return project_select_html;
             }
@@ -141,23 +141,23 @@ $(document).ready(function () {
     PM.prototype = Object.create(AppCommonClass.prototype);
     PM.prototype.constructor = PM;
 
-    let pm = new PM();
-    let pm_modal = $('#fp-pm-modal');
+    var pm = new PM();
+    var pm_modal = $('#fp-pm-modal');
 
-    let uid = 0;
+    var uid = 0;
     pm_modal.on('hide.bs.modal', function () {
         pm.hide_modal($(this));
     });
     pm_modal.on('show.bs.modal', function (event) {
-        let btn = $(event.relatedTarget);
+        var btn = $(event.relatedTarget);
         uid = btn.data('uid');
 
-        let modal = $(this);
+        var modal = $(this);
         $.get('/project/user/' + g_user_id, function (resp) {
-            let data = resp['data'];
-            let project_select = modal.find('[name="project_name"]');
+            var data = resp['data'];
+            var project_select = modal.find('[name="project_name"]');
             console.log(data);
-            let project_select_html = pm.get_file_option(data);
+            var project_select_html = pm.get_file_option(data);
             project_select.html(project_select_html);
         })
     });
@@ -165,12 +165,12 @@ $(document).ready(function () {
     $('.fp_pm').click(function () {
         pm.show_modal(pm_modal, $(this));
 
-        let user = $(this).data('user');
+        var user = $(this).data('user');
         pm_modal.find('.modal-title').text('分配【' + user + '】项目')
     });
 
     $('.submit_pm').click(function () {
-        let params = pm_modal.find('form').serialize();
+        var params = pm_modal.find('form').serialize();
         $.post('/users/fp_pm?user_id=' + uid, params, function (resp) {
             if (resp.success) {
                 pm_modal.modal('hide');

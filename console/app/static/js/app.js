@@ -24,11 +24,11 @@ $(document).ready(function () {
     });
 
 
-    let retract = 'retract';
+    var retract = 'retract';
 
     function expend_aside() {
-        let btn_fold_menu = $('.btn-fold-menu');
-        let text = btn_fold_menu.attr('title');
+        var btn_fold_menu = $('.btn-fold-menu');
+        var text = btn_fold_menu.attr('title');
         if (text === '收起') {
             btn_fold_menu.addClass(retract);
             btn_fold_menu.attr('title', '展开').text('展开');
@@ -41,9 +41,9 @@ $(document).ready(function () {
     }
 
     function resize_width() {
-        let window_width = $(window).width();
-        let btn_fold_menu = $('.btn-fold-menu');
-        let text = btn_fold_menu.attr('title');
+        var window_width = $(window).width();
+        var btn_fold_menu = $('.btn-fold-menu');
+        var text = btn_fold_menu.attr('title');
         if (window_width < 1200) {
             btn_fold_menu.addClass(retract);
             btn_fold_menu.attr('title', '展开').text('展开');
@@ -62,7 +62,7 @@ $(document).ready(function () {
     });
 
 
-    let toggle_menu = $('.aside-menu-v2-toggle');
+    var toggle_menu = $('.aside-menu-v2-toggle');
 
     toggle_menu.each(function (index, el) {
         $(this).click(function () {
@@ -91,7 +91,7 @@ $(document).ready(function () {
 });
 
 ;(function ($, window, undefined) {
-    let $allDropdowns = $();
+    var $allDropdowns = $();
     $.fn.dropdownHover = function (options) {
 
         $allDropdowns = $allDropdowns.add(this.parent());
@@ -180,7 +180,7 @@ jQuery.cachedScript = function (url, options) {
 
 function downloadFile(url) {
     try {
-        let elemIF = document.createElement("iframe");
+        var elemIF = document.createElement("iframe");
         elemIF.src = url;
         elemIF.style.display = "none";
         document.body.appendChild(elemIF);

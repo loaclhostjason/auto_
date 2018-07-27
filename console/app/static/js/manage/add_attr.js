@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    let html_tr = '';
+    var html_tr = '';
 
     html_tr += '<tr>';
     html_tr += '<td><input name="item" class="td-input" required/></td>';

@@ -1,8 +1,8 @@
-let app_common = new AppCommonClass();
+var app_common = new AppCommonClass();
 
-let $$ = go.GraphObject.make;
+var $$ = go.GraphObject.make;
 
-let myDiagram =
+var myDiagram =
     $$(go.Diagram, "myDiagramProject",
         {
             initialContentAlignment: go.Spot.Center,
@@ -27,57 +27,57 @@ function makeButton(text, action, visiblePredicate) {
         }).ofObject() : {});
 }
 
-let firstContextMenu =
+var firstContextMenu =
     $$(go.Adornment, "Vertical",
         makeButton("新增DID", function (e, obj) {
-            let node = obj.part.adornedPart;
+            var node = obj.part.adornedPart;
             if (node === null) return false;
 
-            let thisemp = node.data;
-            let parent_id = thisemp['key'];
-            let level = thisemp['level'];
+            var thisemp = node.data;
+            var parent_id = thisemp['key'];
+            var level = thisemp['level'];
 
 
-            let add_content = $("#add-content");
+            var add_content = $("#add-content");
             app_common.show_modal(add_content, $(this));
             add_content.find('[name="parent_id"]').val(parent_id);
             add_content.find('[name="level"]').val(Number(level) + 1);
         })
     );
 
-let secondContextMenu =
+var secondContextMenu =
     $$(go.Adornment, "Vertical",
         makeButton("新增配置", function (e, obj) {
-            let node = obj.part.adornedPart;
+            var node = obj.part.adornedPart;
             if (node === null) return false;
 
-            let thisemp = node.data;
-            let parent_id = thisemp['key'];
-            let level = thisemp['level'];
+            var thisemp = node.data;
+            var parent_id = thisemp['key'];
+            var level = thisemp['level'];
 
 
-            let add_content = $("#add-content");
+            var add_content = $("#add-content");
             app_common.show_modal(add_content, $(this));
             add_content.find('[name="parent_id"]').val(parent_id);
             add_content.find('[name="level"]').val(Number(level) + 1);
         }),
         makeButton('修改名称', function (e, obj) {
-            let node = obj.part.adornedPart;
+            var node = obj.part.adornedPart;
             if (node === null) return false;
 
-            let thisemp = node.data;
-            let id = thisemp['key'];
+            var thisemp = node.data;
+            var id = thisemp['key'];
 
-            let update_name = $('#update-name-modal');
+            var update_name = $('#update-name-modal');
             app_common.show_modal(update_name);
             update_name.find('[name="id"]').val(id);
         }),
         makeButton("删除", function (e, obj) {
-            let node = obj.part.adornedPart;
+            var node = obj.part.adornedPart;
             if (node === null) return false;
 
-            let thisemp = node.data;
-            let id = thisemp['key'];
+            var thisemp = node.data;
+            var id = thisemp['key'];
             $.post('/project/tree/delete/' + id, '', function (resp) {
                 if (resp.success) {
                     toastr.success(resp.message);
@@ -89,15 +89,15 @@ let secondContextMenu =
 
         }),
         makeButton("复制", function (e, obj) {
-            let node = obj.part.adornedPart;
+            var node = obj.part.adornedPart;
             if (node === null) return false;
 
-            let thisemp = node.data;
-            let key = thisemp['key'];
-            let level = thisemp['level'];
-            let name = thisemp['name'];
+            var thisemp = node.data;
+            var key = thisemp['key'];
+            var level = thisemp['level'];
+            var name = thisemp['name'];
 
-            let params = {
+            var params = {
                 'level': level,
                 'content': name
             };
@@ -112,11 +112,11 @@ let secondContextMenu =
 
         }),
         makeButton("上移", function (e, obj) {
-            let node = obj.part.adornedPart;
+            var node = obj.part.adornedPart;
             if (node === null) return false;
 
-            let thisemp = node.data;
-            let key = thisemp['key'];
+            var thisemp = node.data;
+            var key = thisemp['key'];
 
             $.post('/project/relation?id=' + key + '&type=up', '', function (resp) {
                 if (resp.success) {
@@ -128,11 +128,11 @@ let secondContextMenu =
             })
         }),
         makeButton("下移", function (e, obj) {
-            let node = obj.part.adornedPart;
+            var node = obj.part.adornedPart;
             if (node === null) return false;
 
-            let thisemp = node.data;
-            let key = thisemp['key'];
+            var thisemp = node.data;
+            var key = thisemp['key'];
 
             $.post('/project/relation?id=' + key + '&type=down', '', function (resp) {
                 if (resp.success) {
@@ -146,39 +146,39 @@ let secondContextMenu =
     );
 
 
-let thirdContextMenu =
+var thirdContextMenu =
     $$(go.Adornment, "Vertical",
         makeButton("新增配置选项", function (e, obj) {
-            let node = obj.part.adornedPart;
+            var node = obj.part.adornedPart;
             if (node === null) return false;
 
-            let thisemp = node.data;
-            let parent_id = thisemp['key'];
-            let level = thisemp['level'];
+            var thisemp = node.data;
+            var parent_id = thisemp['key'];
+            var level = thisemp['level'];
 
 
-            let add_content = $("#add-content");
+            var add_content = $("#add-content");
             app_common.show_modal(add_content, $(this));
             add_content.find('[name="parent_id"]').val(parent_id);
             add_content.find('[name="level"]').val(Number(level) + 1);
         }),
         makeButton('修改名称', function (e, obj) {
-            let node = obj.part.adornedPart;
+            var node = obj.part.adornedPart;
             if (node === null) return false;
 
-            let thisemp = node.data;
-            let id = thisemp['key'];
+            var thisemp = node.data;
+            var id = thisemp['key'];
 
-            let update_name = $('#update-name-modal');
+            var update_name = $('#update-name-modal');
             app_common.show_modal(update_name);
             update_name.find('[name="id"]').val(id);
         }),
         makeButton("删除", function (e, obj) {
-            let node = obj.part.adornedPart;
+            var node = obj.part.adornedPart;
             if (node === null) return false;
 
-            let thisemp = node.data;
-            let id = thisemp['key'];
+            var thisemp = node.data;
+            var id = thisemp['key'];
             $.post('/project/tree/delete/' + id, '', function (resp) {
                 if (resp.success) {
                     toastr.success(resp.message);
@@ -190,15 +190,15 @@ let thirdContextMenu =
 
         }),
         makeButton("复制", function (e, obj) {
-            let node = obj.part.adornedPart;
+            var node = obj.part.adornedPart;
             if (node === null) return false;
 
-            let thisemp = node.data;
-            let key = thisemp['key'];
-            let level = thisemp['level'];
-            let name = thisemp['name'];
+            var thisemp = node.data;
+            var key = thisemp['key'];
+            var level = thisemp['level'];
+            var name = thisemp['name'];
 
-            let params = {
+            var params = {
                 'level': level,
                 'content': name
             };
@@ -213,11 +213,11 @@ let thirdContextMenu =
 
         }),
         makeButton("上移", function (e, obj) {
-            let node = obj.part.adornedPart;
+            var node = obj.part.adornedPart;
             if (node === null) return false;
 
-            let thisemp = node.data;
-            let key = thisemp['key'];
+            var thisemp = node.data;
+            var key = thisemp['key'];
 
             $.post('/project/relation?id=' + key + '&type=up', '', function (resp) {
                 if (resp.success) {
@@ -229,11 +229,11 @@ let thirdContextMenu =
             })
         }),
         makeButton("下移", function (e, obj) {
-            let node = obj.part.adornedPart;
+            var node = obj.part.adornedPart;
             if (node === null) return false;
 
-            let thisemp = node.data;
-            let key = thisemp['key'];
+            var thisemp = node.data;
+            var key = thisemp['key'];
 
             $.post('/project/relation?id=' + key + '&type=down', '', function (resp) {
                 if (resp.success) {
@@ -252,11 +252,11 @@ myDiagram.nodeTemplateMap.add("FirstNode",
         $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name")),
         {
             click: function (e, obj) {
-                let node = obj.part.data;
+                var node = obj.part.data;
                 if (node === null) return false;
 
-                let parent_id = node['key'];
-                let level = node['level'];
+                var parent_id = node['key'];
+                var level = node['level'];
                 $.g_projects.get_project_data(project_id, parent_id);
                 $.g_projects.get_attr_input(project_id, level, parent_id);
 
@@ -276,11 +276,11 @@ myDiagram.nodeTemplateMap.add("SecondNode",
         $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name")),
         {
             click: function (e, obj) {
-                let node = obj.part.data;
+                var node = obj.part.data;
                 if (node === null) return false;
 
-                let parent_id = node['key'];
-                let level = node['level'];
+                var parent_id = node['key'];
+                var level = node['level'];
                 $.g_projects.get_project_data(project_id, parent_id);
                 $.g_projects.get_attr_input(project_id, level, parent_id);
 
@@ -301,11 +301,11 @@ myDiagram.nodeTemplateMap.add("ThirdNode",
         $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name")),
         {
             click: function (e, obj) {
-                let node = obj.part.data;
+                var node = obj.part.data;
                 if (node === null) return false;
 
-                let parent_id = node['key'];
-                let level = node['level'];
+                var parent_id = node['key'];
+                var level = node['level'];
                 console.log(level);
 
                 $.g_parent_id = parent_id;
