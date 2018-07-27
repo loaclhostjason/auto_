@@ -30,38 +30,43 @@ sty = {
 
 
 def check_las(new_data_init):
-    if '$' not in new_data_init:
-        new_data = ''
-        for k, v in sty.items():
-            if k in new_data_init:
-                new_data_str = ''
-                data_list = new_data_init.split(k)
-                if data_list:
-                    for dl in data_list:
-                        new_data_str += '$' + dl + k
-                new_data = new_data_str[:-1]
-            else:
-                new_data = '$' + new_data_init
-    else:
-        new_data = new_data_init
+    if '$' in new_data_init:
+        return new_data_init
 
-    print(new_data)
-    return new_data
+    result = []
+    split_re = '|\\'.join(sty.keys())
+    split_re = '(\\' + split_re + ')'
+    split_data = re.split(r'%s' % split_re, new_data_init)
+
+    print(split_data)
+    if split_data:
+        for dl in split_data:
+            if dl not in sty.keys():
+                result.append('$' + dl)
+            else:
+                result.append(dl)
+    else:
+        result = '$' + new_data_init
+
+    if isinstance(result, list):
+        result = ''.join(result)
+    print(result)
+    return result
 
 
 def change_data(new_data_init):
     if not new_data_init:
         return ''
 
-    new_data_init = check_las(new_data_init)
-
-    for k, v in sty.items():
-        new_data_init = new_data_init.replace(k, v)
-
     hav_i = False
     if "!" in new_data_init:
         new_data_init = new_data_init[2:-1]
         hav_i = True
+
+    new_data_init = check_las(new_data_init)
+
+    for k, v in sty.items():
+        new_data_init = new_data_init.replace(k, v)
 
     new_data = ''
     if '|' in new_data_init:
