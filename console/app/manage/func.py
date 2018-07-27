@@ -1,5 +1,6 @@
 from flask import request
 from collections import defaultdict
+import os
 
 
 def get_content():
@@ -100,3 +101,25 @@ def get_extra_content2():
                         pass
                 result[key].append(d)
     return {k: v for k, v in result.items() if v}
+
+
+'''
+00000000000000000
+
+'''
+
+
+def del_os_filename(base_path, filename):
+    for root, dirs, files in os.walk(base_path, topdown=False):
+        for name in files:
+            if filename and filename == name:
+                os.remove(os.path.join(root, name))
+
+
+def upload_file(path, file, data):
+    if data:
+        del_os_filename(path, data.file)
+
+    save_filename = file.filename
+    file.save(os.path.join(path, save_filename))
+    return save_filename, file.filename

@@ -3,6 +3,7 @@ from enum import Enum
 from datetime import datetime
 from ..base import Tool
 import json
+from .func import del_os_filename
 
 
 class AttrType(Enum):
@@ -119,10 +120,35 @@ class ExtraAttrContent(db.Model):
 
     content_section = db.Column(db.Text)
     content_section_val = db.Column(db.Text)
-    attr = db.relationship('Attr', backref=db.backref("extra_attr_content", uselist=False, cascade="all, delete-orphan"))
+    attr = db.relationship('Attr',
+                           backref=db.backref("extra_attr_content", uselist=False, cascade="all, delete-orphan"))
 
     @classmethod
     def edit(cls, form_data, attr):
         cls.update_model(attr, form_data)
         db.session.add(attr)
+        return
+
+
+class Las(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_name = db.Column(db.String(100))
+    description = db.Column(db.String(200))
+
+    file_name = db.Column(db.String(100))
+    file = db.Column(db.String(100))
+
+    @classmethod
+    def edit_or_create_las(cls, form_data, las, path):
+        if not las:
+            doc = cls(**form_data)
+            db.session.add(doc)
+            return
+
+        if form_data.get('file'):
+            del_os_filename(path, las.file)
+            las.file = form_data['file']
+            las.file_name = form_data.get('file_name')
+
+        db.session.add(las)
         return

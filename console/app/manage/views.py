@@ -1,10 +1,13 @@
 from . import manage
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, current_app
 from flask_login import login_required
 from ..decorators import role_required
 from .models import *
 from .func import *
 import json
+from .forms import *
+from ..base import Check
+import os
 
 
 @manage.route('/attrs', methods=['GET', 'POST'])
@@ -67,3 +70,49 @@ def edit_extra_attr(id):
         return render_template('manage/edit_extra_attrs.html', attr_info=attr_info, extra_attr=extra_attr)
     else:
         return render_template('manage/edit_extra_attrs2.html', attr_info=attr_info, extra_attr=extra_attr)
+
+
+@manage.route('/las')
+@login_required
+@role_required
+def las():
+    from ..main.models import Project
+    project_names = Project.query.group_by(Project.project_name).all()
+
+    las = Las.query.all()
+    las = {v.project_name: v.file_name for v in las if v.file_name}
+    return render_template('manage/las.html', project_names=project_names, las=las)
+
+
+@manage.route('/las/create', methods=['GET', 'POST'])
+@login_required
+@role_required
+def create_edit_las_file():
+    form = LasFileForm()
+    project_name = request.args.get('project_name')
+    las = Las.query.filter_by(project_name=project_name).first()
+    path = os.path.join(current_app.config['LAS_FILE_PATH_ROOT'])
+
+    Check(form).check_validate_on_submit()
+    if form.validate_on_submit():
+
+        form_data = form.get_form_data()
+        form_data['project_name'] = project_name
+
+        file = request.files.get('file')
+        if not file:
+            form_data['file'] = las.file if las else None
+            form_data['file_name'] = las.file_name if las else None
+        else:
+            form_data['file'], form_data['file_name'] = upload_file(path, file, las)
+
+        if las:
+            form.populate_obj(las)
+
+        Las.edit_or_create_las(form_data, las, path)
+        flash({'success': '更新成功！'})
+        return redirect(url_for('.las'))
+
+    if las:
+        form.set_form_data(las)
+    return render_template('manage/create_las_file.html', form=form)

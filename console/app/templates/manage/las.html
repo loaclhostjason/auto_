@@ -1,0 +1,65 @@
+{% extends "manage.html" %}
+{% import "macro/macro_content.html" as content %}
+{% import "macro/macro_form.html" as render_form %}
+{% from "macro/macro_table.html" import td_status %}
+
+{% set active = 'las' %}
+{% set menu_open = 'attrs' %}
+
+{% block manage_content %}
+
+    <div class="row">
+        <div class="col-sm-12">
+            {{ content.panel_title('LAS管理') }}
+        </div>
+
+        <div class="col-sm-12">
+
+            <div>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th width="150">项目名称</th>
+                        <th>las 下拉文件</th>
+                        <th width="150" class="text-right">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if project_names %}
+                        {% for project_name in project_names %}
+                            <tr>
+                                <td>{{ project_name.name }}</td>
+                                <td>
+                                    {% if las.get(project_name.name) %}
+                                        <span>{{ las[project_name.name] }}</span>
+                                    {% else %}
+                                        --
+                                    {% endif %}
+                                </td>
+
+                                <td class="text-right">
+                                    <div>
+                                        <a href="{{ url_for('.create_edit_las_file', project_name=project_name.name) }}">添加文件</a>
+                                        <span class="text-explode">|</span>
+                                        <a href="javascript:void (0)" class="delete-las-file">删除文件</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                    {% else %}
+                        <tr>
+                            <td style="padding: 50px 0" colspan="8" align="center">
+                                <span>没有记录</span>
+                            </td>
+                        </tr>
+
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+{% endblock %}
