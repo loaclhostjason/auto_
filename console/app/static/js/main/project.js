@@ -381,7 +381,7 @@ $(document).ready(function () {
         let new_las_name = '';
         for (let i = 0; i <= num; i++) {
             if ($('[name="las_' + i + '"]').val())
-                new_las_name += '$' + $('[name="las_' + i + '"]').val() + $('[name="las_f_' + i + '"]').val()
+                new_las_name += $('[name="las_' + i + '"]').val() + $('[name="las_f_' + i + '"]').val()
         }
         if ($.inArray(new_las_name[new_las_name.length - 1], ['#', '&', '-', '/']) > -1) {
             new_las_name = new_las_name.substring(0, new_las_name.length - 1)

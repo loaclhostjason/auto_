@@ -7,6 +7,7 @@ from app.manage.models import AttrContent, Attr
 from collections import defaultdict, OrderedDict
 from enum import Enum
 import datetime
+import re
 
 app = create_app()
 app.app_context().push()
@@ -20,13 +21,40 @@ class Bite(Enum):
     bite = 'BitPosition'
 
 
+sty = {
+    '#': '+',
+    '&': '.',
+    '/': '|',
+    '-': '-',
+}
+
+
+def check_las(new_data_init):
+    if '$' not in new_data_init:
+        new_data = ''
+        for k, v in sty.items():
+            if k in new_data_init:
+                new_data_str = ''
+                data_list = new_data_init.split(k)
+                if data_list:
+                    for dl in data_list:
+                        new_data_str += '$' + dl + k
+                new_data = new_data_str[:-1]
+            else:
+                new_data = '$' + new_data_init
+    else:
+        new_data = new_data_init
+
+    print(new_data)
+    return new_data
+
+
 def change_data(new_data_init):
-    sty = {
-        '#': '+',
-        '&': '.',
-        '/': '|',
-        '-': '-',
-    }
+    if not new_data_init:
+        return ''
+
+    new_data_init = check_las(new_data_init)
+
     for k, v in sty.items():
         new_data_init = new_data_init.replace(k, v)
 

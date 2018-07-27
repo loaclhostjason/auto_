@@ -36,7 +36,6 @@ def option_project_data():
 
     default_conf = [v.default_conf for v in project_data if v.default_conf]
     default_conf = list(set(default_conf))[0] if default_conf else None
-    print(default_conf)
 
     project_dict = dict()
     cot = real_content.copy()
