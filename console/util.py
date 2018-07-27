@@ -236,7 +236,8 @@ class ExportXml(object):
 
         if r:
             for address, projects in r.items():
-                project = ProjectData.query.filter_by(project_id=self.project_id).order_by(ProjectData.project_relation_id).all()
+                project = ProjectData.query.filter_by(project_id=self.project_id).order_by(
+                    ProjectData.project_relation_id).all()
                 conf_data = defaultdict(list)
                 if project:
                     for pro in project:
@@ -254,16 +255,14 @@ class ExportXml(object):
 
     @property
     def __default_conf(self):
-        data = ProjectData.query.filter_by(project_id=self.project_id, default_conf=True).all()
+        data = ProjectData.query. \
+            filter(ProjectData.project_id == self.project_id, ProjectData.default_conf.isnot(None)).all()
         default_ = dict()
         if data:
             for d in data:
                 parent_relation = ProjectRelation.query.get_or_404(d.project_relation_id)
-                content = json.loads(d.content) if d.content else None
-                if content:
-                    for k, v in content.items():
-                        if 'byte' in k and v:
-                            default_[parent_relation.parent_id] = v
+                if d.default_conf:
+                    default_[parent_relation.parent_id] = d.default_conf
         return default_
 
     def xml_section_attr(self, did_name, type_result):

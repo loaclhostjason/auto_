@@ -34,7 +34,9 @@ def option_project_data():
     project_data = ProjectData.query.filter(ProjectData.project_id == project_id,
                                             ProjectData.project_relation_id.in_(cpr_ids) if cpr_ids else False).all()
 
-    default_conf = {v.project_relation_id: v.default_conf for v in project_data if v.default_conf}
+    default_conf = [v.default_conf for v in project_data if v.default_conf]
+    default_conf = list(set(default_conf))[0] if default_conf else None
+    print(default_conf)
 
     project_dict = dict()
     cot = real_content.copy()
@@ -99,18 +101,12 @@ def option_project_data():
 
 def get_default_conf():
     project_relation_id = request.form.getlist('project_relation_id')
-    default_conf = request.form.getlist('default_conf')
+    default_conf = request.form.get('default_conf')
     result = dict()
-    print(111, default_conf)
     if project_relation_id:
         for index, v in enumerate(project_relation_id):
-            try:
-                if v in default_conf:
-                    result[v] = True
-                else:
-                    result[v] = False
-            except Exception as e:
-                result[v] = False
+            if default_conf:
+                result[v] = default_conf
     return result
 
 
