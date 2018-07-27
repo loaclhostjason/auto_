@@ -455,7 +455,7 @@ class ExportXml(object):
                             except Exception:
                                 default_val = ''
 
-                        node_parameter.setAttribute('ParamDefaultValue', default_val)
+                        node_parameter.setAttribute('ParamDefaultValue', str(default_val))
                         for parameter_k, parameter_v in parameter_val.items():
 
                             # parameter and byte bit bit_len
