@@ -24,7 +24,7 @@ class Bite(Enum):
 sty = {
     '#': '+',
     '&': '.',
-    '/': '|',
+    '/': '+',
     '-': '-',
 }
 
@@ -63,12 +63,9 @@ def change_data(new_data_init):
 
     new_data_init = check_las(new_data_init)
 
-    for k, v in sty.items():
-        new_data_init = new_data_init.replace(k, v)
-
     new_data = ''
-    if '|' in new_data_init:
-        data = new_data_init.split('|')
+    if '/' in new_data_init:
+        data = new_data_init.split('/')
         for index, v in enumerate(data):
             if index == 0:
                 try:
@@ -82,16 +79,22 @@ def change_data(new_data_init):
                     new_data += '(' + v
             else:
                 if index < len(data) - 1:
-                    new_data += '|' + v
+                    new_data += '/' + v
                 else:
-                    new_data += '|' + v + ')'
+                    new_data += '/' + v + ')'
     else:
         new_data = new_data_init
 
+    if '#' in new_data:
+        n = new_data.split('#')
+        new_data = ['(%s)' % v for v in n if v]
+        new_data = '+'.join(new_data)
+
+    for k, v in sty.items():
+        new_data = new_data.replace(k, v)
+
     if hav_i:
         new_data = '!(' + new_data + ')'
-        new_data = new_data.replace('((', '(')
-        new_data = new_data.replace('))', ')')
     return new_data
 
 
@@ -275,7 +278,6 @@ class ExportXml(object):
                         parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
                         conf_data[parent_relation.parent_id].append((pro.conf_data, pro.las))
 
-                print(conf_data)
                 conf_data = {k: v for k, v in conf_data.items()}
                 conf_data = {
                     'conf_data': conf_data
@@ -551,5 +553,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(2)
+    export_xml = ExportXml(1)
     export_xml.run()
