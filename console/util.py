@@ -38,7 +38,6 @@ def check_las(new_data_init):
     split_re = '(\\' + split_re + ')'
     split_data = re.split(r'%s' % split_re, new_data_init)
 
-    print(split_data)
     if split_data:
         for dl in split_data:
             if dl not in sty.keys():
@@ -50,7 +49,6 @@ def check_las(new_data_init):
 
     if isinstance(result, list):
         result = ''.join(result)
-    print(result)
     return result
 
 
