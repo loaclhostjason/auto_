@@ -33,7 +33,7 @@ def projects():
     user = User.query.get_or_404(current_user.id)
     project_name = user.project_name
 
-    project_query = Project.query.order_by(Project.project_name)
+    project_query = Project.query.order_by(Project.project_name, Project.id)
     if current_user.is_admin:
         project_list = project_query.all()
     elif current_user.is_pm_admin:
