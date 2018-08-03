@@ -1,4 +1,5 @@
-import xml.dom.minidom
+# import xml.dom.minidom
+from dom import minidom
 import os
 import json
 from app import create_app
@@ -344,7 +345,7 @@ class ExportXml(object):
         return content, sum(new_reset_section, [])
 
     def set_xml(self):
-        doc = xml.dom.minidom.Document()
+        doc = minidom.Document()
         root = doc.createElement('ConfigurationModule')
 
         root.setAttribute('%s-CONFIG-SCHEMA-VERSION' % self.xml_managers_attr, '1.0')
