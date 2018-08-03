@@ -865,9 +865,10 @@ class Element(Node):
         order = ['IDREF', 'DidWriteScope', 'ReadBackCompare', 'DelayForMS']
 
         attrs = self._get_attributes()
-        # a_names = sorted(attrs.keys(), key=str.lower, reverse=True)
-        a_names = attrs.keys()
-        print(attrs.keys())
+        a_names = sorted(attrs.keys(), key=str.lower, reverse=True)
+
+        if not len(list(set(attrs.keys()) - set(order))):
+            a_names = sorted(attrs.keys(), key=order.index)
 
         for a_name in a_names:
             writer.write(" %s=\"" % a_name)
