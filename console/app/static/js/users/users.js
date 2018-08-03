@@ -16,7 +16,9 @@ $(document).ready(function () {
     user_modal.on('hide.bs.modal', function () {
         users.hide_modal($(this));
     });
+    var btn;
     user_modal.on('show.bs.modal', function (event) {
+        btn = $(event.relatedTarget);
         laydate.render({
             elem: '#expiry_time',
             min: moment().format('YYYY-MM-DD'),
@@ -34,7 +36,8 @@ $(document).ready(function () {
 
     $('.submit_user').click(function () {
         var params = user_modal.find('form').serialize();
-        params += '&role=user';
+        var role = btn.data('role');
+        params += '&role=' + role || 'user';
         console.log(params);
         $.post('/users/create', params, function (resp) {
             if (resp.success) {
