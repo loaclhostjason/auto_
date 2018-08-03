@@ -855,6 +855,7 @@ class Element(Node):
         attrs = self._get_attributes()
         # a_names = sorted(attrs.keys())
         a_names = attrs.keys()
+        print(a_names)
 
         for a_name in a_names:
             writer.write(" %s=\"" % a_name)
