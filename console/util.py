@@ -562,7 +562,9 @@ class ExportXml(object):
         with open(files_path, 'r') as f:
             for line in f:
                 if '<DefaultValue' in line:
-                    line = line[:20] + '"' + line[20:-16] + '"' + line[-16:-1] + '\r'
+                    line = line[:20] + '"' + line[20:-16] + '"' + line[-16:-1] + '\r\n'
+                else:
+                    line = line + '\r\n'
                 file_data += line
 
         with open(files_path, 'w', encoding='utf-8') as f:
@@ -578,7 +580,9 @@ class ExportXml(object):
         with open(files_path, 'r') as f:
             for line in f:
                 if '<DefaultValue' in line:
-                    line = line[:20] + '"' + line[20:-16] + '"' + line[-16:-1] + '\r'
+                    line = line[:20] + '"' + line[20:-16] + '"' + line[-16:-1] + '\r\n'
+                else:
+                    line = line + '\r\n'
                 file_data += line
 
         with open(files_path, 'w', encoding='utf-8') as f:
