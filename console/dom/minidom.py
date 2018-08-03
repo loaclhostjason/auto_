@@ -862,10 +862,12 @@ class Element(Node):
         # newl = newline string
         writer.write(indent + "<" + self.tagName)
 
+        order = ['IDREF', 'DidWriteScope', 'ReadBackCompare', 'DelayForMS']
+
         attrs = self._get_attributes()
-        a_names = sorted(attrs.keys(), key=str.lower, reverse=True)
-        # a_names = attrs.keys()
-        # print(a_names)
+        # a_names = sorted(attrs.keys(), key=str.lower, reverse=True)
+        a_names = attrs.keys()
+        print(attrs.keys())
 
         for a_name in a_names:
             writer.write(" %s=\"" % a_name)
