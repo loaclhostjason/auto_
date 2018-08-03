@@ -410,7 +410,10 @@ class ExportXml(object):
                 if val:
                     for k in self.__did_order:
                         did_item_s = doc.createElement(k)
-                        did_item_s.appendChild(doc.createTextNode(str(val.get(k) or '')))
+                        if k == 'DefaultValue':
+                            did_item_s.appendChild(doc.createTextNode(str(val.get(k) or '')))
+                        else:
+                            did_item_s.appendChild(doc.createTextNode(str(val.get(k) or '')))
                         node_did_item.appendChild(did_item_s)
                     node_did_list.appendChild(node_did_item)
         root.appendChild(node_did_list)
@@ -555,11 +558,31 @@ class ExportXml(object):
         with open(files_path, 'w', encoding='utf-8') as f:
             doc.writexml(f, indent='', addindent='  ', newl='\r\n', encoding="utf-8")
 
+        file_data = ""
+        with open(files_path, 'r') as f:
+            for line in f:
+                if '<DefaultValue' in line:
+                    line = line[:20] + '"' + line[20:-16] + '"' + line[-16:-1]
+                file_data += line
+
+        with open(files_path, 'w', encoding='utf-8') as f:
+            f.write(file_data)
+
     def mk_dir(self, project_name):
         files_path = self.set_dir_path(project_name)
         doc = self.set_xml()
         with open(files_path, 'w', encoding='utf-8') as f:
             doc.writexml(f, indent='', addindent='  ', newl='\r\n', encoding="utf-8")
+
+        file_data = ""
+        with open(files_path, 'r') as f:
+            for line in f:
+                if '<DefaultValue' in line:
+                    line = line[:20] + '"' + line[20:-16] + '"' + line[-16:-1]
+                file_data += line
+
+        with open(files_path, 'w', encoding='utf-8') as f:
+            f.write(file_data)
 
 
 if __name__ == '__main__':
