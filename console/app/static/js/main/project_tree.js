@@ -263,6 +263,7 @@ myDiagram.nodeTemplateMap.add("FirstNode",
                 // extra config
                 $('.add-extra-config').show();
                 $('.add-extra-config').attr('level', 1);
+                $('.submit-project-data').hide();
             }
         }, {
             contextMenu: firstContextMenu
@@ -288,6 +289,7 @@ myDiagram.nodeTemplateMap.add("SecondNode",
                 $('.add-extra-config').show();
                 $('.add-extra-config').attr('level', 2);
                 $('.add-extra-config').attr('name', node['name']);
+                $('.submit-project-data').hide();
             }
         }, {
             contextMenu: secondContextMenu
@@ -314,6 +316,7 @@ myDiagram.nodeTemplateMap.add("ThirdNode",
 
                 // extra config
                 $('.add-extra-config').hide();
+                $('.submit-project-data').show();
             }
         }, {
             contextMenu: thirdContextMenu
