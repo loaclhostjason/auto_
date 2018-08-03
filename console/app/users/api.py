@@ -18,7 +18,7 @@ def validate_user_pwd(upw, upw2):
 
 @users.route('/info/<int:id>')
 @login_required
-@role_required
+@role_required2
 def get_user_info(id):
     user = User.query.filter_by(id=id).first()
     if not user:
@@ -54,7 +54,7 @@ def create_users():
 
 @users.route('/edit/<int:id>', methods=['POST'])
 @login_required
-@role_required
+@role_required2
 def edit_users(id):
     users_params = request.form.to_dict()
     type = request.args.get('type')
@@ -91,7 +91,7 @@ def edit_users(id):
 
 @users.route('/delete/<int:id>', methods=['POST'])
 @login_required
-@role_required
+@role_required2
 def delete_user(id):
     user = User.query.filter_by(id=id).first()
     if not user:
