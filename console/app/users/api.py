@@ -6,7 +6,7 @@ from .forms import UserForm
 from ..base import Check
 from ..models import User
 from .. import db
-from ..decorators import role_required
+from ..decorators import role_required, role_required2
 
 
 def validate_user_pwd(upw, upw2):
@@ -28,7 +28,7 @@ def get_user_info(id):
 
 @users.route('/create', methods=['POST'])
 @login_required
-@role_required
+@role_required2
 def create_users():
     users_params = request.form.to_dict()
     user_role = request.form.get('role')
