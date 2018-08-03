@@ -244,6 +244,10 @@ class ExportXml(object):
             for ac in attr_content:
                 content = json.loads(ac.real_content) if ac and ac.real_content else None
                 if content:
+                    if content.get('BytePosition'):
+                        content['BytePosition'] = int(content['BytePosition']) + 1
+                    if content.get('BitPosition'):
+                        content['BitPosition'] = int(content['BitPosition']) + 1
                     r[ac.project_relation_id].append(content)
         d['byte'] = r
         return d
