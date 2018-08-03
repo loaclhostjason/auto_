@@ -246,8 +246,6 @@ class ExportXml(object):
                 if content:
                     if content.get('BytePosition'):
                         content['BytePosition'] = int(content['BytePosition']) + 1
-                    if content.get('BitPosition'):
-                        content['BitPosition'] = int(content['BitPosition']) + 1
                     r[ac.project_relation_id].append(content)
         d['byte'] = r
         return d
@@ -563,8 +561,6 @@ class ExportXml(object):
             for line in f:
                 if '<DefaultValue' in line:
                     line = line[:20] + '"' + line[20:-16] + '"' + line[-16:-1] + '\r\n'
-                else:
-                    line = line + '\r\n'
                 file_data += line
 
         with open(files_path, 'w', encoding='utf-8') as f:
@@ -581,8 +577,6 @@ class ExportXml(object):
             for line in f:
                 if '<DefaultValue' in line:
                     line = line[:20] + '"' + line[20:-16] + '"' + line[-16:-1] + '\r\n'
-                else:
-                    line = line + '\r\n'
                 file_data += line
 
         with open(files_path, 'w', encoding='utf-8') as f:
