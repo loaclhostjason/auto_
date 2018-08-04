@@ -159,3 +159,9 @@ class ProjectData(db.Model):
             data.real_content = ';'.join(result)
             print(';'.join(result))
             db.session.add(data)
+
+
+class ProjectGroup(db.Model):
+    __tablename__ = 'project_group'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(32))
