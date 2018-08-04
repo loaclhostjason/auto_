@@ -25,13 +25,13 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% if project_names %}
-                        {% for project_name in project_names %}
+                    {% if project_groups %}
+                        {% for project_info in project_groups %}
                             <tr>
-                                <td>{{ project_name.name }}</td>
+                                <td>{{ project_info.name }}</td>
                                 <td>
-                                    {% if las.get(project_name.name) %}
-                                        <span>{{ las[project_name.name] }}</span>
+                                    {% if las.get(project_info.name) %}
+                                        <span>{{ las[project_info.name] }}</span>
                                     {% else %}
                                         --
                                     {% endif %}
@@ -39,9 +39,9 @@
 
                                 <td class="text-right">
                                     <div>
-                                        <a href="{{ url_for('.create_edit_las_file', project_name=project_name.name) }}">添加文件</a>
+                                        <a href="{{ url_for('.create_edit_las_file', group_id=project_info.id) }}">添加文件</a>
                                         <span class="text-explode">|</span>
-                                        <a href="javascript:void (0)" class="delete-las-file" data-project-name="{{ project_name.name }}">删除文件</a>
+                                        <a href="javascript:void (0)" class="delete-las-file" data-group-id="{{ project_info.id }}">删除文件</a>
                                     </div>
                                 </td>
                             </tr>
@@ -70,8 +70,8 @@
     <script>
         $(document).ready(function () {
             $('.delete-las-file').click(function () {
-                var project_name = $(this).data('project-name');
-                $.update_info_reload('是否删除', '/manage/las/delete?project_name=' + project_name, '');
+                var group_id = $(this).data('group-id');
+                $.update_info_reload('是否删除', '/manage/las/delete?group_id=' + group_id, '');
             })
         })
 

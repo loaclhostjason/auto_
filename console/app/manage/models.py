@@ -138,6 +138,9 @@ class Las(db.Model):
     file_name = db.Column(db.String(100))
     file = db.Column(db.String(100))
 
+    project_group_id = db.Column(db.Integer, db.ForeignKey('project_group.id'))
+    project_group = db.relationship('ProjectGroup', backref=db.backref("las"))
+
     @classmethod
     def edit_or_create_las(cls, form_data, las, path):
         if not las:

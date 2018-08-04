@@ -3,6 +3,7 @@
 
 {% set menu_cur = 'manage' %}
 {% set manage_menu = [('属性管理', 'manage.attrs', active == 'attrs')] %}
+{% set manage_project_group = [('项目管理', 'manage.project_group', active == 'project_group')] %}
 {% set manage_las = [('LAS管理', 'manage.las', active == 'las')] %}
 
 
@@ -13,6 +14,9 @@
             <dl class="aside-menu-dl">
                 <dd>
                     {{ aside_menu_one(manage_menu, 'fa fa-sitemap') }}
+                </dd>
+                <dd>
+                    {{ aside_menu_one(manage_project_group, 'fa fa-cog') }}
                 </dd>
                 <dd>
                     {{ aside_menu_one(manage_las, 'fa fa-superpowers') }}

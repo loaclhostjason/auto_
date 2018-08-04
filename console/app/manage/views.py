@@ -8,6 +8,7 @@ import json
 from .forms import *
 from ..base import Check
 import os
+from ..main.models import ProjectGroup
 
 
 @manage.route('/attrs', methods=['GET', 'POST'])
@@ -79,12 +80,11 @@ def edit_extra_attr(id):
 @login_required
 @role_required
 def las():
-    from ..main.models import Project
-    project_names = Project.query.group_by(Project.project_name).all()
+    project_groups = ProjectGroup.query.all()
 
     las = Las.query.all()
     las = {v.project_name: v.file_name for v in las if v.file_name}
-    return render_template('manage/las.html', project_names=project_names, las=las)
+    return render_template('manage/las.html', project_groups=project_groups, las=las)
 
 
 @manage.route('/las/create', methods=['GET', 'POST'])
@@ -126,8 +126,8 @@ def create_edit_las_file():
 @role_required
 def delete_las_file():
     path = os.path.join(current_app.config['LAS_FILE_PATH_ROOT'])
-    project_name = request.args.get('project_name')
-    las = Las.query.filter_by(project_name=project_name).first()
+    group_id = request.args.get('group_id')
+    las = Las.query.filter_by(project_group_id=group_id).first()
     if not las:
         return jsonify({'success': False, 'message': '没有数据'})
 
@@ -135,4 +135,49 @@ def delete_las_file():
     las.file_name = None
     las.file = None
     db.session.add(las)
+    return jsonify({'success': True, 'message': '更新成功'})
+
+
+@manage.route('/project/group', methods=['GET', 'POST'])
+@login_required
+@role_required
+def project_group():
+    action = request.args.get('action')
+    if request.method == 'POST':
+        name = request.form.get('name')
+        id = request.form.get('id')
+
+        old_name = ProjectGroup.query.filter_by(name=name).first()
+        if not name or not action:
+            return jsonify({'success': False, 'message': '参数错误'})
+
+        if action == 'edit':
+            group_p = ProjectGroup.query.filter_by(id=id).first()
+            if old_name and group_p.name != name:
+                return jsonify({'success': False, 'message': '项目名称重复了'})
+            group_p.name = name
+            db.session.add(group_p)
+
+        if action == 'create':
+            if old_name:
+                return jsonify({'success': False, 'message': '项目名称重复了'})
+            project = ProjectGroup(name=name)
+            db.session.add(project)
+
+        return jsonify({'success': True, 'message': '更新成功'})
+
+    project_groups = ProjectGroup.query.all()
+    return render_template('manage/project_group.html', project_groups=project_groups)
+
+
+@manage.route('/project/group/delete/<int:id>', methods=['POST'])
+@login_required
+@role_required
+def delete_project_group(id):
+    project_group_info = ProjectGroup.query.filter_by(id=id).first()
+    if not project_group_info:
+        return jsonify({'success': False, 'message': '参数错误'})
+
+    # todo some bug
+    db.session.delete(project_group_info)
     return jsonify({'success': True, 'message': '更新成功'})
