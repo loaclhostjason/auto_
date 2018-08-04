@@ -180,21 +180,31 @@ class ExportXml(object):
         attr_content = AttrContent.query.filter_by(project_relation_id=project_relation.id).first()
 
         header, *arg = self.default_attr
+        header_default = [
+            (((v['item_protocol'] + '-') if v.get('item_protocol') else '') + v['item'], v['item_default'])
+            for v in header if v.get('item') and v.get('item_default')]
+
         if not attr_content or not attr_content.real_content:
-            return list(), dict()
+            if not header:
+                return list(), dict()
+            else:
+                return header_default, dict(header_default)
 
         content = json.loads(attr_content.real_content)
 
         order_content = self.__ecu_order()
         if order_content:
             for oc in order_content:
-                result[oc] = content.get(oc)
+                result[oc] = content.get(oc) or dict(header_default).get(oc, '')
 
         result_list = [(key, val) for key, val in result.items()]
         return result_list, dict(result)
 
     @property
     def xml_did_list(self):
+        header, did, *args = self.default_attr
+        did_default = {v['item']: v['item_default'] for v in did if v.get('item') and v.get('item_default')}
+
         result = OrderedDict()
         project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, level=2). \
             order_by(ProjectRelation.relation_order).all()
@@ -204,7 +214,13 @@ class ExportXml(object):
         for pr in project_relation:
             attr_content = AttrContent.query.filter_by(project_relation_id=pr.id).first()
             real_content = json.loads(attr_content.real_content) if attr_content and attr_content.real_content else {}
-            result[pr.name] = real_content or {}
+            if real_content:
+                for k, v in real_content.items():
+                    if not real_content.get(k):
+                        real_content[k] = did_default.get(k, '')
+            else:
+                real_content = did_default
+            result[pr.name] = real_content
 
         return result
 
@@ -227,23 +243,36 @@ class ExportXml(object):
         return result
 
     def __get_(self, projects):
-        d = defaultdict(list)
+        *args, t_did = self.default_attr
+        t_did = {v['item']: v['item_default'] for v in t_did if v.get('item') and v.get('item_default')}
 
+        d = defaultdict(list)
         project_relation_ids = [project['project_relation_id'] for project in projects if
                                 project.get('project_relation_id')]
 
         attr_content = AttrContent.query.filter(AttrContent.project_relation_id.in_(project_relation_ids)).all()
         pro = ProjectRelation.query.filter(ProjectRelation.id.in_(project_relation_ids)).all()
 
-        r = defaultdict(list)
         d['parameter_name'] = [{p.id: p.name} for p in pro]
+        r = defaultdict(list)
         if attr_content:
             for ac in attr_content:
                 content = json.loads(ac.real_content) if ac and ac.real_content else None
                 if content:
+                    for k, v in content.items():
+                        if not content.get(k):
+                            content[k] = t_did.get(k, '')
+
                     if content.get('BytePosition'):
                         content['BytePosition'] = int(content['BytePosition']) + 1
                     r[ac.project_relation_id].append(content)
+
+        this_id = [v.project_relation_id for v in attr_content]
+        dif_id = list(set(project_relation_ids) - set(this_id))
+        if len(dif_id):
+            for id_info in dif_id:
+                r[id_info].append(t_did)
+
         d['byte'] = r
         return d
 
@@ -479,7 +508,7 @@ class ExportXml(object):
                                 byte_content = byte_content[0]
                                 for p_key in self.__parameter_order():
                                     node_byte_name = doc.createElement(p_key)
-                                    node_byte_name.appendChild(doc.createTextNode(str(byte_content.get(p_key))))
+                                    node_byte_name.appendChild(doc.createTextNode(str(byte_content.get(p_key, ''))))
                                     node_parameter.appendChild(node_byte_name)
 
                             # ConfData
@@ -595,5 +624,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(29)
+    export_xml = ExportXml(28)
     export_xml.run()
