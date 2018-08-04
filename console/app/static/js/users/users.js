@@ -11,6 +11,7 @@ $(document).ready(function () {
     var user_modal = $('#user_modal');
     $('.create_user').click(function () {
         users.show_modal(user_modal, $(this));
+        user_modal.find('.modal-title').text('添加项目管理员');
     });
 
     user_modal.on('hide.bs.modal', function () {
@@ -103,7 +104,7 @@ $(document).ready(function () {
     // create com user
     $('.create_com_user').click(function () {
         users.show_modal(user_modal, $(this));
-        user_modal.find('.modal-title').text('项目管理员【' + $(this).data('username') + '】，分配普通用户');
+        user_modal.find('.modal-title').text('添加普通用户');
     });
 
 

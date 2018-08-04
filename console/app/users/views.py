@@ -10,12 +10,12 @@ from config import Config
 import os
 from datetime import datetime
 from ..models import *
-from ..decorators import role_required2
+from ..decorators import role_admin_pm
 
 
 @users.route('/')
 @login_required
-@role_required2
+@role_admin_pm
 def users_list():
     form = UserForm()
     # users = User.query.filter(User.group_user_id.is_(None)).all()

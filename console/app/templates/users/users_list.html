@@ -30,9 +30,24 @@
 
     <td>
         {% if user.role.name == 'admin' %}
-            <span>全部</span>
+            <label class="label_border"><span>全部</span></label>
         {% else %}
-            <span>{{ user.project_name or '--' }}</span>
+            {% if user.project_name %}
+                <label class="label_border"><span>{{ user.project_name }}</span></label>
+                {% if current_user.is_admin or (current_user.is_pm_admin and user.role.name == 'user') %}
+                    <label class="label_border">
+                        <a href="javascript:void (0)" class="fp_pm text-success" data-user="{{ user.username }}"
+                           data-uid="{{ user.id }}"><i class="glyphicon glyphicon-edit"></i> 项目</a>
+                    </label>
+                {% endif %}
+            {% else %}
+                {% if current_user.is_admin or (current_user.is_pm_admin and user.role.name == 'user') %}
+                    <label class="label_border">
+                        <a href="javascript:void (0)" class="fp_pm text-warning" data-user="{{ user.username }}"
+                           data-uid="{{ user.id }}"><i class="glyphicon glyphicon-plus"></i> 项目</a>
+                    </label>
+                {% endif %}
+            {% endif %}
         {% endif %}
     </td>
 
@@ -48,10 +63,6 @@
                 <a href="javascript:void (0)" class="update_password"
                    data-id="{{ user.id }}"
                    data-username="{{ user.username }}">修改密码</a>
-                {% if current_user.is_admin or current_user.is_pm_admin and user.id != current_user.id %}
-                    <span class="text-explode">|</span>
-                    <a href="javascript:void (0)" class="fp_pm" data-user="{{ user.username }}" data-uid="{{ user.id }}">分配项目</a>
-                {% endif %}
             </div>
 
         {% else %}
@@ -109,7 +120,7 @@
                         <th width="120">登录IP</th>
                         <th width="150">注册时间</th>
                         <th width="150">到期时间</th>
-                        <th>权限</th>
+                        <th width="120">权限</th>
                         <th>项目</th>
                         <th width="160" class="text-right">操作</th>
                     </tr>

@@ -6,7 +6,7 @@ from .forms import UserForm
 from ..base import Check
 from ..models import User
 from .. import db
-from ..decorators import role_required, role_required2
+from ..decorators import role_required, role_admin_pm
 
 
 def validate_user_pwd(upw, upw2):
@@ -18,7 +18,7 @@ def validate_user_pwd(upw, upw2):
 
 @users.route('/info/<int:id>')
 @login_required
-@role_required2
+@role_admin_pm
 def get_user_info(id):
     user = User.query.filter_by(id=id).first()
     if not user:
@@ -28,7 +28,7 @@ def get_user_info(id):
 
 @users.route('/create', methods=['POST'])
 @login_required
-@role_required2
+@role_admin_pm
 def create_users():
     users_params = request.form.to_dict()
     user_role = request.form.get('role')
@@ -54,7 +54,7 @@ def create_users():
 
 @users.route('/edit/<int:id>', methods=['POST'])
 @login_required
-@role_required2
+@role_admin_pm
 def edit_users(id):
     users_params = request.form.to_dict()
     type = request.args.get('type')
@@ -91,7 +91,7 @@ def edit_users(id):
 
 @users.route('/delete/<int:id>', methods=['POST'])
 @login_required
-@role_required2
+@role_admin_pm
 def delete_user(id):
     user = User.query.filter_by(id=id).first()
     if not user:

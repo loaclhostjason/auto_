@@ -13,7 +13,10 @@ def login():
     Check(form).check_validate_on_submit()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        print(user)
+        if not user:
+            flash({'errors': '用户名或者密码错误！'})
+            return redirect(request.url)
+
         if user.is_expiry is not None and user.is_expiry < 0:
             flash({'errors': '已过期，无法登陆，请联系管理员'})
             return redirect(request.url)

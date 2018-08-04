@@ -67,15 +67,12 @@ def change_data(new_data_init):
     new_data = ''
     if '/' in new_data_init:
         data = new_data_init.split('/')
-        print(data)
         for index, v in enumerate(data):
             if index == 0:
                 try:
                     tmp_s = v[-6]
-                    # print(tmp_s)
                     tmp = v.split(tmp_s)
                     tmp = [v for v in tmp if v]
-                    # print(tmp, tmp_s)
                     new_data += ''.join(tmp[:-1]) + tmp_s + '(' + ''.join(tmp[-1])
                 except Exception as e:
                     new_data += '(' + v
@@ -85,13 +82,11 @@ def change_data(new_data_init):
                         new_data += '/' + v[:5] + ')' + v[5:-5] + '(' + v[-5:]
                     else:
                         new_data += '/' + v
-                    # print(new_data)
                 else:
                     new_data += '/' + v + ')'
     else:
         new_data = new_data_init
 
-    # print(new_data)
     if '#' in new_data:
         n = new_data.split('#')
         new_data = ['(%s)' % v for v in n if v]
@@ -184,6 +179,7 @@ class ExportXml(object):
 
         attr_content = AttrContent.query.filter_by(project_relation_id=project_relation.id).first()
 
+        header, *arg = self.default_attr
         if not attr_content or not attr_content.real_content:
             return list(), dict()
 
@@ -344,6 +340,20 @@ class ExportXml(object):
                         new_reset_section.append(vv)
         return content, sum(new_reset_section, [])
 
+    @property
+    def default_attr(self):
+        attr_query = Attr.query
+
+        header = attr_query.filter_by(level=1).first()
+        did = attr_query.filter_by(level=2).first()
+        t_did = attr_query.filter_by(level=3).first()
+
+        header = json.loads(header.content) if header else []
+        did = json.loads(did.content) if did else []
+        t_did = json.loads(t_did.content) if t_did else []
+
+        return header, did, t_did
+
     def set_xml(self):
         doc = minidom.Document()
         root = doc.createElement('ConfigurationModule')
@@ -409,10 +419,7 @@ class ExportXml(object):
                 if val:
                     for k in self.__did_order:
                         did_item_s = doc.createElement(k)
-                        if k == 'DefaultValue':
-                            did_item_s.appendChild(doc.createTextNode(str(val.get(k) or '')))
-                        else:
-                            did_item_s.appendChild(doc.createTextNode(str(val.get(k) or '')))
+                        did_item_s.appendChild(doc.createTextNode(str(val.get(k) or '')))
                         node_did_item.appendChild(did_item_s)
                     node_did_list.appendChild(node_did_item)
         root.appendChild(node_did_list)
@@ -486,7 +493,6 @@ class ExportXml(object):
                             if conf_data:
                                 node_conf_data.setAttribute('useConfData', 'true')
                                 for data in conf_data:
-                                    # print(change_data(data[1]))
                                     node_config_data = doc.createElement('ConfigData')
                                     node_config_data.setAttribute('Value', data[0])
                                     node_config_data.setAttribute('ConfigExpression', change_data(data[1]))
@@ -589,5 +595,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(2)
+    export_xml = ExportXml(29)
     export_xml.run()

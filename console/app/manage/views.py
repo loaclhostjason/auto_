@@ -23,6 +23,7 @@ def attrs():
 @role_required
 def edit_attr(id):
     attr_info = Attr.query.filter_by(id=id).first_or_404()
+    aciton = request.args.get('action')
 
     if request.method == 'POST':
         content = get_content()
@@ -30,6 +31,8 @@ def edit_attr(id):
             'content': json.dumps(content)
         }
         Attr.edit(data, attr_info)
+        if aciton == 'json':
+            return jsonify({'success': True, 'message': '更新成功'})
         flash({'success': '更新成功'})
         return redirect(url_for('.attrs'))
 
