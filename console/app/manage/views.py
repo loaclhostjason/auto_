@@ -83,7 +83,7 @@ def las():
     project_groups = ProjectGroup.query.all()
 
     las = Las.query.all()
-    las = {v.project_name: v.file_name for v in las if v.file_name}
+    las = {v.project_group_id: v.file_name for v in las if v.file_name}
     return render_template('manage/las.html', project_groups=project_groups, las=las)
 
 
@@ -92,22 +92,22 @@ def las():
 @role_required
 def create_edit_las_file():
     form = LasFileForm()
-    project_name = request.args.get('project_name')
-    las = Las.query.filter_by(project_name=project_name).first()
+    group_id = request.args.get('group_id')
+    las = Las.query.filter_by(project_group_id=group_id).first()
     path = os.path.join(current_app.config['LAS_FILE_PATH_ROOT'])
 
     Check(form).check_validate_on_submit()
     if form.validate_on_submit():
 
         form_data = form.get_form_data()
-        form_data['project_name'] = project_name
+        form_data['project_group_id'] = group_id
 
         file = request.files.get('file')
         if not file:
             form_data['file'] = las.file if las else None
             form_data['file_name'] = las.file_name if las else None
         else:
-            form_data['file'], form_data['file_name'] = upload_file(path, file, las, project_name)
+            form_data['file'], form_data['file_name'] = upload_file(path, file, las, group_id)
 
         if las:
             form.populate_obj(las)
@@ -179,5 +179,14 @@ def delete_project_group(id):
         return jsonify({'success': False, 'message': '参数错误'})
 
     # todo some bug
+    las = project_group_info.las
+    if len(las):
+        return jsonify({'success': False, 'message': 'las 关联中'})
+    users = project_group_info.users
+    if len(users):
+        return jsonify({'success': False, 'message': 'users 关联中'})
+    projects = project_group_info.project
+    if len(projects):
+        return jsonify({'success': False, 'message': 'projects 关联中'})
     db.session.delete(project_group_info)
     return jsonify({'success': True, 'message': '更新成功'})

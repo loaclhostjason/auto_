@@ -136,7 +136,7 @@ $(document).ready(function () {
             }
 
             data.forEach(function (val) {
-                project_select_html += '<option value="' + val + '">' + val + '</option>';
+                project_select_html += '<option value="' + val[0] + '">' + val[1] + '</option>';
             });
             return project_select_html;
         }
@@ -157,9 +157,9 @@ $(document).ready(function () {
         uid = btn.data('uid');
 
         var modal = $(this);
-        $.get('/project/user/' + g_user_id, function (resp) {
+        $.get('/project/group/pm', function (resp) {
             var data = resp['data'];
-            var project_select = modal.find('[name="project_name"]');
+            var project_select = modal.find('[name="project_group"]');
             console.log(data);
             var project_select_html = pm.get_file_option(data);
             project_select.html(project_select_html);

@@ -74,7 +74,7 @@ def create_project():
     form_data = request.form.to_dict()
 
     type_file = request.args.get('type_file')
-    if type_file == 'file' and not form_data.get('project_name'):
+    if type_file == 'file' and not form_data.get('project_group'):
         return jsonify({'success': False, 'message': '项目名称不能为空'})
 
     if not form_data.get('name'):
@@ -86,7 +86,7 @@ def create_project():
 
     d = {
         'name': form_data['name'],
-        'project_name': form_data.get('project_name') or form_data['name'],
+        'project_group_id': form_data.get('project_group'),
         'user_id': current_user.get_id(),
     }
 
@@ -164,12 +164,12 @@ def delete_project(id):
 
     del_DF('%s.xml' % project.name, project.name)
 
-    project_name = project.name
+    project_group_id = project.project_group_id
     db.session.commit()
-    func_project = Project.query.filter_by(project_name=project_name).all()
+    func_project = Project.query.filter_by(project_group_id=project_group_id).all()
 
     if not func_project:
-        las = Las.query.filter_by(project_name=project_name).first()
+        las = Las.query.filter_by(project_group_id=project_group_id).first()
         path = current_app.config['LAS_FILE_PATH_ROOT']
         if las:
             del_os_filename(path, las.file)

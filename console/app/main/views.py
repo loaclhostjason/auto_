@@ -31,18 +31,18 @@ def sorry():
 @login_required
 def projects():
     user = User.query.get_or_404(current_user.id)
-    project_name = user.project_name
+    project_group_id = user.project_group_id
 
-    project_query = Project.query.order_by(Project.project_name, Project.id)
+    project_query = Project.query.order_by(Project.project_group_id, Project.id)
     if current_user.is_admin:
         project_list = project_query.all()
     elif current_user.is_pm_admin:
-        project_list = project_query.filter_by(project_name=project_name).all()
+        project_list = project_query.filter_by(project_group_id=project_group_id).all()
     else:
         project_list = project_query.filter_by(user_id=current_user.id).all()
 
     group_project = db.session.query(Project.id, func.count(Project.id).label('project_num')).group_by(
-        Project.project_name).all()
+        Project.project_group_id).all()
     group_project = {project_id: num for project_id, num in group_project}
     return render_template('main/projects.html', projects=project_list, group_project=group_project)
 
@@ -202,7 +202,7 @@ def download_file():
     project_id = request.args.get('project_id')
     project = Project.query.get_or_404(project_id)
     export_xml = ExportXml(project_id)
-    export_xml.mk_dir(project.project_name)
+    export_xml.mk_dir(project.project_group.name)
     export_xml.run()
     return download_files(project.name)
 

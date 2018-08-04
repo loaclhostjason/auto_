@@ -336,7 +336,7 @@ class ExportXml(object):
         attr = Attr.query.filter_by(level=2).first()
         if not attr or not attr.extra_attr_content:
             return list()
-        content = json.loads(attr.extra_attr_content.content_val) if attr.extra_attr_content else {}
+        content = json.loads(attr.extra_attr_content.content_val) if attr.extra_attr_content and attr.extra_attr_content.content_val else {}
         content = content.get(did_name) or {}
 
         read_section = content.get('readsection')
@@ -353,13 +353,13 @@ class ExportXml(object):
         attr = Attr.query.filter_by(level=1).first()
         if not attr or not attr.extra_attr_content:
             return list(), list()
-        content = json.loads(attr.extra_attr_content.content_section_val) if attr.extra_attr_content else {}
+        content = json.loads(attr.extra_attr_content.content_section_val or '{}') if attr.extra_attr_content else {}
         content = content.get(str(self.project_id))
 
         attr2 = Attr.query.filter_by(level=2).first()
         if not attr or not attr.extra_attr_content:
             return list(), list()
-        content2 = json.loads(attr2.extra_attr_content.content_val) if attr.extra_attr_content else {}
+        content2 = json.loads(attr2.extra_attr_content.content_val or '{}') if attr.extra_attr_content else {}
         new_reset_section = []
         for k, v in content2.items():
             resetsection = v.get('resetsection')
@@ -497,37 +497,38 @@ class ExportXml(object):
                             except Exception:
                                 default_val = ''
 
-                        node_parameter.setAttribute('ParamDefaultValue', str(default_val))
-                        for parameter_k, parameter_v in parameter_val.items():
+                        if default_val:
+                            node_parameter.setAttribute('ParamDefaultValue', str(default_val or ''))
+                            for parameter_k, parameter_v in parameter_val.items():
 
-                            # parameter and byte bit bit_len
-                            byte_content = byte.get(parameter_k)
+                                # parameter and byte bit bit_len
+                                byte_content = byte.get(parameter_k)
 
-                            # bite
-                            if byte_content:
-                                byte_content = byte_content[0]
-                                for p_key in self.__parameter_order():
-                                    node_byte_name = doc.createElement(p_key)
-                                    node_byte_name.appendChild(doc.createTextNode(str(byte_content.get(p_key, ''))))
-                                    node_parameter.appendChild(node_byte_name)
+                                # bite
+                                if byte_content:
+                                    byte_content = byte_content[0]
+                                    for p_key in self.__parameter_order():
+                                        node_byte_name = doc.createElement(p_key)
+                                        node_byte_name.appendChild(doc.createTextNode(str(byte_content.get(p_key, ''))))
+                                        node_parameter.appendChild(node_byte_name)
 
-                            # ConfData
-                            node_conf_data = doc.createElement('ConfData')
-                            conf_data = val['conf_data'].get(parameter_k)
+                                # ConfData
+                                node_conf_data = doc.createElement('ConfData')
+                                conf_data = val['conf_data'].get(parameter_k)
 
-                            if not conf_data:
-                                node_conf_data.setAttribute('useConfData', 'no')
-                                node_parameter.appendChild(node_conf_data)
-
-                            if conf_data:
-                                node_conf_data.setAttribute('useConfData', 'true')
-                                for data in conf_data:
-                                    node_config_data = doc.createElement('ConfigData')
-                                    node_config_data.setAttribute('Value', data[0])
-                                    node_config_data.setAttribute('ConfigExpression', change_data(data[1]))
-                                    node_conf_data.appendChild(node_config_data)
-
+                                if not conf_data:
+                                    node_conf_data.setAttribute('useConfData', 'no')
                                     node_parameter.appendChild(node_conf_data)
+
+                                if conf_data:
+                                    node_conf_data.setAttribute('useConfData', 'true')
+                                    for data in conf_data:
+                                        node_config_data = doc.createElement('ConfigData')
+                                        node_config_data.setAttribute('Value', data[0])
+                                        node_config_data.setAttribute('ConfigExpression', change_data(data[1]))
+                                        node_conf_data.appendChild(node_config_data)
+
+                                        node_parameter.appendChild(node_conf_data)
 
                         node_modification_item.appendChild(node_parameter)
                     node_modification.appendChild(node_modification_item)

@@ -30,8 +30,6 @@ class User(UserMixin, db.Model):
 
     expiry_time = db.Column(db.DateTime)
 
-    project_name = db.Column(db.String(100))
-
     project_group_id = db.Column(db.Integer, db.ForeignKey('project_group.id'))
     project_group = db.relationship('ProjectGroup', backref=db.backref("users"))
 

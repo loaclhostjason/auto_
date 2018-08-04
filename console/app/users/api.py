@@ -106,14 +106,13 @@ def delete_user(id):
 @role_required
 def fp_pm_users():
     user_id = request.args.get('user_id')
-
-    project_name = request.form.get('project_name')
+    project_group_id = request.form.get('project_group')
 
     user = User.query.filter_by(id=user_id).first()
     if not user:
         return jsonify({'success': False, 'message': '没有记录'})
 
-    user.project_name = project_name
+    user.project_group_id = project_group_id
     db.session.add(user)
 
     return jsonify({'success': True, 'message': '更新成功'})

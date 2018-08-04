@@ -30,8 +30,8 @@
                             <tr>
                                 <td>{{ project_info.name }}</td>
                                 <td>
-                                    {% if las.get(project_info.name) %}
-                                        <span>{{ las[project_info.name] }}</span>
+                                    {% if las.get(project_info.id) %}
+                                        <span>{{ las[project_info.id] }}</span>
                                     {% else %}
                                         --
                                     {% endif %}

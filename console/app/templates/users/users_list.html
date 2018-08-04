@@ -32,8 +32,8 @@
         {% if user.role.name == 'admin' %}
             <label class="label_border"><span>全部</span></label>
         {% else %}
-            {% if user.project_name %}
-                <label class="label_border"><span>{{ user.project_name }}</span></label>
+            {% if user.project_group %}
+                <label class="label_border"><span>{{ user.project_group.name }}</span></label>
                 {% if current_user.is_admin or (current_user.is_pm_admin and user.role.name == 'user') %}
                     <label class="label_border">
                         <a href="javascript:void (0)" class="fp_pm text-success" data-user="{{ user.username }}"

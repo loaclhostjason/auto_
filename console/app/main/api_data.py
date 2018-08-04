@@ -146,10 +146,10 @@ def edit_project_data_api(project_id):
 @login_required
 def get_las_info():
     from read_las_config import read_excel
-    project_name = request.args.get('project_name')
+    project_group_id = request.args.get('project_group_id')
 
     path = current_app.config['LAS_FILE_PATH_ROOT']
-    las = Las.query.filter_by(project_name=project_name).first()
+    las = Las.query.filter_by(project_group_id=project_group_id).first()
 
     if las:
         path = os.path.join(path, las.file)

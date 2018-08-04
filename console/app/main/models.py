@@ -16,13 +16,15 @@ class Project(db.Model):
     # 文件名称
     name = db.Column(db.String(68), index=True)
     # 项目名称
-    project_name = db.Column(db.String(68), index=True)
+    # project_name = db.Column(db.String(68), index=True)
+    project_group_id = db.Column(db.Integer, db.ForeignKey('project_group.id'))
 
     first_time = db.Column(db.DateTime, default=datetime.now)
     last_time = db.Column(db.DateTime, default=datetime.now)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User', backref=db.backref("project", cascade="all, delete"))
+    project_group = db.relationship('ProjectGroup', backref=db.backref("project"))
 
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)

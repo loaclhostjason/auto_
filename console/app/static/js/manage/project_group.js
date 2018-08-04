@@ -49,6 +49,6 @@ $(document).ready(function () {
 
     $('.delete-project-group').click(function () {
         var id = $(this).data('id');
-        $.update_info_reload('是否删除', '/project/group/delete/' + id, '');
+        $.update_info_reload('是否删除', '/manage/project/group/delete/' + id, '');
     })
 });

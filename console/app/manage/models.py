@@ -31,10 +31,10 @@ class Attr(db.Model):
 
     @classmethod
     def init_attr(cls):
-        _ecu = [{"item_required": "y", "item_zh": "EcuName", "item": "EcuName"},
-                {"item_required": "y", "item_zh": "RequestId", "item": "RequestId"},
-                {"item_required": "y", "item_zh": "ResponseId", "item": "ResponseId"},
-                {"item_required": "y", "item_zh": "ConfigurationFileNumber", "item": "ConfigurationFileNumber"},
+        _ecu = [{"item_zh": "EcuName", "item_required": "y", "item": "EcuName"},
+                {"item_zh": "RequestId", "item_required": "y", "item": "RequestId"},
+                {"item_zh": "ResponseId", "item_required": "y", "item": "ResponseId"},
+                {"item_zh": "ConfigurationFileNumber", "item_required": "y", "item": "ConfigurationFileNumber"},
                 {"item_zh": "ApplicationLayerSpec", "item_protocol": "ApplicationLayer",
                  "item": "ApplicationLayerSpec"}, {"item_zh": "P2", "item_protocol": "ApplicationLayer", "item": "P2"},
                 {"item_zh": "P2Star", "item_protocol": "ApplicationLayer", "item": "P2Star"},
@@ -45,13 +45,14 @@ class Attr(db.Model):
                 {"item_zh": "AlgorithmNumber", "item": "AlgorithmNumber"},
                 {"item_zh": "ConfigurationIndex", "item": "ConfigurationIndex"}]
 
-        _content = [{"item_zh": "DidNo", "item": "DidNo"}, {"item_zh": "DidIndicator", "item": "DidIndicator"},
-                    {"item_zh": "Name", "item": "Name"}, {"item_zh": "DidLength", "item": "DidLength"},
-                    {"item_zh": "FeatureCode", "item": "FeatureCode"},
-                    {"item_zh": "DefaultValue", "item": "DefaultValue"}]
+        _content = [{"item_zh": "ParameterName:", "item_required": "y", "item": "ParameterName"},
+                    {"item_zh": "BytePosition:", "item_required": "y", "item": "BytePosition"},
+                    {"item_zh": "BitPosition:", "item_required": "y", "item": "BitPosition"},
+                    {"item_zh": "BitLength:", "item_required": "y", "item": "BitLength"}]
 
         _did_len = [{"item_zh": "DidNo", "item": "DidNo"}, {"item_zh": "DidIndicator", "item": "DidIndicator"},
                     {"item_zh": "Name", "item": "Name"}, {"item_zh": "DidLength", "item": "DidLength"},
+                    {"item_zh": "FeatureCode", "item": "FeatureCode"},
                     {"item_zh": "DefaultValue", "item": "DefaultValue"}]
         r = [
             {'name': 'ECU属性配置', 'level': 1, 'type': 'worker', 'content': json.dumps(_ecu)},
@@ -129,10 +130,53 @@ class ExtraAttrContent(db.Model):
         db.session.add(attr)
         return
 
+    @classmethod
+    def init_content(cls):
+        attr_1 = dict()
+        attr_1['content'] = json.dumps(
+            [
+                {"item_zh": "PinDefinition", "item": "PinDefinition"},
+                {"item_zh": "PinNumber", "item": "PinNumber"},
+                {"pin_num": "2"}
+            ]
+        )
+
+        attr_1['content_section'] = json.dumps(
+            [
+                {"resetsection_item_zh": "NeedReset", "resetsection_item": "NeedReset"},
+                {"resetsection_item_zh": "DelayForMS", "resetsection_item": "DelayForMS"}
+            ]
+        )
+
+        attr_2 = dict()
+        attr_2['content'] = json.dumps(
+            {
+                "writsection": [
+                    {"item_zh": "DidWriteScope", "item": "DidWriteScope"},
+                    {"item_zh": "ReadBackCompare", "item": "ReadBackCompare"},
+                    {"item_zh": "DelayForMS", "item": "DelayForMS"}
+                ],
+                "readsection": [
+                    {"item_zh": "OverrideDefault", "item": "OverrideDefault"}
+                ]}
+        )
+
+        attr_info = Attr.query.filter_by(level=1).first()
+        attr_info2 = Attr.query.filter_by(level=2).first()
+        attr_1['attr_id'] = attr_info.id
+        attr_2['attr_id'] = attr_info2.id
+
+        attr_content = AttrContent.query.all()
+        if attr_content:
+            return
+        result = [cls(**attr_1), cls(**attr_2)]
+        db.session.add_all(result)
+        db.session.commit()
+        return
+
 
 class Las(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    project_name = db.Column(db.String(100))
     description = db.Column(db.String(200))
 
     file_name = db.Column(db.String(100))

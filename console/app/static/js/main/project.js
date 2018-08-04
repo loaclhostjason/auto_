@@ -166,8 +166,11 @@ $(document).ready(function () {
         $.post('/project/content/add/' + project_id, params, function (resp) {
             if (resp.success) {
                 add_content.modal('hide');
-                if (level >= 4)
+                if (level >= 4) {
                     projects.get_project_data(project_id, parent_id);
+                    $('.submit-project-data').show();
+                }
+
                 projects.get_protect_relation(project_id)
             } else
                 toastr.error(resp.message)
@@ -236,7 +239,7 @@ $(document).ready(function () {
     var num = 0;
     update_las_modal.on('show.bs.modal', function (event) {
         $(this).find('[name="no_las"]').val('!');
-        $.get('/las/get?project_name=' + project_name).done(function (resp) {
+        $.get('/las/get?project_group_id=' + project_group_id).done(function (resp) {
             var data = resp['data'];
 
             function option_html(data, selected_val) {
@@ -314,7 +317,7 @@ $(document).ready(function () {
     });
 
     var data = '';
-    $.get('/las/get?project_name=' + project_name).done(function (resp) {
+    $.get('/las/get?project_group_id=' + project_group_id).done(function (resp) {
         data = resp['data'];
     });
 
