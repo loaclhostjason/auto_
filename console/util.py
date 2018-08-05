@@ -151,8 +151,7 @@ class ExportXml(object):
         pin_num = int(pin_num)
         data = result['data']
         if data:
-            result = [data[i:i + pin_num] for i in range(0, len(data), pin_num)]
-
+            result = [data[i:i + len(data) // 2] for i in range(0, len(data), len(data) // 2)]
         return result
 
     @staticmethod
@@ -336,7 +335,8 @@ class ExportXml(object):
         attr = Attr.query.filter_by(level=2).first()
         if not attr or not attr.extra_attr_content:
             return list()
-        content = json.loads(attr.extra_attr_content.content_val) if attr.extra_attr_content and attr.extra_attr_content.content_val else {}
+        content = json.loads(
+            attr.extra_attr_content.content_val) if attr.extra_attr_content and attr.extra_attr_content.content_val else {}
         content = content.get(did_name) or {}
 
         read_section = content.get('readsection')
@@ -423,11 +423,11 @@ class ExportXml(object):
                         if nk == 'PhysicalLayer':
                             pin_data = self.xml_pin
                             if pin_data:
-                                for v in pin_data:
+                                pin_num = len(pin_data)
+                                for pnum in range(pin_num):
                                     node_pin = doc.createElement('Pin')
-                                    for cv in v:
-                                        if cv and isinstance(cv, dict):
-                                            node_pin.setAttribute(cv['item'], cv['item_value'])
+                                    for cv in pin_data[pnum]:
+                                        node_pin.setAttribute(cv['item'], cv['item_value'])
                                     node_protocol_k.appendChild(node_pin)
                         node_name_protocol.appendChild(node_protocol_k)
 
@@ -625,5 +625,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(28)
+    export_xml = ExportXml(1)
     export_xml.run()

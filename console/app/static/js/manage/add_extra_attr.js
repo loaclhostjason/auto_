@@ -3,7 +3,7 @@ $(document).ready(function () {
 
     html_tr += '<tr>';
     html_tr += '<td><input name="item" class="td-input" required/></td>';
-    html_tr += '<td><input name="item_zh" class="td-input" required/></td>';
+    // html_tr += '<td><input name="item_zh" class="td-input" required/></td>';
     html_tr += '<td><a href="javascript:void(0);" class="td-remove">移除</a></td>';
 
     html_tr += '</tr>';
@@ -21,7 +21,7 @@ $(document).ready(function () {
 
     html_tr2 += '<tr>';
     html_tr2 += '<td><input name="resetsection_item" class="td-input" required/></td>';
-    html_tr2 += '<td><input name="resetsection_item_zh" class="td-input" required/></td>';
+    // html_tr2 += '<td><input name="resetsection_item_zh" class="td-input" required/></td>';
     html_tr2 += '<td><a href="javascript:void(0);" class="td-remove">移除</a></td>';
 
     html_tr2 += '</tr>';

@@ -24,7 +24,8 @@
                     {% set extra_content = extra_attr.content | loads_jason if extra_attr and extra_attr.content else [] %}
                     {% set extra_content_val = extra_attr.content_val | loads_jason if extra_attr and extra_attr.content_val else {} %}
                     {% set content_val = extra_content_val.get(project.id | string) or [] %}
-                    <input class="form-control pull-left" name="pin_num" value="{{ extra_content[-1].get('pin_num') or '' }}" type="number" readonly>
+                    <input class="form-control pull-left" name="pin_num"
+                           value="{{ extra_content[-1].get('pin_num') or '' }}" type="number" readonly>
                     <div>注：暂时不支持配置 有管理员配置</div>
                 </div>
             </div>
@@ -37,7 +38,7 @@
                         <thead>
                         <tr>
                             <th>PIN_ID</th>
-                            <th>显示名称</th>
+                            <th>属性名称</th>
                             <th>值</th>
                         </tr>
                         </thead>
@@ -52,12 +53,12 @@
                                         {% if 'pin_num' not in attr.keys() %}
                                             <tr>
                                                 {% if loop.index0 == 0 %}
-                                                    <td rowspan="{{ extra_attr_pin_num | int }}">
+                                                    <td rowspan="{{ (extra_attr.content | loads_jason) | length - 1  }}">
                                                         {{ 'Pin_%d' % index }}
                                                     </td>
                                                 {% endif %}
 
-                                                <td>{{ attr['item_zh'] }}</td>
+                                                <td>{{ attr['item'] }}</td>
                                                 <td>
                                                     <input name="item" value="{{ attr['item'] }}" type="hidden"/>
                                                     <input name="item_value" class="td-input" required
@@ -100,10 +101,11 @@
                                 {% for attr in extra_content_section %}
                                     <tr>
                                         <td>
-                                            {{ attr['resetsection_item_zh'] }}
+                                            {{ attr['resetsection_item'] }}
                                         </td>
                                         <td>
-                                            <input name="resetsection_item" value="{{ attr['resetsection_item'] }}" type="hidden"/>
+                                            <input name="resetsection_item" value="{{ attr['resetsection_item'] }}"
+                                                   type="hidden"/>
                                             <input name="resetsection_item_value" class="td-input" required
                                                    value="{{ content_section_val[loop.index0]['resetsection_item_value'] if content_section_val }}"/>
                                         </td>
@@ -124,7 +126,8 @@
                 <div class="col-sm-2"></div>
                 <div class="col-sm-3">
                     <button class="btn btn-primary">保存</button>
-                    <a href="{{ url_for('.edit_file', project_id=project.id) }}" class="btn btn-default" style="margin-left: 20px">取消</a>
+                    <a href="{{ url_for('.edit_file', project_id=project.id) }}" class="btn btn-default"
+                       style="margin-left: 20px">取消</a>
                 </div>
             </div>
         </form>

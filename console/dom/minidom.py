@@ -863,12 +863,16 @@ class Element(Node):
         writer.write(indent + "<" + self.tagName)
 
         order = ['IDREF', 'DidWriteScope', 'ReadBackCompare', 'DelayForMS']
+        order2 = ['PinDefinition', 'PinNumber']
 
         attrs = self._get_attributes()
         a_names = sorted(attrs.keys(), key=str.lower, reverse=True)
 
         if not len(list(set(attrs.keys()) - set(order))):
             a_names = sorted(attrs.keys(), key=order.index)
+
+        if not len(list(set(attrs.keys()) - set(order2))):
+            a_names = sorted(attrs.keys(), key=order2.index)
 
         for a_name in a_names:
             writer.write(" %s=\"" % a_name)
