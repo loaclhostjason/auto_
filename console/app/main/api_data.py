@@ -151,7 +151,7 @@ def get_las_info():
     path = current_app.config['LAS_FILE_PATH_ROOT']
     las = Las.query.filter_by(project_group_id=project_group_id).first()
 
-    if las:
+    if las and las.file:
         path = os.path.join(path, las.file)
 
     data = read_excel(path, las.file if las else None)
