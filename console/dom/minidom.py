@@ -864,6 +864,7 @@ class Element(Node):
 
         order = ['IDREF', 'DidWriteScope', 'ReadBackCompare', 'DelayForMS']
         order2 = ['PinDefinition', 'PinNumber']
+        order3 = ['IDREF', 'OverrideDefault']
 
         attrs = self._get_attributes()
         a_names = sorted(attrs.keys(), key=str.lower, reverse=True)
@@ -873,6 +874,9 @@ class Element(Node):
 
         if not len(list(set(attrs.keys()) - set(order2))):
             a_names = sorted(attrs.keys(), key=order2.index)
+
+        if not len(list(set(attrs.keys()) - set(order3))):
+            a_names = sorted(attrs.keys(), key=order3.index)
 
         for a_name in a_names:
             writer.write(" %s=\"" % a_name)
