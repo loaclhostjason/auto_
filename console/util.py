@@ -137,6 +137,22 @@ class ExportXml(object):
             return list()
         content = json.loads(attr.extra_attr_content.content_val) if attr.extra_attr_content else {}
         content = content.get(str(self.project_id)) or []
+        if not content:
+            content = json.loads(attr.extra_attr_content.content) if attr.extra_attr_content else []
+            if not content:
+                return list()
+            pin_num = content[-1].get('pin_num')
+            pin_num = int(pin_num)
+            content = [
+                {
+                    'item': v['item'],
+                    'item_value': v['item_default']
+                } for v in content[:-1] if v.get('item_default')
+            ]
+            content = content * pin_num
+            result = [content[i:i + len(content) // 2] for i in range(0, len(content), len(content) // 2)]
+            return result
+
         result = {
             'pin_num': 0,
             'data': list()
@@ -340,7 +356,27 @@ class ExportXml(object):
         content = content.get(did_name) or {}
 
         read_section = content.get('readsection')
+
+        de_content = json.loads(
+            attr.extra_attr_content.content) if attr.extra_attr_content and attr.extra_attr_content.content else {}
+        if not read_section:
+            if de_content.get('readsection'):
+                read_section = [
+                    {
+                        'item': v['item'],
+                        'item_value': v['item_default']
+                    } for v in de_content['readsection'] if v.get('item_default')
+                ]
+
         write_section = content.get('writsection')
+        if not write_section:
+            if de_content.get('writsection'):
+                write_section = [
+                    {
+                        'item': v['item'],
+                        'item_value': v['item_default']
+                    } for v in de_content['writsection'] if v.get('item_default')
+                ]
 
         result = {
             'read_section': read_section,
@@ -355,6 +391,13 @@ class ExportXml(object):
             return list(), list()
         content = json.loads(attr.extra_attr_content.content_section_val or '{}') if attr.extra_attr_content else {}
         content = content.get(str(self.project_id))
+        if not content:
+            content_sec = json.loads(attr.extra_attr_content.content_section or '{}') if attr.extra_attr_content else []
+            content = [
+                {
+                    'resetsection_item': v['resetsection_item'],
+                    'resetsection_item_value': v['resetsection_item_default']
+                } for v in content_sec]
 
         attr2 = Attr.query.filter_by(level=2).first()
         if not attr or not attr.extra_attr_content:
@@ -367,6 +410,7 @@ class ExportXml(object):
                 for kk, vv in resetsection.items():
                     if kk == str(self.project_id):
                         new_reset_section.append(vv)
+
         return content, sum(new_reset_section, [])
 
     @property

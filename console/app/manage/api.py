@@ -29,12 +29,12 @@ def add_attr_content():
     attr = Attr.query.filter_by(level=level).first()
 
     content = json.loads(attr.content) if attr and attr.content else []
-    result = [(info['item'], info['item_zh']) for info in content if info.get('item_required')]
+    result = [info['item'] for info in content if info.get('item_required')]
 
     if result:
-        for r, r_name in result:
+        for r in result:
             if not form_data.get(r):
-                return jsonify({'success': False, 'message': '请检查【%s】，是否必须填写' % r_name})
+                return jsonify({'success': False, 'message': '请检查【%s】，是否必须填写' % r})
 
     if form_data.get('BytePosition') and int(form_data['BytePosition']) > int(did_byte_len):
         return jsonify({'success': False, 'message': 'BytePositionc 数字在0-%s之间' % int(did_byte_len)})
