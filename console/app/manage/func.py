@@ -78,7 +78,7 @@ def get_extra_reset_content():
 def get_extra_content2():
     field_key = [
         'item',
-        'item_zh',
+        'item_default',
     ]
     field_keys = {
         'readsection': field_key,

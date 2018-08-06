@@ -44,6 +44,7 @@
                         </thead>
                         <tbody>
                         <tr>
+
                             {% if extra_attr and extra_attr.content %}
                                 {% set extra_attr_pin_num =  extra_content[-1].get('pin_num') or 0 %}
                                 {% for index in range(1, extra_attr_pin_num | int + 1) %}
@@ -62,8 +63,7 @@
                                                 <td>
                                                     <input name="item" value="{{ attr['item'] }}" type="hidden"/>
                                                     <input name="item_value" class="td-input" required
-                                                           value="
-                                                           {{ (content_val[loop_root * 2+ loop.index0 - 2]['item_value'] or content_val[loop_root * 2+ loop.index0 - 2].get('item_default', '')) if content_val }}"/>
+                                                           value="{{ content_val[loop_root * 2+ loop.index0 - 2]['item_value'] if content_val else default_attr.get(attr['item'], '') }}"/>
                                                 </td>
                                             </tr>
                                         {% endif %}
@@ -108,7 +108,7 @@
                                             <input name="resetsection_item" value="{{ attr['resetsection_item'] }}"
                                                    type="hidden"/>
                                             <input name="resetsection_item_value" class="td-input" required
-                                                   value="{{ (content_section_val[loop.index0]['resetsection_item_value'] or content_section_val[loop.index0].get('resetsection_item_default', '')) if content_section_val }}"/>
+                                                   value="{{ content_section_val[loop.index0]['resetsection_item_value']  if content_section_val else default_sec.get(attr['resetsection_item'], '') }}"/>
                                         </td>
                                     </tr>
 

@@ -165,10 +165,35 @@ def edit_extra_attr_file(project_id):
             extra_attr.content_val = json.dumps(content_val)
         db.session.add(extra_attr)
         return redirect(url_for('.edit_file', project_id=project_id))
+
+    # todo ruan
+    default_sec = {}
+    default_write_attr = {}
+    default_read_attr = {}
     if int(level) == 1:
-        return render_template('main/create_edit_extra_attr_file.html', project=project, extra_attr=extra_attr)
+        default_attr = json.loads(extra_attr.content) if extra_attr.content else {}
+        default_sec = json.loads(extra_attr.content_section) if extra_attr.content_section else {}
+        default_attr = {val['item']: val['item_default'] for val in default_attr if
+                        val.get('item') and val.get('item_default')}
+        default_sec = {val['resetsection_item']: val['resetsection_item_default'] for val in default_sec if
+                       val.get('resetsection_item') and val.get('resetsection_item_default')}
     else:
-        return render_template('main/create_edit_extra_attr_file2.html', project=project, extra_attr=extra_attr)
+        default_attr = json.loads(extra_attr.content) if extra_attr.content else {}
+        if default_attr:
+            default_read_attr = default_attr.get('readsection')
+            default_read_attr = {val['item']: val['item_default'] for val in default_read_attr if
+                                 val.get('item_default')}
+
+            default_write_attr = default_attr.get('writsection')
+            default_write_attr = {val['item']: val['item_default'] for val in default_write_attr if
+                                  val.get('item_default')}
+
+    if int(level) == 1:
+        return render_template('main/create_edit_extra_attr_file.html', project=project, extra_attr=extra_attr,
+                               default_attr=default_attr, default_sec=default_sec)
+    else:
+        return render_template('main/create_edit_extra_attr_file2.html', project=project, extra_attr=extra_attr,
+                               default_read_attr=default_read_attr, default_write_attr=default_write_attr)
 
 
 @main.after_request
