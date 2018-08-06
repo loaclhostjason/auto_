@@ -53,7 +53,7 @@
                                         {% if 'pin_num' not in attr.keys() %}
                                             <tr>
                                                 {% if loop.index0 == 0 %}
-                                                    <td rowspan="{{ (extra_attr.content | loads_jason) | length - 1  }}">
+                                                    <td rowspan="{{ (extra_attr.content | loads_jason) | length - 1 }}">
                                                         {{ 'Pin_%d' % index }}
                                                     </td>
                                                 {% endif %}
@@ -62,7 +62,8 @@
                                                 <td>
                                                     <input name="item" value="{{ attr['item'] }}" type="hidden"/>
                                                     <input name="item_value" class="td-input" required
-                                                           value="{{ content_val[loop_root * 2+ loop.index0 - 2]['item_value'] if content_val }}"/>
+                                                           value="
+                                                           {{ (content_val[loop_root * 2+ loop.index0 - 2]['item_value'] or content_val[loop_root * 2+ loop.index0 - 2].get('item_default', '')) if content_val }}"/>
                                                 </td>
                                             </tr>
                                         {% endif %}
@@ -107,7 +108,7 @@
                                             <input name="resetsection_item" value="{{ attr['resetsection_item'] }}"
                                                    type="hidden"/>
                                             <input name="resetsection_item_value" class="td-input" required
-                                                   value="{{ content_section_val[loop.index0]['resetsection_item_value'] if content_section_val }}"/>
+                                                   value="{{ (content_section_val[loop.index0]['resetsection_item_value'] or content_section_val[loop.index0].get('resetsection_item_default', '')) if content_section_val }}"/>
                                         </td>
                                     </tr>
 

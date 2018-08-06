@@ -25,7 +25,8 @@
 
             <div class="form-group">
                 <div class="form-group">
-                    <div class="col-sm-2"><label for="" class="control-label pull-right"><span>DID地址名称:</span></label></div>
+                    <div class="col-sm-2"><label for="" class="control-label pull-right"><span>DID地址名称:</span></label>
+                    </div>
                     <div class="col-sm-3">
                         <label style="position: relative; top: 10px;left: 20px">{{ request.args.get('name') }}</label>
                     </div>
@@ -53,7 +54,7 @@
                                         <td>
                                             <input name="readsection_item" value="{{ attr['item'] }}" type="hidden"/>
                                             <input name="readsection_item_value" class="td-input" required
-                                                   value="{{ readsection[loop.index0]['item_value'] if readsection }}"/>
+                                                   value="{{ (readsection[loop.index0]['item_value'] or readsection[loop.index0].get('item_default', '')) if readsection }}"/>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -90,7 +91,7 @@
                                         <td>
                                             <input name="writsection_item" value="{{ attr['item'] }}" type="hidden"/>
                                             <input name="writsection_item_value" class="td-input" required
-                                                   value="{{ writsection[loop.index0]['item_value'] if writsection }}"/>
+                                                   value="{{ (writsection[loop.index0]['item_value'] or writsection[loop.index0].get('item_default', '')) if writsection }}"/>
                                         </td>
 
                                     </tr>
@@ -117,7 +118,8 @@
                 <div class="col-sm-2"></div>
                 <div class="col-sm-3">
                     <button class="btn btn-primary">保存</button>
-                    <a href="{{ url_for('.edit_file', project_id=project.id) }}" class="btn btn-default" style="margin-left: 20px">取消</a>
+                    <a href="{{ url_for('.edit_file', project_id=project.id) }}" class="btn btn-default"
+                       style="margin-left: 20px">取消</a>
                 </div>
             </div>
 

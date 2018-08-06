@@ -6,7 +6,7 @@ $(document).ready(function () {
         var html_tr = '';
         html_tr += '<tr>';
         html_tr += '<td><input name="' + t + '_item" class="td-input" required/></td>';
-        // html_tr += '<td><input name="' + t + '_item_zh" class="td-input" required/></td>';
+        html_tr += '<td><input name="' + t + '_item_default" class="td-input"/></td>';
         html_tr += '<td><a href="javascript:void(0);" class="td-remove">移除</a></td>';
 
         html_tr += '</tr>';

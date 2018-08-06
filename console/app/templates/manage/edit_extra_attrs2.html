@@ -34,7 +34,7 @@
                         <thead>
                         <tr>
                             <th width="200">属性字段</th>
-{#                            <th>显示名称</th>#}
+                            <th width="200">默认值</th>
                             <th>操作</th>
                         </tr>
                         </thead>
@@ -46,10 +46,10 @@
                                         <td>
                                             <input name="readsection_item" class="td-input" required value="{{ attr['item'] }}"/>
                                         </td>
-{#                                        <td>#}
-{#                                            <input name="readsection_item_zh" class="td-input" required#}
-{#                                                   value="{{ attr['item_zh'] }}"/>#}
-{#                                        </td>#}
+                                        <td>
+                                            <input name="readsection_item_default" class="td-input"
+                                                   value="{{ attr['item_default'] }}"/>
+                                        </td>
 
                                         <td><a href="javascript:void(0);" class="td-remove">移除</a></td>
                                     </tr>
@@ -81,7 +81,7 @@
                         <thead>
                         <tr>
                             <th width="200">属性字段</th>
-{#                            <th>显示名称</th>#}
+                            <th width="200">默认值</th>
                             <th>操作</th>
                         </tr>
                         </thead>
@@ -94,10 +94,10 @@
                                         <td>
                                             <input name="writsection_item" class="td-input" required value="{{ attr['item'] }}"/>
                                         </td>
-{#                                        <td>#}
-{#                                            <input name="writsection_item_zh" class="td-input" required#}
-{#                                                   value="{{ attr['item_zh'] }}"/>#}
-{#                                        </td>#}
+                                        <td>
+                                            <input name="writsection_item_default" class="td-input"
+                                                   value="{{ attr['item_default'] }}"/>
+                                        </td>
 
                                         <td><a href="javascript:void(0);" class="td-remove">移除</a></td>
                                     </tr>

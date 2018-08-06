@@ -32,7 +32,7 @@ def get_content():
 def get_extra_content():
     field_key = [
         'item',
-        'item_zh',
+        'item_default',
     ]
     items = request.form.getlist('item')
     if not items:
@@ -55,7 +55,7 @@ def get_extra_content():
 def get_extra_reset_content():
     field_key = [
         'resetsection_item',
-        'resetsection_item_zh',
+        'resetsection_item_default',
     ]
     items = request.form.getlist('resetsection_item')
     if not items:

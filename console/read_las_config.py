@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 import xlrd
+import os
+
 
 def read_excel(path, file):
     result = []
+    file_path = os.path.abspath(os.path.dirname(__file__))
+    file_path = os.path.join(file_path, 'SV71_VDS.xlsx')
     if not file:
-        excel_file = xlrd.open_workbook('./SV71_VDS.xlsx')
+        excel_file = xlrd.open_workbook(file_path)
     else:
         excel_file = xlrd.open_workbook(path)
 
