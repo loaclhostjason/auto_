@@ -135,10 +135,10 @@ class ExportXml(object):
         attr = Attr.query.filter_by(level=1).first()
         if not attr or not attr.extra_attr_content:
             return list()
-        content = json.loads(attr.extra_attr_content.content_val) if attr.extra_attr_content else {}
+        content = json.loads(attr.extra_attr_content.content_val or '{}') if attr.extra_attr_content else {}
         content = content.get(str(self.project_id)) or []
         if not content:
-            content = json.loads(attr.extra_attr_content.content) if attr.extra_attr_content else []
+            content = json.loads(attr.extra_attr_content.content or '{}') if attr.extra_attr_content else []
             if not content:
                 return list()
             pin_num = content[-1].get('pin_num')
@@ -292,6 +292,16 @@ class ExportXml(object):
         return d
 
     @staticmethod
+    def str_to_hex(data):
+        try:
+            hex_data = hex(int(data, 2))
+            hex_data = hex_data.replace('0x', '')
+            hex_data = '0{}'.format(hex_data) if len(hex_data) % 2 else hex_data
+        except:
+            hex_data = data
+        return hex_data
+
+    @staticmethod
     def __parameter_order():
         attr = Attr.query.filter_by(level=3).first()
         if not attr or not attr.content:
@@ -325,7 +335,7 @@ class ExportXml(object):
                 if project:
                     for pro in project:
                         parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
-                        conf_data[parent_relation.parent_id].append((pro.conf_data, pro.las))
+                        conf_data[parent_relation.parent_id].append((self.str_to_hex(pro.conf_data), pro.las))
 
                 conf_data = {k: v for k, v in conf_data.items()}
                 conf_data = {
@@ -351,8 +361,7 @@ class ExportXml(object):
         attr = Attr.query.filter_by(level=2).first()
         if not attr or not attr.extra_attr_content:
             return list()
-        content = json.loads(
-            attr.extra_attr_content.content_val) if attr.extra_attr_content and attr.extra_attr_content.content_val else {}
+        content = json.loads(attr.extra_attr_content.content_val or '{}') if attr.extra_attr_content else {}
         content = content.get(did_name) or {}
 
         read_section = content.get('readsection')
@@ -397,7 +406,7 @@ class ExportXml(object):
                 {
                     'resetsection_item': v['resetsection_item'],
                     'resetsection_item_value': v['resetsection_item_default']
-                } for v in content_sec]
+                } for v in content_sec if v.get('resetsection_item_default')]
 
         attr2 = Attr.query.filter_by(level=2).first()
         if not attr or not attr.extra_attr_content:
@@ -542,7 +551,7 @@ class ExportXml(object):
                                 default_val = ''
 
                         if default_val:
-                            node_parameter.setAttribute('ParamDefaultValue', str(default_val or ''))
+                            node_parameter.setAttribute('ParamDefaultValue', self.str_to_hex(str(default_val or '')))
                             for parameter_k, parameter_v in parameter_val.items():
 
                                 # parameter and byte bit bit_len
