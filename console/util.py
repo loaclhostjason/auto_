@@ -587,7 +587,8 @@ class ExportXml(object):
 
                                         node_parameter.appendChild(node_conf_data)
 
-                        node_modification_item.appendChild(node_parameter)
+                        if default_val:
+                            node_modification_item.appendChild(node_parameter)
                     node_modification.appendChild(node_modification_item)
         root.appendChild(node_modification)
 
