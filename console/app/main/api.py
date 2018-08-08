@@ -266,4 +266,4 @@ def file_info_is():
             if not p.project_config_name:
                 message.append('【文件：%s, 无法下载。缺少配置ConfigurationFileNumber】' % p.name)
 
-    return jsonify({'success': True, 'message': 'ok' if not len(project) else ';'.join(message)})
+    return jsonify({'success': True, 'message': 'ok' if not len(message) else ';'.join(message)})
