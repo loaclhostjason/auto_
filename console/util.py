@@ -108,18 +108,22 @@ class ExportXml(object):
         self.header_order = ['ApplicationLayer', 'PhysicalLayer']
 
     def set_path(self):
+        if not self.xml_managers_attr:
+            return
         path = os.path.abspath(os.path.dirname(__file__))
         real_path = os.path.join(path, 'files', 'all')
-        files_path = os.path.join(real_path, '%s.xml' % self.xml_managers_attr)
+        files_path = os.path.join(real_path, '%s.95' % self.xml_managers_attr)
 
         if not os.path.exists(real_path):
             os.makedirs(real_path)
         return files_path
 
     def set_dir_path(self, project_name):
+        if not self.xml_managers_attr:
+            return
         path = os.path.abspath(os.path.dirname(__file__))
         real_path = os.path.join(path, 'files', project_name)
-        files_path = os.path.join(real_path, '%s.xml' % self.xml_managers_attr)
+        files_path = os.path.join(real_path, '%s.95' % self.xml_managers_attr)
 
         if not os.path.exists(real_path):
             os.makedirs(real_path)
@@ -128,7 +132,7 @@ class ExportXml(object):
     @property
     def xml_managers_attr(self):
         project = Project.query.get_or_404(self.project_id)
-        return project.name
+        return project.project_config_name
 
     @property
     def xml_pin(self):
@@ -642,6 +646,9 @@ class ExportXml(object):
 
     def run(self):
         files_path = self.set_path()
+        if not files_path:
+            return 'ConfigurationFileNumber no fund'
+
         doc = self.set_xml()
         with open(files_path, 'w', encoding='utf-8') as f:
             doc.writexml(f, indent='', addindent='  ', newl='\r\n', encoding="utf-8")
@@ -660,6 +667,9 @@ class ExportXml(object):
 
     def mk_dir(self, project_name):
         files_path = self.set_dir_path(project_name)
+        if not files_path:
+            return 'ConfigurationFileNumber no fund'
+
         doc = self.set_xml()
         with open(files_path, 'w', encoding='utf-8') as f:
             doc.writexml(f, indent='', addindent='  ', newl='\r\n', encoding="utf-8")

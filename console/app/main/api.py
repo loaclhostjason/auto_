@@ -162,7 +162,7 @@ def delete_project(id):
     project = Project.query.get_or_404(id)
     db.session.delete(project)
 
-    del_DF('%s.xml' % project.name, project.name)
+    del_DF('%s.95' % project.project_config_name, project.name)
 
     project_group_id = project.project_group_id
     db.session.commit()
@@ -249,3 +249,21 @@ def submit_attr_content():
             else:
                 r[k] = v
     return jsonify({'success': True, 'data': data, 'content': r})
+
+
+@main.route('/file/info/is')
+@login_required
+def file_info_is():
+    project_id = request.args.get('project_id')
+    if not project_id:
+        return jsonify({'success': False, 'message': 'no project id'})
+
+    project_id = project_id.split(',')
+    project = Project.query.filter(Project.id.in_(project_id)).all()
+    message = list()
+    if project:
+        for p in project:
+            if not p.project_config_name:
+                message.append('【文件：%s, 无法下载。缺少配置ConfigurationFileNumber】' % p.name)
+
+    return jsonify({'success': True, 'message': 'ok' if not len(project) else ';'.join(message)})

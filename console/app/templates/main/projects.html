@@ -96,12 +96,23 @@
                 $('.project-table').find('.publish_project:checked').each(function () {
                     project_id.push($(this).val())
                 });
+
+
                 if (project_id) {
-                    project_id.forEach(function (value) {
-                        downloadFile('/download_file?project_id=' + value)
-                    })
+                    $.get('file/info/is?project_id=' + project_id.toString(), function (resp) {
+                        if (!resp.success) {
+                            toastr.error(resp.message)
+                        } else {
+                            toastr.success(resp.message)
+                        }
+                    }).done(function () {
+                        project_id.forEach(function (value) {
+                            downloadFile('/download_file?project_id=' + value)
+                        })
+                    });
+
                 }
-                console.log(project_id)
+
             })
         })
     </script>

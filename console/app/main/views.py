@@ -135,7 +135,6 @@ def edit_extra_attr_file(project_id):
 
             c_all = content_val.values()
             resetsection = [v['resetsection'] for v in c_all if v['resetsection']]
-            print(resetsection)
 
             content = get_extra_content2(project_id)
 
@@ -144,7 +143,7 @@ def edit_extra_attr_file(project_id):
                 for v in resetsection:
                     for kk, vv in v.items():
                         reset_section_d[kk].append(vv)
-            print(reset_section_d)
+
             reset_section_d = {k: list(set(sum(v, []))) for k, v in reset_section_d.items()}
             content['resetsection'] = {project_id: reset_section_d.get(project_id) or []}
 
@@ -229,7 +228,7 @@ def download_file():
     export_xml = ExportXml(project_id)
     export_xml.mk_dir(project.project_group.name)
     export_xml.run()
-    return download_files(project.name)
+    return download_files(project.project_config_name)
 
 
 @main.route('/project/edit/name', methods=['POST'])

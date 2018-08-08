@@ -162,7 +162,7 @@ def download_files(filename):
     try:
         from urllib.parse import quote
 
-        filename = '%s.xml' % filename
+        filename = '%s.95' % filename
         filename_path = os.path.join(current_app.config['FILE_PATH'], filename)
         print(filename_path)
 
