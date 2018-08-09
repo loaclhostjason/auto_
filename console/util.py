@@ -284,6 +284,8 @@ class ExportXml(object):
 
                     if content.get('BytePosition'):
                         content['BytePosition'] = int(content['BytePosition']) + 1
+                    if content.get('BitPosition'):
+                        content['BitPosition'] = int(content['BitPosition']) + (int(content['BitLength']) - 1) if content.get('BitLength') and int(content['BitLength']) > 0 else 0
                     r[ac.project_relation_id].append(content)
 
         this_id = [v.project_relation_id for v in attr_content]
@@ -581,11 +583,12 @@ class ExportXml(object):
                                     node_conf_data.setAttribute('useConfData', 'true')
                                     for data in conf_data:
                                         node_config_data = doc.createElement('ConfigData')
-                                        node_config_data.setAttribute('Value', data[0])
-                                        node_config_data.setAttribute('ConfigExpression', change_data(data[1]))
-                                        node_conf_data.appendChild(node_config_data)
+                                        if data[0] and data[1]:
+                                            node_config_data.setAttribute('Value', data[0])
+                                            node_config_data.setAttribute('ConfigExpression', change_data(data[1]))
+                                            node_conf_data.appendChild(node_config_data)
 
-                                        node_parameter.appendChild(node_conf_data)
+                                            node_parameter.appendChild(node_conf_data)
 
                         if default_val:
                             node_modification_item.appendChild(node_parameter)
