@@ -3,6 +3,7 @@ from datetime import datetime
 from enum import Enum
 from flask import request
 import json
+from ..manage.models import AttrContent
 
 
 class ProjectRelationType(Enum):
@@ -88,15 +89,28 @@ class ProjectData(db.Model):
     project_relation = db.relationship('ProjectRelation',
                                        backref=db.backref("project_data", cascade="all, delete-orphan"))
 
-    @property
-    def conf_data(self):
-        if not self.content:
+    @staticmethod
+    def p_did_len(project_id):
+        attr = AttrContent.query.filter_by(project_id=project_id).all()
+        d = dict()
+        if attr:
+            for info in attr:
+                content = json.loads(info.real_content or '{}')
+                d.update(content)
+        try:
+            did_len = int(d.get('DidLength'))
+        except:
+            did_len = 0
+        return did_len
+
+    def conf_data(self, project_id):
+        did_len = self.p_did_len(project_id)
+        if not self.content or not did_len:
             return
 
         content = json.loads(self.content)
-        extra_key = [
-            'byte0', 'byte1', 'byte2', 'byte3'
-        ]
+
+        extra_key = ['byte{}'.format(v) for v in range(did_len)]
         for key in extra_key:
             if content.get(key):
                 return content[key]
@@ -109,18 +123,18 @@ class ProjectData(db.Model):
             key.append('%s_%s' % (str_key, index))
         return key
 
-    @classmethod
-    def get_content(cls, project_id):
-        bit0 = cls.init_key('bit0')
-        bit1 = cls.init_key('bit1')
-        bit2 = cls.init_key('bit2')
-        bit3 = cls.init_key('bit3')
+    def get_content(self, project_id):
+        did_len = self.p_did_len(project_id)
+        key = list()
+        if not did_len:
+            return list()
 
-        extra_key = [
-            'byte0', 'byte1', 'byte2', 'byte3'
-        ]
+        for i in range(did_len):
+            key.extend(self.init_key('bit{}'.format(i)))
 
-        key = bit0 + bit1 + bit2 + bit3 + extra_key
+        extra_key = ['byte{}'.format(v) for v in range(did_len)]
+
+        key.extend(extra_key)
 
         project_relation_id = request.form.getlist('project_relation_id')
         result = []
@@ -139,31 +153,6 @@ class ProjectData(db.Model):
 
             result.append(d)
         return [v for v in result if v.get('content')]
-
-    @classmethod
-    def update_real_content(cls, project_id):
-        db.session.commit()
-        project_data = cls.query.filter_by(project_id=project_id).all()
-        if not project_data:
-            return
-
-        result = []
-        for data in project_data:
-            content = json.loads(data.content) if data.content else None
-            if content:
-                for index in range(3):
-                    if content.get('byte%s' % index):
-                        result.append(data.name)
-                        result.append(data.las)
-                        result.append('byte%s' % index)
-                        for loop in range(8):
-                            if content.get('bit%s_%s' % (index, loop)):
-                                result.append('bit%s' % loop)
-                        result.append(content.get('byte%s' % index))
-
-            data.real_content = ';'.join(result)
-            print(';'.join(result))
-            db.session.add(data)
 
 
 class ProjectGroup(db.Model):

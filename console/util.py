@@ -345,7 +345,8 @@ class ExportXml(object):
                 if project:
                     for pro in project:
                         parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
-                        conf_data[parent_relation.parent_id].append((self.str_to_hex(pro.conf_data), pro.las))
+                        conf_data[parent_relation.parent_id].append(
+                            (self.str_to_hex(ProjectData().conf_data(self.project_id)), pro.las))
 
                 conf_data = {k: v for k, v in conf_data.items()}
                 conf_data = {

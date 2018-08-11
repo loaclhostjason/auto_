@@ -47,43 +47,6 @@ def projects():
     return render_template('main/projects.html', projects=project_list, group_project=group_project)
 
 
-@main.route('/project/data/edit/<int:project_id>', methods=['GET', 'POST'])
-@login_required
-def edit_project_data(project_id):
-    project = Project.query.get_or_404(project_id)
-
-    if request.method == 'POST':
-        data = ProjectData.get_content(project_id)
-        if not data:
-            return redirect(request.url)
-
-        new_dict = dict()
-        for v in data:
-            new_dict[v['project_relation_id']] = v
-
-        for project_relation_id, val in new_dict.items():
-            val['content'] = json.dumps(val['content'])
-            old_project_data = ProjectData.query.filter_by(project_relation_id=project_relation_id).first()
-            if old_project_data:
-
-                ProjectData.update_model(old_project_data, val)
-            else:
-                new_project_data = ProjectData(**val)
-                db.session.add(new_project_data)
-
-        ProjectData.update_real_content(project_id)
-        flash({'success': '更新成功'})
-        export_xml = ExportXml(project_id)
-        export_xml.run()
-        return redirect(request.url)
-
-    result = get_project_children(project_id)
-    # max_len = max([len(v) for v in result.values()])
-    project_data = ProjectData.query.filter_by(project_id=project_id).all()
-    project_data = {v.project_relation_id: v.to_dict() for v in project_data}
-    return render_template('main/edit_project_data.html', project=project, result=result, project_data=project_data)
-
-
 @main.route('/project/create_edit', methods=['GET', 'POST'])
 @login_required
 def create_edit_project():

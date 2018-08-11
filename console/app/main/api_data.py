@@ -59,7 +59,7 @@ def option_project_data():
                 byte_c = 'byte%s' % real_content['BytePosition']
                 bite_c = 'bit%s_%s' % (real_content['BytePosition'], real_content['BitPosition'])
                 t[bite_c] = 'y'
-                t[byte_c] = c.get(byte_c) or '0'
+                t[byte_c] = c.get(byte_c) or ''
                 for kkk, vvv in t.items():
                     if kkk.startswith('byte'):
                         if kkk != byte_c:
@@ -114,11 +114,11 @@ def get_default_conf():
 @login_required
 def edit_project_data_api(project_id):
     # get attr 参数
-    data = ProjectData.get_content(project_id)
+    data = ProjectData().get_content(project_id)
     default_conf = get_default_conf()
 
     if not data:
-        return jsonify({'success': True, 'message': 'project_id不存在'})
+        return jsonify({'success': False, 'message': 'project_id不存在'})
 
     new_dict = dict()
     for v in data:
@@ -128,7 +128,6 @@ def edit_project_data_api(project_id):
         val['content'] = json.dumps(val['content'])
         old_project_data = ProjectData.query.filter_by(project_relation_id=project_relation_id).first()
         if old_project_data:
-
             ProjectData.update_model(old_project_data, val)
             old_project_data.default_conf = default_conf.get(project_relation_id)
             db.session.add(old_project_data)
