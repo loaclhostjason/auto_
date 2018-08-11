@@ -335,7 +335,12 @@ myDiagram.nodeTemplateMap.add("ThirdNode",
     ));
 
 myDiagram.linkTemplate =
-    $$(go.Link, {selectionAdorned: false},
+    $$(go.Link,
+        {
+            selectionAdorned: false,
+            routing: go.Link.Orthogonal,
+            corner: 10
+        },
         $$(go.Shape, {strokeWidth: 2, stroke: "#666"}),
         $$(go.Shape, {fill: '#666', stroke: null, toArrow: "Standard", segmentFraction: 0})
     );
