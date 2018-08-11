@@ -54,6 +54,8 @@ def check_las(new_data_init):
 
 
 def change_data(new_data_init):
+    if str(new_data_init).lower() == 'none':
+        return ''
     if not new_data_init:
         return ''
 
@@ -285,7 +287,9 @@ class ExportXml(object):
                     if content.get('BytePosition'):
                         content['BytePosition'] = int(content['BytePosition']) + 1
                     if content.get('BitPosition'):
-                        content['BitPosition'] = int(content['BitPosition']) + (int(content['BitLength']) - 1) if content.get('BitLength') and int(content['BitLength']) > 0 else 0
+                        content['BitPosition'] = int(content['BitPosition']) + (
+                                int(content['BitLength']) - 1) if content.get('BitLength') and int(
+                            content['BitLength']) > 0 else 0
                     r[ac.project_relation_id].append(content)
 
         this_id = [v.project_relation_id for v in attr_content]
@@ -551,12 +555,18 @@ class ExportXml(object):
                         if default_conf.get(parameter_val_kk):
                             default_val = default_conf[parameter_val_kk]
                         else:
-                            try:
-                                default_val = val['conf_data'].get(parameter_val_kk)[0][0]
-                            except Exception:
-                                default_val = ''
+                            # try:
+                            #     default_val = val['conf_data'].get(parameter_val_kk)[0][0]
+                            # except Exception:
+                            #     default_val = ''
+                            default_val = ''
 
-                        if default_val:
+                        try:
+                            _config_data_las = val['conf_data'].get(parameter_val_kk)[0][0]
+                        except Exception:
+                            _config_data_las = ''
+
+                        if _config_data_las:
                             node_parameter.setAttribute('ParamDefaultValue', self.str_to_hex(str(default_val or '')))
                             for parameter_k, parameter_v in parameter_val.items():
 
@@ -583,14 +593,14 @@ class ExportXml(object):
                                     node_conf_data.setAttribute('useConfData', 'true')
                                     for data in conf_data:
                                         node_config_data = doc.createElement('ConfigData')
-                                        if data[0] and data[1]:
+                                        if data[0] and data[1] and change_data(data[1]):
                                             node_config_data.setAttribute('Value', data[0])
                                             node_config_data.setAttribute('ConfigExpression', change_data(data[1]))
                                             node_conf_data.appendChild(node_config_data)
 
                                             node_parameter.appendChild(node_conf_data)
 
-                        if default_val:
+                        if _config_data_las:
                             node_modification_item.appendChild(node_parameter)
                     node_modification.appendChild(node_modification_item)
         root.appendChild(node_modification)

@@ -74,7 +74,7 @@ $(document).ready(function () {
                     html += '<td colspan="8">';
                     html += '<div class="col-xs-12"><div class="row">';
                     if (content['byte' + num]) {
-                        html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="' + (content['byte' + num] || '') + '">';
+                        html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="' + (((!content['byte' + num] || content['byte' + num] == '0') ?  '' : content['byte' + num])) + '">';
                     } else {
                         if (num == byte_position) {
                             html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="">';
