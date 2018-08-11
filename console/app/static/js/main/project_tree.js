@@ -13,7 +13,8 @@ var myDiagram =
                 {
                     setsPortSpot: false,
                     setsChildPortSpot: false,
-                    arrangement: go.TreeLayout.ArrangementHorizontal
+                    arrangement: go.TreeLayout.ArrangementHorizontal,
+                    layerSpacing: 250
                 }
             )
         });
