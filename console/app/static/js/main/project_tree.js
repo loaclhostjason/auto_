@@ -340,7 +340,8 @@ myDiagram.linkTemplate =
         {
             selectionAdorned: false,
             routing: go.Link.Orthogonal,
-            corner: 10
+            corner: 10,
+            toSpot: new go.Spot(0, 0.5)
         },
         $$(go.Shape, {strokeWidth: 2, stroke: "#666"}),
         $$(go.Shape, {fill: '#666', stroke: null, toArrow: "Standard", segmentFraction: 0})
