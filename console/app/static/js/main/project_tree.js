@@ -14,7 +14,7 @@ var myDiagram =
                     setsPortSpot: false,
                     setsChildPortSpot: false,
                     arrangement: go.TreeLayout.ArrangementHorizontal,
-                    layerSpacing: 250
+                    layerSpacing: 180
                 }
             )
         });
@@ -341,6 +341,7 @@ myDiagram.linkTemplate =
             selectionAdorned: false,
             routing: go.Link.Orthogonal,
             corner: 10,
+            fromSpot: new go.Spot(1, 0.5),
             toSpot: new go.Spot(0, 0.5)
         },
         $$(go.Shape, {strokeWidth: 2, stroke: "#666"}),
