@@ -6,6 +6,7 @@ from .func import *
 from ..manage.models import *
 import json
 from sqlalchemy import func
+from other import del_DF
 
 
 # func tree has deleted
@@ -153,15 +154,7 @@ def delete_project_tree(id):
     return jsonify({'success': True, 'message': '更新成功'})
 
 
-@main.route('/project/delete/<int:id>', methods=['POST'])
-@login_required
-def delete_project(id):
-    from other import del_DF
-    from ..manage.func import del_os_filename
-    from ..manage.models import Las
-    project = Project.query.get_or_404(id)
-    db.session.delete(project)
-
+def delete_project_file(project):
     del_DF('%s.95' % project.project_config_name, project.name)
 
     project_group_id = project.project_group_id
@@ -173,6 +166,15 @@ def delete_project(id):
         path = current_app.config['LAS_FILE_PATH_ROOT']
         if las:
             del_os_filename(path, las.file)
+
+
+@main.route('/project/delete/<int:id>', methods=['POST'])
+@login_required
+def delete_project(id):
+    project = Project.query.get_or_404(id)
+    db.session.delete(project)
+
+    delete_project_file(project)
     return jsonify({'success': True, 'message': '删除成功'})
 
 

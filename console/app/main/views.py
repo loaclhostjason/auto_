@@ -234,6 +234,7 @@ def download_file():
 @main.route('/project/edit/name', methods=['POST'])
 @login_required
 def edit_project_name():
+    from .api import delete_project_file
     name = request.form.get('name')
     id = request.form.get('id')
     if not name:
@@ -246,13 +247,16 @@ def edit_project_name():
         return jsonify({'success': False, 'message': '没有此记录'})
 
     if not project_relation.parent_id:
-        old_project = Project.query.filter_by(name=name, level=level).first()
+        old_project = Project.query.filter_by(name=name).first()
         if old_project:
             return jsonify({'success': False, 'message': '名称已经存在'})
 
         project = Project.query.filter_by(name=project_relation.name).first()
         project.name = name
         db.session.add(project)
+
+        # todo 删除文件
+        delete_project_file(project)
 
     project_relation.name = name
     db.session.add(project_relation)

@@ -58,9 +58,10 @@ class ProjectRelation(db.Model):
             order_by(cls.relation_order.desc(), cls.id.desc()).first()
         result = []
         for index, name in enumerate(content.split('\r\n'), start=max_order.relation_order + 1 if max_order else 1):
-            data['relation_order'] = index
-            data['name'] = name
-            result.append(cls(**data))
+            if name:
+                data['relation_order'] = index
+                data['name'] = name
+                result.append(cls(**data))
 
         db.session.add_all(result)
         db.session.flush()
