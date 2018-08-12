@@ -57,18 +57,10 @@ def option_project_data():
                 c = json.loads(v.content)
                 t = {k: v for k, v in c.items() if not k.startswith('bit')}
                 byte_c = 'byte%s' % real_content['BytePosition']
-                bite_c = 'bit%s_%s' % (real_content['BytePosition'], real_content['BitPosition'])
-                t[bite_c] = 'y'
+
                 t[byte_c] = c.get(byte_c) or ''
-                for kkk, vvv in t.items():
-                    if kkk.startswith('byte'):
-                        if kkk != byte_c:
-                            t[kkk] = ''
                 vv['content'] = t
                 project_dict[v.project_relation_id] = vv
-
-                v.content = json.dumps(t)
-                db.session.add(v)
 
     did_len = 0
     if result:
@@ -115,6 +107,7 @@ def get_default_conf():
 def edit_project_data_api(project_id):
     # get attr 参数
     data = ProjectData().get_content(project_id)
+    print(data)
     default_conf = get_default_conf()
 
     if not data:

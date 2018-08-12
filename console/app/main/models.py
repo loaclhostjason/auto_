@@ -103,18 +103,19 @@ class ProjectData(db.Model):
             did_len = 0
         return did_len
 
-    def conf_data(self, project_id):
+    def conf_data(self, content, project_id):
         did_len = self.p_did_len(project_id)
-        if not self.content or not did_len:
+        if not content or not did_len:
             return
 
-        content = json.loads(self.content)
+        content = json.loads(content)
 
+        result = ''
         extra_key = ['byte{}'.format(v) for v in range(did_len)]
         for key in extra_key:
             if content.get(key):
-                return content[key]
-        return
+                result += content.get(key)
+        return result
 
     @staticmethod
     def init_key(str_key):
@@ -128,9 +129,6 @@ class ProjectData(db.Model):
         key = list()
         if not did_len:
             return list()
-
-        for i in range(did_len):
-            key.extend(self.init_key('bit{}'.format(i)))
 
         extra_key = ['byte{}'.format(v) for v in range(did_len)]
 

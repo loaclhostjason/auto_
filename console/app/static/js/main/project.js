@@ -1,3 +1,11 @@
+function remove(arr) {
+    var newarr = [];
+    for (var i = 0; i < arr.length - 1; i++) {
+        newarr.push(arr[i]);
+    }
+    return newarr;
+}
+
 $(document).ready(function () {
     function Projects() {
         AppCommonClass.call(this);
@@ -38,18 +46,28 @@ $(document).ready(function () {
                     var byte_position = resp['byte_position'];
                     var default_conf = resp['default_conf'];
                     $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position));
-                    $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf));
+                    $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf, bit_position));
                 } else {
                     toastr.error(resp.message)
                 }
             });
         };
 
-        this.project_data_html = function (result, project_data, did_len, byte_position, default_conf) {
+        this.project_data_html = function (result, project_data, did_len, byte_position, default_conf, bit_position) {
             if (!result || !result.length) return '';
 
 
             var html = '';
+
+            var new_byte_position = Math.ceil(bit_position.length / 8) - 1 + Number(byte_position);
+            var dif_did_len = new_byte_position - byte_position;
+            var _new_byte_position = [];
+            if (dif_did_len) {
+                for (var i = 1; i <= dif_did_len; i++) {
+                    _new_byte_position.push(Number(byte_position) + i);
+                }
+            }
+
             result.forEach(function (data) {
                 var prid = data['level_4_id'];
                 var data_info = project_data[data['level_4_id']] || {};
@@ -70,13 +88,14 @@ $(document).ready(function () {
                         bet_number.push(i);
                     }
                 }
+                console.log(byte_position);
                 bet_number.forEach(function (num) {
                     html += '<td colspan="8">';
                     html += '<div class="col-xs-12"><div class="row">';
                     if (content['byte' + num]) {
                         html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="' + (content['byte' + num] || '') + '">';
                     } else {
-                        if (num == byte_position) {
+                        if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
                             html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="">';
                         } else
                             html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="" disabled>';
@@ -102,21 +121,84 @@ $(document).ready(function () {
             var html = '';
             html += '<tr>';
             html += '<th width="100" style="vertical-align: middle; min-width: 100px"></th>';
-            html += '<th width="120" style="vertical-align: middle; min-width: 120px">LAS</th>';
+            html += '<th width="120" style="vertical-align: middle; min-width: 120px">LAS</th>'
+
+            if (!bit_position || !bit_position.length) {
+                return html
+            }
+            var new_byte_position = Math.ceil(bit_position.length / 8) - 1 + Number(byte_position);
+            var dif_did_len = new_byte_position - byte_position;
+
+            var _n = bit_position.length - 8;
+            if (dif_did_len > 1) {
+                _n = bit_position.length - (8 * (Math.ceil(bit_position.length / 8) - 1));
+            }
+
+
+            var new_bit_position = [];
+            var _new_byte_position = [];
+            if (dif_did_len) {
+                for (var i = 1; i <= dif_did_len; i++) {
+                    _new_byte_position.push(Number(byte_position) + i);
+                }
+
+                for (var j = 0; j < _n; j++) {
+                    new_bit_position.push(j)
+                }
+
+            }
+
+            // alert(_new_byte_position[_new_byte_position.length-2]);
+            // alert(_new_byte_position.splice(-1,1));
+            console.log(_new_byte_position);
+            var aaaa = remove(_new_byte_position);
+
+            console.log(_new_byte_position);
+
 
             if (did_len) {
                 for (var i = 0; i < did_len; i++) {
                     html += '<th colspan="8"><div class="text-center with-bottom-border"><span>BYTE' + i + '</span></div>';
                     html += '<div style="width: 172px">';
                     var a = '';
-                    for (var j = 7; j >= 0; j--) {
-                        if ($.inArray(j, bit_position) > -1 && byte_position == i) {
-                            a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
+                    if (_new_byte_position.length && $.inArray(i, _new_byte_position) > -1) {
+                        if (!aaaa.length) {
+                            for (var j = 7; j >= 0; j--) {
+                                if ($.inArray(j, new_bit_position) > -1) {
+                                    a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
+                                } else {
+                                    a += '<div style="width: 12.5%; float: left;text-align: center"><span>' + j + '</span>';
+                                }
+                                a += '</div>';
+                            }
                         } else {
-                            a += '<div style="width: 12.5%; float: left;text-align: center"><span>' + j + '</span>';
+                            if ($.inArray(i, aaaa) > -1) {
+                                for (var j = 7; j >= 0; j--) {
+                                    a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
+                                    a += '</div>';
+                                }
+                            } else {
+                                for (var j = 7; j >= 0; j--) {
+                                    if ($.inArray(j, new_bit_position) > -1) {
+                                        a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
+                                    } else {
+                                        a += '<div style="width: 12.5%; float: left;text-align: center"><span>' + j + '</span>';
+                                    }
+                                    a += '</div>';
+                                }
+                            }
                         }
-                        a += '</div>';
+                    } else {
+                        for (var j = 7; j >= 0; j--) {
+                            if ($.inArray(j, bit_position) > -1 && byte_position == i) {
+                                a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
+                            } else {
+                                a += '<div style="width: 12.5%; float: left;text-align: center"><span>' + j + '</span>';
+                            }
+                            a += '</div>';
+                        }
                     }
+
                     html += a;
                     html += '</div></th>';
                 }
