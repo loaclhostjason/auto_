@@ -102,12 +102,53 @@ def change_data(new_data_init):
     return new_data
 
 
+def get_test(did_len, init_val):
+    r = list()
+    for index in range(did_len):
+        r.append('00000000')
+
+    if init_val:
+        return init_val
+    return r
+
+
 class ExportXml(object):
 
     def __init__(self, project_id):
         self.project_id = project_id
 
         self.header_order = ['ApplicationLayer', 'PhysicalLayer']
+
+    # did default value
+    def get_did_default_val(self):
+        project_data = ProjectData.query.filter_by(project_id=self.project_id).all()
+        if not project_data:
+            return
+        init_val = []
+
+        r = dict()
+        for info in project_data:
+            project_relation = ProjectRelation.query.filter_by(id=info.project_relation_id).first()
+            project_relation = ProjectRelation.query.filter_by(
+                id=project_relation.parent_id if project_relation else '').first()
+
+            did_len = AttrContent.get_did_len(project_relation.parent_id)
+            bit_len, start_bit, byte_info = AttrContent.get_attr_info(info.project_relation_id)
+
+            end_bit = start_bit + bit_len
+
+            init_val = get_test(did_len, init_val)
+
+            __init_val = init_val[byte_info]
+            # __init_val[start_bit:end_bit] = info.default_conf
+            __init_val = __init_val[0:start_bit] + info.default_conf + __init_val[end_bit:]
+            init_val[byte_info] = __init_val
+
+            r[project_relation.parent_id] = init_val
+
+        r = {k: ''.join([v[::-1] for v in list_val]) for k, list_val in r.items()}
+        print(r)
+        return r
 
     def set_path(self):
         if not self.xml_managers_attr:
@@ -223,6 +264,9 @@ class ExportXml(object):
 
     @property
     def xml_did_list(self):
+        # default
+        default_val_did = self.get_did_default_val()
+
         header, did, *args = self.default_attr
         did_default = {v['item']: v['item_default'] for v in did if v.get('item') and v.get('item_default')}
 
@@ -241,6 +285,9 @@ class ExportXml(object):
                         real_content[k] = did_default.get(k, '')
             else:
                 real_content = did_default
+
+            if default_val_did.get(pr.id):
+                real_content['DefaultValue'] = self.str_to_hex(default_val_did[pr.id])
             result[pr.name] = real_content
 
         return result

@@ -59,14 +59,20 @@ $(document).ready(function () {
 
             var html = '';
 
-            var new_byte_position = Math.ceil(bit_position.length / 8) - 1 + Number(byte_position);
-            var dif_did_len = new_byte_position - byte_position;
             var _new_byte_position = [];
-            if (dif_did_len) {
-                for (var i = 1; i <= dif_did_len; i++) {
-                    _new_byte_position.push(Number(byte_position) + i);
+            if (bit_position) {
+                var start_bit = bit_position[0];
+                var bit_len = start_bit + bit_position.length;
+                var new_byte_position = Math.ceil(bit_len / 8) - 1 + Number(byte_position);
+                var dif_did_len = new_byte_position - byte_position;
+
+                if (dif_did_len) {
+                    for (var i = 1; i <= dif_did_len; i++) {
+                        _new_byte_position.push(Number(byte_position) + i);
+                    }
                 }
             }
+
 
             result.forEach(function (data) {
                 var prid = data['level_4_id'];
@@ -121,40 +127,38 @@ $(document).ready(function () {
             var html = '';
             html += '<tr>';
             html += '<th width="100" style="vertical-align: middle; min-width: 100px"></th>';
-            html += '<th width="120" style="vertical-align: middle; min-width: 120px">LAS</th>'
+            html += '<th width="120" style="vertical-align: middle; min-width: 120px">LAS</th>';
 
-            if (!bit_position || !bit_position.length) {
-                return html
-            }
-            var new_byte_position = Math.ceil(bit_position.length / 8) - 1 + Number(byte_position);
-            var dif_did_len = new_byte_position - byte_position;
-
-            var _n = bit_position.length - 8;
-            if (dif_did_len > 1) {
-                _n = bit_position.length - (8 * (Math.ceil(bit_position.length / 8) - 1));
-            }
-
-
-            var new_bit_position = [];
+            var aaaa = [];
             var _new_byte_position = [];
-            if (dif_did_len) {
-                for (var i = 1; i <= dif_did_len; i++) {
-                    _new_byte_position.push(Number(byte_position) + i);
+            var new_bit_position = [];
+            if (bit_position && bit_position.length) {
+                var start_bit = bit_position[0];
+                var bit_len = start_bit + bit_position.length;
+                var new_byte_position = Math.ceil(bit_len / 8) - 1 + Number(byte_position);
+                var dif_did_len = new_byte_position - byte_position;
+
+                var _n = bit_len - 8;
+                if (dif_did_len > 1) {
+                    _n = bit_position.length - (8 * (Math.ceil(bit_len / 8) - 1));
                 }
 
-                for (var j = 0; j < _n; j++) {
-                    new_bit_position.push(j)
+
+                if (dif_did_len) {
+                    for (var i = 1; i <= dif_did_len; i++) {
+                        _new_byte_position.push(Number(byte_position) + i);
+                    }
+
+                    for (var j = 7; j > 7 - _n; j--) {
+                        new_bit_position.push(j)
+                    }
+
                 }
 
+                console.log(_new_byte_position);
+                aaaa = remove(_new_byte_position);
             }
-
-            // alert(_new_byte_position[_new_byte_position.length-2]);
-            // alert(_new_byte_position.splice(-1,1));
-            console.log(_new_byte_position);
-            var aaaa = remove(_new_byte_position);
-
-            console.log(_new_byte_position);
-
+            console.log(aaaa)
 
             if (did_len) {
                 for (var i = 0; i < did_len; i++) {

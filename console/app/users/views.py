@@ -11,6 +11,7 @@ import os
 from datetime import datetime
 from ..models import *
 from ..decorators import role_admin_pm
+from sqlalchemy import or_, and_
 
 
 @users.route('/')
@@ -19,5 +20,11 @@ from ..decorators import role_admin_pm
 def users_list():
     form = UserForm()
     # users = User.query.filter(User.group_user_id.is_(None)).all()
-    users = User.query.all()
+    if current_user.is_admin:
+        users = User.query.all()
+    else:
+        users = User.query.filter(
+            or_(and_(User.project_group_id == current_user.project_group_id, User.role == 'user'),
+                User.id == current_user.id)).all()
+
     return render_template('users/users_list.html', users=users, form=form)

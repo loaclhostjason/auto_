@@ -39,6 +39,11 @@
                                         style="border-right: 1px solid #dddddd">
                                         <span>{{ project.project_group.name }}</span>
                                     </td>
+                                {% elif loop.index0 == 0 %}
+                                    <td class="text-center" rowspan="{{ num }}"
+                                        style="border-right: 1px solid #dddddd">
+                                        <span>{{ project.project_group.name }}</span>
+                                    </td>
                                 {% endif %}
 
                                 <td>

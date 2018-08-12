@@ -41,9 +41,12 @@ def projects():
     else:
         project_list = project_query.filter_by(user_id=current_user.id).all()
 
-    group_project = db.session.query(Project.id, func.count(Project.id).label('project_num')).group_by(
+    group_project = db.session.query(Project.id, Project.project_group_id,
+                                     func.count(Project.id).label('project_num')).group_by(
         Project.project_group_id).all()
-    group_project = {project_id: num for project_id, num in group_project}
+
+    group_project = {project_id: num for project_id, project_group_id, num in group_project}
+    print(group_project)
     return render_template('main/projects.html', projects=project_list, group_project=group_project)
 
 

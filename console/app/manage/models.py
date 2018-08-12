@@ -84,6 +84,45 @@ class AttrContent(db.Model):
     project_relation = db.relationship('ProjectRelation',
                                        backref=db.backref("attr_content", cascade="all, delete-orphan"))
 
+    @staticmethod
+    def get_did_len(project_relation_id):
+        attr = AttrContent.query.filter_by(project_relation_id=project_relation_id).first()
+
+        attr = json.loads(attr.real_content or '{}')
+        _len_did = 0
+        try:
+            _len_did = int(attr.get('DidLength'))
+        except:
+            pass
+        return _len_did
+
+    @staticmethod
+    def get_attr_info(project_relation_id, is_parent=False):
+        from ..main.models import ProjectRelation
+        project_relation = ProjectRelation.query.filter_by(id=project_relation_id).first()
+
+        if not is_parent:
+            attr = AttrContent.query.filter_by(
+                project_relation_id=project_relation.parent_id if project_relation else '').first()
+        else:
+            attr = AttrContent.query.filter_by(
+                project_relation_id=project_relation.id if project_relation else '').first()
+
+        attr = json.loads(attr.real_content or '{}') if attr else {}
+        bit_line = 0
+        start_bit = 0
+        byte_info = 0
+        if attr:
+            try:
+
+                bit_line = int(attr.get('BitLength') or 0) or 0
+                start_bit = int(attr.get('BitPosition') or 0) or 0
+                byte_info = int(attr.get('BytePosition') or 0) or 0
+            except Exception as e:
+                print(e)
+                pass
+        return bit_line, start_bit, byte_info
+
     def get_insert_data(self, data, project_id):
         if not data:
             return

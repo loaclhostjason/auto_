@@ -19,5 +19,9 @@ def get_project_user():
         project_groups = user.project_group if user.role.name != 'admin' else project_groups_query.all()
     else:
         project_groups = project_groups_query.all()
-    project_groups = [(v.id, v.name) for v in project_groups]
+
+    try:
+        project_groups = [(v.id, v.name) for v in project_groups]
+    except Exception as e:
+        project_groups = [(project_groups.id, project_groups.name)]
     return jsonify({'data': project_groups})

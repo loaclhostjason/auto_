@@ -90,6 +90,17 @@ def option_project_data():
     return jsonify(r2)
 
 
+def split_default_val(data, bit_len):
+    if len(data) == bit_len:
+        return data
+
+    if len(data) > bit_len:
+        data = data[-bit_len:]
+    else:
+        data = ''.join(['0' for v in range(bit_len - len(data))]) + data
+    return data
+
+
 def get_default_conf():
     project_relation_id = request.form.getlist('project_relation_id')
     default_conf = request.form.get('default_conf')
@@ -97,7 +108,9 @@ def get_default_conf():
     if project_relation_id:
         for index, v in enumerate(project_relation_id):
             if default_conf:
-                result[v] = default_conf
+                bit_len, *args = AttrContent.get_attr_info(v)
+                result[v] = default_conf if len(default_conf) == bit_len else split_default_val(default_conf, bit_len)
+
     return result
 
 
@@ -107,7 +120,6 @@ def get_default_conf():
 def edit_project_data_api(project_id):
     # get attr 参数
     data = ProjectData().get_content(project_id)
-    print(data)
     default_conf = get_default_conf()
 
     if not data:

@@ -4,6 +4,7 @@ from enum import Enum
 from flask import request
 import json
 from ..manage.models import AttrContent
+import math
 
 
 class ProjectRelationType(Enum):
@@ -125,6 +126,8 @@ class ProjectData(db.Model):
         return key
 
     def get_content(self, project_id):
+        from .api_data import split_default_val
+
         did_len = self.p_did_len(project_id)
         key = list()
         if not did_len:
@@ -147,7 +150,15 @@ class ProjectData(db.Model):
                 d['las'] = request.form.getlist('las')[index]
                 d['name'] = request.form.getlist('name')[index]
                 # if request.form.get('%s_%s' % (val, v)):
-                d['content'][v] = request.form.get('%s_%s' % (val, v)) or ''
+                if request.form.get('%s_%s' % (val, v)):
+
+                    bit_len, start_bit, byte_info = AttrContent.get_attr_info(val)
+                    _this_val = request.form.get('%s_%s' % (val, v))
+
+                    d['content'][v] = _this_val
+                    # d['content'][v] = split_default_val(_this_val, math.ceil(bit_len / (math.ceil((bit_len + start_bit) / 8) - 1)))
+                else:
+                    d['content'][v] = ''
 
             result.append(d)
         return [v for v in result if v.get('content')]

@@ -103,7 +103,7 @@ def delete_user(id):
 
 @users.route('/fp_pm', methods=['POST'])
 @login_required
-@role_required
+@role_admin_pm
 def fp_pm_users():
     user_id = request.args.get('user_id')
     project_group_id = request.form.get('project_group')

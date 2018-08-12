@@ -63,6 +63,8 @@ class Config:
 
     LAS_FILE_PATH_ROOT = las_path_root
 
+    DEFAULT_BIT = '00000000'
+
     @staticmethod
     def init_app(app):
         pass
