@@ -140,14 +140,14 @@ class ExportXml(object):
             init_val = get_test(did_len, init_val)
 
             __init_val = init_val[byte_info]
+            # print(__init_val)
             # __init_val[start_bit:end_bit] = info.default_conf
-            __init_val = __init_val[0:start_bit] + info.default_conf + __init_val[end_bit:]
+            __init_val = __init_val[0:start_bit] + (info.default_conf or '') + __init_val[end_bit:]
             init_val[byte_info] = __init_val
 
             r[project_relation.parent_id] = init_val
 
         r = {k: ''.join([v[::-1] for v in list_val]) for k, list_val in r.items()}
-        print(r)
         return r
 
     def set_path(self):
