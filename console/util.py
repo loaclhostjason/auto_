@@ -9,6 +9,10 @@ from collections import defaultdict, OrderedDict
 from enum import Enum
 import datetime
 import re
+import sys
+
+os_name = sys.platform
+operate = '\n' if os_name.startswith('win') else '\r\n'
 
 app = create_app()
 app.app_context().push()
@@ -713,15 +717,15 @@ class ExportXml(object):
 
         doc = self.set_xml()
         with open(files_path, 'w', encoding='utf-8') as f:
-            doc.writexml(f, indent='', addindent='  ', newl='\r\n', encoding="utf-8")
+            doc.writexml(f, indent='', addindent='  ', newl=operate, encoding="utf-8")
 
         file_data = ""
         with open(files_path, 'r') as f:
             for line in f:
                 if '<DefaultValue' in line:
-                    line = line[:20] + (('"' + line[20:-16] + '"') if line[20:-16] else '') + line[-16:-1] + '\r\n'
+                    line = line[:20] + (('"' + line[20:-16] + '"') if line[20:-16] else '') + line[-16:-1] + operate
                 else:
-                    line = line[:-1] + '\r\n'
+                    line = line[:-1] + operate
                 file_data += line
 
         with open(files_path, 'w', encoding='utf-8') as f:
@@ -734,15 +738,15 @@ class ExportXml(object):
 
         doc = self.set_xml()
         with open(files_path, 'w', encoding='utf-8') as f:
-            doc.writexml(f, indent='', addindent='  ', newl='\r\n', encoding="utf-8")
+            doc.writexml(f, indent='', addindent='  ', newl=operate, encoding="utf-8")
 
         file_data = ""
         with open(files_path, 'r') as f:
             for line in f:
                 if '<DefaultValue' in line:
-                    line = line[:20] + (('"' + line[20:-16] + '"') if line[20:-16] else '') + line[-16:-1] + '\r\n'
+                    line = line[:20] + (('"' + line[20:-16] + '"') if line[20:-16] else '') + line[-16:-1] + operate
                 else:
-                    line = line[:-1] + '\r\n'
+                    line = line[:-1] + operate
                 file_data += line
 
         with open(files_path, 'w', encoding='utf-8') as f:
@@ -750,5 +754,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(1)
+    export_xml = ExportXml(4)
     export_xml.run()
