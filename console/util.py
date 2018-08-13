@@ -179,7 +179,8 @@ class ExportXml(object):
     @property
     def xml_managers_attr(self):
         project = Project.query.get_or_404(self.project_id)
-        return project.project_config_name
+        result = '{}_{}'.format(project.project_group.name, project.name)
+        return result
 
     @property
     def xml_pin(self):

@@ -155,7 +155,8 @@ def delete_project_tree(id):
 
 
 def delete_project_file(project):
-    del_DF('%s.95' % project.project_config_name, project.name)
+    file = '{}_{}'.format(project.project_group.name, project.project_config_name)
+    del_DF('%s.95' % file, project.name)
 
     project_group_id = project.project_group_id
     db.session.commit()
