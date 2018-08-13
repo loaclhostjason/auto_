@@ -107,18 +107,43 @@
                     $.get('file/info/is?project_id=' + project_id.toString(), function (resp) {
                         if (!resp.success) {
                             toastr.error(resp.message)
-                        } else {
-                            toastr.success(resp.message)
                         }
                     }).done(function () {
                         project_id.forEach(function (value) {
-                            downloadFile('/download_file?project_id=' + value)
+                            {#downloadFile('/download_file?project_id=' + value)#}
+                            export_file('/download_file?project_id=' + value);
                         })
                     });
 
                 }
 
             })
-        })
+        });
+
+        function export_file(url) {
+            $.fileDownload(url, {
+                httpMethod: 'get',
+                prepareCallback: function (url) {
+                    toastr.options.timeOut = null;
+                    toastr.info('下载开始，请稍等...');
+                },
+                successCallback: function (url) {
+                    toastr.clear();
+                    toastr.options.timeOut = 2000;
+                    toastr.success('导出成功');
+                },
+                failCallback: function (html, url) {
+                    var json = JSON.parse(html);
+                    console.log(json);
+                    if (json.status === 512) {
+                        toastr.clear();
+                        toastr.options.timeOut = 2000;
+                        toastr.error(json.errorMessage);
+                    }
+                }
+            });
+        }
+
+
     </script>
 {% endblock %}

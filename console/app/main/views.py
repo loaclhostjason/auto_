@@ -197,6 +197,14 @@ def download_file():
     return download_files(project.project_config_name)
 
 
+@main.after_request
+def after_request(response):
+    if request.url_rule.rule == '/download_file':
+        response.headers['Set-Cookie'] = 'fileDownload=true; path=/'
+
+    return response
+
+
 @main.route('/project/edit/name', methods=['POST'])
 @login_required
 def edit_project_name():
