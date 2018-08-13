@@ -89,6 +89,7 @@
 {% block scripts %}
 
     {{ super() }}
+    <script src="{{ url_for('static', filename='vendor/jquery.fileDownload.min.js') }}"></script>
     <script>
         $(document).ready(function () {
             $('.delete-project').click(function () {

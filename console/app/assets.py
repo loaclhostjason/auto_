@@ -24,7 +24,6 @@ common_css = Bundle(
 common_js = Bundle(
     'vendor/nprogress/nprogress.js',
     'vendor/toastr/toastr.min.js',
-    'vendor/jquery.fileDownload.min.js',
     'vendor/jquery-ui.min.js',
     'js/update_password.js',
     'js/class.js',
@@ -34,7 +33,9 @@ common_js = Bundle(
 )
 
 go_js = Bundle(
-    'js/gojs/other/*',
+    'js/gojs/other/Arrowheads.js',
+    'js/gojs/other/BalloonLink.js',
+    'js/gojs/other/NonRealtimeDraggingTool.js',
     filters='jsmin',
     output='public/js/go_js',
 )
