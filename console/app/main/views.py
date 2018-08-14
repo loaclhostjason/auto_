@@ -194,7 +194,9 @@ def download_file():
     export_xml = ExportXml(project_id)
     export_xml.mk_dir(project.project_group.name)
     export_xml.run()
-    return download_files(project.project_config_name)
+
+    file = '{}_{}'.format(project.project_group.name, project.name)
+    return download_files(file)
 
 
 @main.after_request
