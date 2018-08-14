@@ -106,12 +106,12 @@ def change_data(new_data_init):
     return new_data
 
 
-def get_test(did_len, init_val):
+def get_test(did_len, init_val, change_init):
     r = list()
     for index in range(did_len):
         r.append('00000000')
 
-    if init_val:
+    if init_val and not change_init:
         return init_val
     return r
 
@@ -123,6 +123,15 @@ class ExportXml(object):
 
         self.header_order = ['ApplicationLayer', 'PhysicalLayer']
 
+    @staticmethod
+    def get_parent_id(info):
+        project_relation = ProjectRelation.query.filter_by(id=info.project_relation_id).first()
+        project_relation = ProjectRelation.query.filter_by(
+            id=project_relation.parent_id if project_relation else '').first()
+        if not project_relation:
+            return
+        return project_relation.parent_id
+
     # did default value
     def get_did_default_val(self):
         project_data = ProjectData.query.filter_by(project_id=self.project_id).all()
@@ -131,25 +140,29 @@ class ExportXml(object):
         init_val = []
 
         r = dict()
-        for info in project_data:
-            project_relation = ProjectRelation.query.filter_by(id=info.project_relation_id).first()
-            project_relation = ProjectRelation.query.filter_by(
-                id=project_relation.parent_id if project_relation else '').first()
+        for index, info in enumerate(project_data):
+            change_init = False
+            parent_id = self.get_parent_id(info)
+            if not parent_id:
+                return
+            if index > 0:
+                prev_info = project_data[index - 1]
+                prev_parent_id = self.get_parent_id(prev_info)
+                if prev_parent_id != parent_id:
+                    change_init = True
 
-            did_len = AttrContent.get_did_len(project_relation.parent_id)
+            did_len = AttrContent.get_did_len(parent_id)
             bit_len, start_bit, byte_info = AttrContent.get_attr_info(info.project_relation_id)
 
             end_bit = start_bit + bit_len
 
-            init_val = get_test(did_len, init_val)
+            init_val = get_test(did_len, init_val, change_init)
 
             __init_val = init_val[byte_info]
-            # print(__init_val)
-            # __init_val[start_bit:end_bit] = info.default_conf
             __init_val = __init_val[0:start_bit] + (info.default_conf or '') + __init_val[end_bit:]
             init_val[byte_info] = __init_val
 
-            r[project_relation.parent_id] = init_val
+            r[parent_id] = init_val
 
         r = {k: ''.join([v[::-1] for v in list_val]) for k, list_val in r.items()}
         return r
