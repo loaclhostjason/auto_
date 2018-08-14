@@ -304,7 +304,7 @@ class ExportXml(object):
             else:
                 real_content = did_default
 
-            if default_val_did.get(pr.id):
+            if default_val_did and default_val_did.get(pr.id):
                 real_content['DefaultValue'] = self.str_to_hex(default_val_did[pr.id])
             result[pr.name] = real_content
 
