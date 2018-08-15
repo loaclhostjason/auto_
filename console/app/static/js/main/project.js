@@ -300,7 +300,11 @@ $(document).ready(function () {
     // submit project data
     $('.submit-project-data').click(function () {
         var params = $('form#project-data-form').serialize();
+        toastr.options.timeOut = null;
+        toastr.info('正在保存中...');
         $.post('/project/data/submit/' + project_id, params, function (resp) {
+            toastr.clear();
+            toastr.options.timeOut = 2000;
             if (resp.success) {
                 toastr.success(resp.message);
                 projects.get_project_data(project_id, $.g_parent_id);

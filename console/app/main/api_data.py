@@ -141,8 +141,8 @@ def edit_project_data_api(project_id):
             new_project_data = ProjectData(**val)
             db.session.add(new_project_data)
 
-    export_xml = ExportXml(project_id)
-    export_xml.run()
+    # export_xml = ExportXml(project_id)
+    # export_xml.run()
     return jsonify({'success': True, 'message': '更新成功'})
 
 
