@@ -108,7 +108,7 @@ def change_data(new_data_init):
 
 def get_test(did_len, init_val, change_init):
     r = list()
-    for index in range(did_len):
+    for index in range(did_len + 1):
         r.append('00000000')
 
     if init_val and not change_init:
@@ -306,6 +306,8 @@ class ExportXml(object):
 
             if default_val_did and default_val_did.get(pr.id):
                 real_content['DefaultValue'] = self.str_to_hex(default_val_did[pr.id])
+            else:
+                real_content['DefaultValue'] = ''
             result[pr.name] = real_content
 
         return result
@@ -768,5 +770,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(4)
+    export_xml = ExportXml(14)
     export_xml.run()
