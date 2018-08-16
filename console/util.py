@@ -106,12 +106,12 @@ def change_data(new_data_init):
     return new_data
 
 
-def get_test(did_len, init_val, change_init):
+def get_test(did_len, init_val):
     r = list()
     for index in range(did_len):
         r.append('00000000')
 
-    if init_val and not change_init:
+    if init_val:
         return init_val
     return r
 
@@ -132,41 +132,44 @@ class ExportXml(object):
             return
         return project_relation.parent_id
 
+    def tt(self):
+        project_data = ProjectData.query.filter_by(project_id=self.project_id).all()
+        r = defaultdict(list)
+        if not project_data:
+            return r
+        for info in project_data:
+            project_relation = ProjectRelation.query.filter_by(id=info.project_relation_id).first()
+            project_relation = ProjectRelation.query.filter_by(
+                id=project_relation.parent_id if project_relation else '').first()
+            if project_relation:
+                r[project_relation.parent_id].append(info)
+        return r
+
     # did default value
     def get_did_default_val(self):
-        project_data = ProjectData.query.filter_by(project_id=self.project_id).all()
+        project_data = self.tt()
         if not project_data:
             return
-        init_val = []
 
         r = dict()
-        for index, info in enumerate(project_data):
-            change_init = False
-            parent_id = self.get_parent_id(info)
-            if not parent_id:
-                return
-            if index > 0:
-                prev_info = project_data[index - 1]
-                prev_parent_id = self.get_parent_id(prev_info)
-                if prev_parent_id != parent_id:
-                    change_init = True
+        for parent_id, datas in project_data.items():
+            init_val = []
+            for info in datas:
+                did_len = AttrContent.get_did_len(parent_id)
+                bit_len, start_bit, byte_info = AttrContent.get_attr_info(info.project_relation_id)
 
-            did_len = AttrContent.get_did_len(parent_id)
-            bit_len, start_bit, byte_info = AttrContent.get_attr_info(info.project_relation_id)
+                end_bit = start_bit + bit_len
 
-            end_bit = start_bit + bit_len
+                init_val = get_test(did_len, init_val)
 
-            init_val = get_test(did_len, init_val, change_init)
+                __init_val = init_val[byte_info]
+                if info.default_conf:
+                    __init_val = __init_val[0:start_bit] + info.default_conf[::-1] + __init_val[end_bit:]
+                init_val[byte_info] = __init_val[::-1]
 
-            __init_val = init_val[byte_info]
-            if info.default_conf:
-                __init_val = __init_val[0:start_bit] + info.default_conf[::-1] + __init_val[end_bit:]
-            init_val[byte_info] = __init_val
+                r[parent_id] = init_val
 
-            r[parent_id] = init_val
-
-        r = {k: ''.join([v[::-1] for v in list_val]) for k, list_val in r.items()}
-        print(r)
+        r = {k: ''.join([v for v in list_val]) for k, list_val in r.items()}
         return r
 
     def set_path(self):
@@ -309,7 +312,8 @@ class ExportXml(object):
             if default_val_did and default_val_did.get(pr.id):
                 real_content['DefaultValue'] = self.str_to_hex(default_val_did[pr.id])
             else:
-                real_content['DefaultValue'] = ''
+                did_len = real_content.get('DidLength')
+                real_content['DefaultValue'] = self.str_to_hex(real_content.get('DefaultValue'), did_len)
             result[pr.name] = real_content
 
         return result
@@ -371,17 +375,19 @@ class ExportXml(object):
         return d
 
     @staticmethod
-    def str_to_hex(data):
+    def str_to_hex(data, did_len=None):
+        if not data:
+            return
         init_de = '00'
         try:
-            data_len = len(data) // 8
+            data_len = len(data) // 8 if not did_len else did_len
 
             hex_data = hex(int(data, 2))
             hex_data = hex_data.replace('0x', '')
             hex_data = '0{}'.format(hex_data) if len(hex_data) % 2 else hex_data
 
             if (data_len - (len(hex_data) // 2)) >= 1:
-                dif_len = data_len - (len(hex_data)//2)
+                dif_len = data_len - (len(hex_data) // 2)
                 hex_data = (init_de * dif_len) + hex_data
         except:
             hex_data = data
