@@ -166,6 +166,7 @@ class ExportXml(object):
             r[parent_id] = init_val
 
         r = {k: ''.join([v[::-1] for v in list_val]) for k, list_val in r.items()}
+        print(r)
         return r
 
     def set_path(self):
@@ -371,10 +372,17 @@ class ExportXml(object):
 
     @staticmethod
     def str_to_hex(data):
+        init_de = '00'
         try:
+            data_len = len(data) // 8
+
             hex_data = hex(int(data, 2))
             hex_data = hex_data.replace('0x', '')
             hex_data = '0{}'.format(hex_data) if len(hex_data) % 2 else hex_data
+
+            if (data_len - (len(hex_data) // 2)) >= 1:
+                dif_len = data_len - (len(hex_data)//2)
+                hex_data = (init_de * dif_len) + hex_data
         except:
             hex_data = data
         return hex_data
@@ -772,5 +780,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(4)
+    export_xml = ExportXml(14)
     export_xml.run()
