@@ -108,7 +108,7 @@ def change_data(new_data_init):
 
 def get_test(did_len, init_val, change_init):
     r = list()
-    for index in range(did_len + 1):
+    for index in range(did_len):
         r.append('00000000')
 
     if init_val and not change_init:
@@ -159,7 +159,8 @@ class ExportXml(object):
             init_val = get_test(did_len, init_val, change_init)
 
             __init_val = init_val[byte_info]
-            __init_val = __init_val[0:start_bit] + (info.default_conf or '') + __init_val[end_bit:]
+            if info.default_conf:
+                __init_val = __init_val[0:start_bit] + info.default_conf + __init_val[end_bit:]
             init_val[byte_info] = __init_val
 
             r[parent_id] = init_val
@@ -412,8 +413,8 @@ class ExportXml(object):
                 if project:
                     for pro in project:
                         parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
-                        conf_data[parent_relation.parent_id].append(
-                            (self.str_to_hex(ProjectData().conf_data(pro.content, self.project_id)), pro.las))
+                        pev_did = ProjectRelation.query.filter_by(id=parent_relation.parent_id).first()
+                        conf_data[parent_relation.parent_id].append((self.str_to_hex(ProjectData().conf_data(pro.content, self.project_id, pev_did.parent_id)), pro.las))
 
                 conf_data = {k: v for k, v in conf_data.items()}
                 conf_data = {

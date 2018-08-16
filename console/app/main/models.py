@@ -91,11 +91,12 @@ class ProjectData(db.Model):
                                        backref=db.backref("project_data", cascade="all, delete-orphan"))
 
     @staticmethod
-    def p_did_len(project_id):
-        attr = AttrContent.query.filter_by(project_id=project_id).all()
+    def p_did_len(project_id, did_relation_id):
+        attr = AttrContent.query.filter_by(project_id=project_id, project_relation_id=did_relation_id).all()
         d = dict()
         if attr:
             for info in attr:
+                # print(info.real_content)
                 content = json.loads(info.real_content or '{}')
                 d.update(content)
         try:
@@ -104,8 +105,9 @@ class ProjectData(db.Model):
             did_len = 0
         return did_len
 
-    def conf_data(self, content, project_id):
-        did_len = self.p_did_len(project_id)
+    def conf_data(self, content, project_id, did_relation_id):
+        did_len = self.p_did_len(project_id, did_relation_id)
+        # print(did_len)
         if not content or not did_len:
             return
 
@@ -125,10 +127,11 @@ class ProjectData(db.Model):
             key.append('%s_%s' % (str_key, index))
         return key
 
-    def get_content(self, project_id):
+    def get_content(self, project_id, did_relation_id):
         from .api_data import split_default_val
 
-        did_len = self.p_did_len(project_id)
+        did_len = self.p_did_len(project_id, did_relation_id)
+        # print(did_len)
         key = list()
         if not did_len:
             return list()
@@ -139,7 +142,7 @@ class ProjectData(db.Model):
 
         project_relation_id = request.form.getlist('project_relation_id')
         result = []
-        print(project_relation_id)
+        # print(project_relation_id)
         for index, val in enumerate(project_relation_id):
             d = {
                 'project_id': project_id,
@@ -155,6 +158,7 @@ class ProjectData(db.Model):
                     bit_len, start_bit, byte_info = AttrContent.get_attr_info(val)
                     _this_val = request.form.get('%s_%s' % (val, v))
 
+                    print(v, _this_val)
                     d['content'][v] = _this_val
                     # d['content'][v] = split_default_val(_this_val, math.ceil(bit_len / (math.ceil((bit_len + start_bit) / 8) - 1)))
                 else:

@@ -302,7 +302,7 @@ $(document).ready(function () {
         var params = $('form#project-data-form').serialize();
         toastr.options.timeOut = null;
         toastr.info('正在保存中...');
-        $.post('/project/data/submit/' + project_id, params, function (resp) {
+        $.post('/project/data/submit/' + project_id + '?data_relation_id=' + $('[name="project_relation_id"]').val(), params, function (resp) {
             toastr.clear();
             toastr.options.timeOut = 2000;
             if (resp.success) {
