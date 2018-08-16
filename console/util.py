@@ -160,7 +160,7 @@ class ExportXml(object):
 
             __init_val = init_val[byte_info]
             if info.default_conf:
-                __init_val = __init_val[0:start_bit] + info.default_conf + __init_val[end_bit:]
+                __init_val = __init_val[0:start_bit] + info.default_conf[::-1] + __init_val[end_bit:]
             init_val[byte_info] = __init_val
 
             r[parent_id] = init_val
@@ -414,7 +414,8 @@ class ExportXml(object):
                     for pro in project:
                         parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
                         pev_did = ProjectRelation.query.filter_by(id=parent_relation.parent_id).first()
-                        conf_data[parent_relation.parent_id].append((self.str_to_hex(ProjectData().conf_data(pro.content, self.project_id, pev_did.parent_id)), pro.las))
+                        conf_data[parent_relation.parent_id].append((self.str_to_hex(
+                            ProjectData().conf_data(pro.content, self.project_id, pev_did.parent_id)), pro.las))
 
                 conf_data = {k: v for k, v in conf_data.items()}
                 conf_data = {
@@ -771,5 +772,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(14)
+    export_xml = ExportXml(4)
     export_xml.run()
