@@ -10,7 +10,7 @@ from ..base import BaseForm
 class LoginForm(FlaskForm, BaseForm):
     username = StringField(validators=[DataRequired(message='用户名不能为空！')])
     password = PasswordField(validators=[DataRequired(message='密码不能为空！')])
-    remember_me = BooleanField('记住我')
+    remember_me = BooleanField('记住我', default=False)
     submit = SubmitField('登录')
 
     def __init__(self):

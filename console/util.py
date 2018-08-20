@@ -786,5 +786,5 @@ class ExportXml(object):
 
 
 if __name__ == '__main__':
-    export_xml = ExportXml(14)
+    export_xml = ExportXml(4)
     export_xml.run()

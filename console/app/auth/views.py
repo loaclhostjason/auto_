@@ -4,6 +4,7 @@ from flask_login import login_user, current_user, login_required, logout_user
 from . import auth
 from .forms import *
 from ..base import Check
+from .models import *
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -21,11 +22,14 @@ def login():
             flash({'errors': '已过期，无法登陆，请联系管理员'})
             return redirect(request.url)
 
-        print(form.password.data)
         if user and user.verify_password(form.password.data):
+            if not OperateLog.is_can_login(user.id):
+                flash({'errors': '账号在另一台电脑上登录，无法登陆'})
+                return redirect(request.url)
+
             login_user(user, form.remember_me.data)
             current_user.update_time_ip()
-            print(1111)
+            OperateLog.add_operate_log(user.id, '登录')
             return redirect(request.args.get('next') or url_for('main.projects'))
         flash({'errors': '用户名或者密码错误！'})
 
@@ -35,5 +39,6 @@ def login():
 @auth.route('/logout')
 @login_required
 def logout():
+    OperateLog.add_operate_log(current_user.id, '注销')
     logout_user()
     return redirect(url_for('auth.login'))
