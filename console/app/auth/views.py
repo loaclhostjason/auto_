@@ -27,6 +27,7 @@ def login():
                 flash({'errors': '账号在另一台电脑上登录，无法登陆'})
                 return redirect(request.url)
 
+            # print(form.remember_me.data)
             login_user(user, True)
             current_user.update_time_ip()
             OperateLog.add_operate_log(user.id, '登录')

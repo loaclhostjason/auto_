@@ -28,13 +28,12 @@ class OperateLog(db.Model):
         }
         operation_log = OperateLog(**d)
         db.session.add(operation_log)
+        db.session.commit()
 
     @classmethod
     def is_can_login(cls, user_id):
         ip = request.remote_addr
-        before_login = cls.before_login(user_id, ip)
-        if before_login:
-            return before_login
+        cls.before_login(user_id, ip)
 
         last_info_query = cls.query.order_by(cls.time.desc(), cls.id.desc()).filter_by(user_id=user_id)
         last_info = last_info_query.first()
@@ -55,4 +54,4 @@ class OperateLog(db.Model):
         last_info = cls.query.order_by(cls.time.desc(), cls.id.desc()).filter_by(user_id=user_id, login_ip=ip).first()
 
         if last_info and last_info.action == '登录':
-            return True
+            cls.add_operate_log(user_id, '注销')
