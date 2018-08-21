@@ -46,6 +46,7 @@ def option_project_data():
         'project_data': project_dict,
         'byte_position': cot.get('BytePosition'),
         'default_conf': default_conf,
+        'ext_bitPosition': cot.get('ExtBitPosition')
     }
     if not real_content.get('BytePosition') or not real_content.get('BitPosition'):
         return jsonify(r1)
@@ -86,6 +87,7 @@ def option_project_data():
         'bit_position': bit_position,
         'byte_position': cot.get('BytePosition'),
         'default_conf': default_conf,
+        'ext_bitPosition': cot.get('ExtBitPosition')
     }
     return jsonify(r2)
 

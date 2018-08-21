@@ -113,11 +113,11 @@ class ProjectData(db.Model):
 
         content = json.loads(content)
 
-        result = ''
+        result = []
         extra_key = ['byte{}'.format(v) for v in range(did_len)]
         for key in extra_key:
             if content.get(key):
-                result += content.get(key)
+                result.append(content.get(key))
         return result
 
     @staticmethod

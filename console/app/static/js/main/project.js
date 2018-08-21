@@ -45,7 +45,8 @@ $(document).ready(function () {
                     var bit_position = resp['bit_position'];
                     var byte_position = resp['byte_position'];
                     var default_conf = resp['default_conf'];
-                    $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position));
+                    var ext_bitPosition = resp['ext_bitPosition'];
+                    $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position, ext_bitPosition));
                     $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf, bit_position));
                 } else {
                     toastr.error(resp.message)
@@ -84,7 +85,7 @@ $(document).ready(function () {
                 html += '<input type="hidden" name="name" value="' + data['level_4'] + '">';
                 html += '<td class="text-center"><a href="javascript:void(0)" class="del-project-func text-danger pull-left" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a>' + data['level_4'] + '</td>';
                 html += '<td class="text-center"><div style="display: inline-flex"><div style="float: left"><input name="las" class="tc-search-words" value="' + (data_info['las'] || '') + '"></div>';
-                html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
+                html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal-bak"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
                 html += '</td>';
 
 
@@ -123,7 +124,7 @@ $(document).ready(function () {
             return html
         };
 
-        this.project_thead_html = function (did_len, bit_position, byte_position) {
+        this.project_thead_html = function (did_len, bit_position, byte_position, ext_bitPosition) {
             var html = '';
             html += '<tr>';
             html += '<th width="100" style="vertical-align: middle; min-width: 100px"></th>';
@@ -149,7 +150,8 @@ $(document).ready(function () {
                         _new_byte_position.push(Number(byte_position) + i);
                     }
 
-                    for (var j = 7; j > 7 - _n; j--) {
+                    ext_bitPosition = Number(ext_bitPosition);
+                    for (var j = ext_bitPosition; j <= _n; j++) {
                         new_bit_position.push(j)
                     }
 
@@ -313,7 +315,7 @@ $(document).ready(function () {
         })
     });
 
-    // show las modal
+    // show las modal todo
     var btn_las;
     var update_las_modal = $("#update-las-modal");
     $(document).on('click', '.show-las-modal', function () {

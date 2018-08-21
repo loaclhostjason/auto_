@@ -57,6 +57,25 @@ def check_las(new_data_init):
     return result
 
 
+def las_change_data(new_data_init):
+    if str(new_data_init).lower() in ['none', 'all']:
+        return ''
+    if not new_data_init:
+        return ''
+    data = re.split(r'(\w{4})+', str(new_data_init).strip())
+    data = [v for v in data if v]
+    r = list()
+    if data:
+        for info in data:
+            if len(info) == 4:
+                info = '$' + info
+            if info == '&':
+                info = '.'
+            r.append(info)
+    r = ''.join(r)
+    return r
+
+
 def change_data(new_data_init):
     if str(new_data_init).lower() in ['none', 'all']:
         return ''
@@ -429,8 +448,11 @@ class ExportXml(object):
                     for pro in project:
                         parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
                         pev_did = ProjectRelation.query.filter_by(id=parent_relation.parent_id).first()
-                        conf_data[parent_relation.parent_id].append((self.str_to_hex(
-                            ProjectData().conf_data(pro.content, self.project_id, pev_did.parent_id)), pro.las))
+
+                        conf_datas = ProjectData().conf_data(pro.content, self.project_id, pev_did.parent_id)
+                        if conf_datas:
+                            for cd_info in conf_datas:
+                                conf_data[parent_relation.parent_id].append((self.str_to_hex(cd_info), pro.las))
 
                 conf_data = {k: v for k, v in conf_data.items()}
                 conf_data = {
@@ -679,9 +701,11 @@ class ExportXml(object):
                                     node_conf_data.setAttribute('useConfData', 'true')
                                     for data in conf_data:
                                         node_config_data = doc.createElement('ConfigData')
-                                        if data[0] and data[1] and change_data(data[1]):
+                                        # if data[0] and data[1] and change_data(data[1]):
+                                        if data[0] and data[1] and las_change_data(data[1]):
+                                            # las_change_data(data[1])
                                             node_config_data.setAttribute('Value', data[0])
-                                            node_config_data.setAttribute('ConfigExpression', change_data(data[1]))
+                                            node_config_data.setAttribute('ConfigExpression', las_change_data(data[1]))
                                             node_conf_data.appendChild(node_config_data)
 
                                             node_parameter.appendChild(node_conf_data)
