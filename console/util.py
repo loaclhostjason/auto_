@@ -1,10 +1,10 @@
 # import xml.dom.minidom
-from dom import minidom
+from console.dom import minidom
 import os
 import json
-from app import create_app
-from app.main.models import Project, ProjectRelation, ProjectData
-from app.manage.models import AttrContent, Attr
+from .app import create_app
+from .app.main.models import Project, ProjectRelation, ProjectData
+from .app.manage.models import AttrContent, Attr
 from collections import defaultdict, OrderedDict
 from enum import Enum
 import datetime

@@ -6,7 +6,7 @@ from .func import *
 from ..manage.models import *
 import json
 from sqlalchemy import func
-from other import del_DF
+from console.other import del_DF
 
 
 # func tree has deleted

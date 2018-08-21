@@ -6,7 +6,7 @@ from . import main
 from .forms import *
 from ..base import Check
 from ..app import upload_files
-from config import Config
+from console.config import Config
 import os
 from datetime import datetime
 from .models import *
@@ -16,7 +16,7 @@ from ..models import User
 from sqlalchemy import or_, func
 
 import json
-from util import ExportXml
+from console.util import ExportXml
 from ..manage.models import Attr, ExtraAttrContent
 from .func_extra import *
 

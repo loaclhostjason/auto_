@@ -6,7 +6,7 @@ from . import users
 from .forms import *
 from ..base import Check
 from ..app import upload_files
-from config import Config
+from console.config import Config
 import os
 from datetime import datetime
 from ..models import *

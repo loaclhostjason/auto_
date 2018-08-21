@@ -1,5 +1,5 @@
 import os
-from config import Config
+from .config import Config
 
 
 def del_DF(file_name, dir_name):

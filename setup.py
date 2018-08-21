@@ -4,7 +4,7 @@ from setuptools import find_packages
 
 if __name__ == '__main__':
     setuptools.setup(
-        name="filling",
+        name="auto_filling",
         version="1.0.0",
         description="auto_filling",
         author="jason",
@@ -45,5 +45,6 @@ if __name__ == '__main__':
             "WTForms"
         ],
         include_package_data=True,
+        exclude_package_date={'': ['.gitignore']},
         zip_safe=False,
     )
