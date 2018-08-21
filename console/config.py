@@ -29,15 +29,21 @@ class ReadConfigJson(object):
 
 base_path = os.path.abspath(os.path.dirname(__file__))
 upload_path = os.path.join(base_path, 'upload', 'projects')
+
 file_path_root = os.path.join(base_path, 'files')
 file_path = os.path.join(file_path_root, 'all')
+
 las_path_root = os.path.join(base_path, 'las_file')
+json_path = os.path.join(base_path, 'json_file')
 
 if not os.path.exists(file_path):
     os.makedirs(file_path)
 
 if not os.path.exists(las_path_root):
     os.makedirs(las_path_root)
+
+if not os.path.exists(json_path):
+    os.makedirs(json_path)
 
 
 class Config:
@@ -62,6 +68,8 @@ class Config:
     FILE_PATH_ROOT = file_path_root
 
     LAS_FILE_PATH_ROOT = las_path_root
+
+    JSON_FILE_PATH = json_path
 
     DEFAULT_BIT = '00000000'
 

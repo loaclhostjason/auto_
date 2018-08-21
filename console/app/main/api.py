@@ -6,7 +6,7 @@ from .func import *
 from ..manage.models import *
 import json
 from sqlalchemy import func
-from console.other import del_DF
+from console.config import Config
 
 
 # func tree has deleted
@@ -154,9 +154,23 @@ def delete_project_tree(id):
     return jsonify({'success': True, 'message': '更新成功'})
 
 
+def del_DF(file_root, file_name, dir_name):
+    for root, dirs, files in os.walk(file_root, topdown=False):
+        if file_name in files:
+            os.remove(os.path.join(root, file_name))
+        if dir_name in dirs:
+            os.rmdir(os.path.join(root, dir_name))
+
+
 def delete_project_file(project):
-    file = '{}_{}'.format(project.project_group.name, project.project_config_name)
-    del_DF('%s.95' % file, project.name)
+    xml_file = '{}_{}.95'.format(project.project_group.name, project.name)
+    xml_root = Config.FILE_PATH_ROOT
+
+    json_file = '[{}]{}_{}.json'.format(project.id, project.project_group.name, project.name)
+    json_root = Config.JSON_FILE_PATH
+
+    del_DF(xml_root, xml_file, project.name)
+    del_DF(json_root, json_file, project.name)
 
     project_group_id = project.project_group_id
     db.session.commit()

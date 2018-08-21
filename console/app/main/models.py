@@ -33,6 +33,14 @@ class Project(db.Model):
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
 
+    def to_json(self):
+        d = self.to_dict()
+        if d.get('first_time'):
+            d['first_time'] = d['first_time'].strftime('%Y-%m-%d %H:%M:%S')
+        if d.get('last_time'):
+            d['last_time'] = d['last_time'].strftime('%Y-%m-%d %H:%M:%S')
+        return d
+
 
 class ProjectRelation(db.Model):
     __tablename__ = 'project_relation'
