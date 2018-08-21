@@ -45,6 +45,11 @@ def add_attr_content():
     if form_data.get('BitPosition') and int(form_data['BitPosition']) > 7:
         return jsonify({'success': False, 'message': 'BitPosition 在0-7之间'})
 
+    if form_data.get('BitLength'):
+        input_number = 16 - int(form_data['BitPosition'])
+        if int(form_data['BitLength']) > input_number:
+            return jsonify({'success': False, 'message': '只能跨2个字节，BitLength 请输入小于等于%d数字' % input_number})
+
     AttrContent.create_edit(form_data, project_id, project_relation_id)
 
     update_project_config_name(form_data, project_id)

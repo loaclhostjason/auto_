@@ -449,7 +449,17 @@ class ExportXml(object):
                         parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
                         pev_did = ProjectRelation.query.filter_by(id=parent_relation.parent_id).first()
 
-                        conf_datas = ProjectData().conf_data(pro.content, self.project_id, pev_did.parent_id)
+                        bit_line, start_bit, byte_info, ext_bit = AttrContent.get_attr_info(pro.project_relation_id,
+                                                                                            show_ext_bit=True)
+                        bit_info = {
+                            'bit_len': bit_line,
+                            'start_bit': start_bit,
+                            'byte_info': byte_info,
+                            'ext_bit': ext_bit,
+                        }
+
+                        conf_datas = ProjectData().conf_data(pro.content, self.project_id, pev_did.parent_id, bit_info)
+                        #print(conf_datas)
                         if conf_datas:
                             for cd_info in conf_datas:
                                 conf_data[parent_relation.parent_id].append((self.str_to_hex(cd_info), pro.las))
@@ -691,7 +701,7 @@ class ExportXml(object):
                                 # ConfData
                                 node_conf_data = doc.createElement('ConfData')
                                 conf_data = val['conf_data'].get(parameter_k)
-                                conf_data = [(v[0], v[1]) for v in conf_data if v[0] and v[1]]
+                                conf_data = [(v[0], v[1]) for v in conf_data if  v[0] and v[1]] if conf_data else None
 
                                 if not conf_data:
                                     node_conf_data.setAttribute('useConfData', 'no')
