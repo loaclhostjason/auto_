@@ -58,7 +58,7 @@ def check_las(new_data_init):
 
 
 def change_data(new_data_init):
-    if str(new_data_init).lower() == 'none':
+    if str(new_data_init).lower() in ['none', 'all']:
         return ''
     if not new_data_init:
         return ''
@@ -401,7 +401,8 @@ class ExportXml(object):
         result = list()
         content = json.loads(attr.content)
         for ar in content:
-            result.append(ar['item'])
+            if ar.get('item') and ar.get('item') != 'ExtBitPosition':
+                result.append(ar['item'])
         return result
 
     @property
@@ -649,8 +650,11 @@ class ExportXml(object):
                             _config_data_las = val['conf_data'].get(parameter_val_kk)[0][0]
                         except Exception:
                             _config_data_las = ''
-
-                        if _config_data_las:
+                        print(66, parameter_val)
+                        print(88, _config_data_las)
+                        # if _config_data_las:
+                        if True:
+                            print(77, parameter_val)
                             node_parameter.setAttribute('ParamDefaultValue', self.str_to_hex(str(default_val or '')))
                             for parameter_k, parameter_v in parameter_val.items():
 
@@ -668,6 +672,8 @@ class ExportXml(object):
                                 # ConfData
                                 node_conf_data = doc.createElement('ConfData')
                                 conf_data = val['conf_data'].get(parameter_k)
+                                conf_data = [(v[0], v[1]) for v in conf_data if v[0] and v[1]]
+                                print(conf_data)
 
                                 if not conf_data:
                                     node_conf_data.setAttribute('useConfData', 'no')
@@ -683,8 +689,12 @@ class ExportXml(object):
                                             node_conf_data.appendChild(node_config_data)
 
                                             node_parameter.appendChild(node_conf_data)
+                                        if data[1] == 'all':
+                                            node_parameter.appendChild(node_conf_data)
+                                            break
 
-                        if _config_data_las:
+                        # if _config_data_las:
+                        if True:
                             node_modification_item.appendChild(node_parameter)
                     node_modification.appendChild(node_modification_item)
         root.appendChild(node_modification)
