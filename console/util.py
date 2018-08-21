@@ -650,11 +650,8 @@ class ExportXml(object):
                             _config_data_las = val['conf_data'].get(parameter_val_kk)[0][0]
                         except Exception:
                             _config_data_las = ''
-                        print(66, parameter_val)
-                        print(88, _config_data_las)
                         # if _config_data_las:
                         if True:
-                            print(77, parameter_val)
                             node_parameter.setAttribute('ParamDefaultValue', self.str_to_hex(str(default_val or '')))
                             for parameter_k, parameter_v in parameter_val.items():
 
@@ -673,7 +670,6 @@ class ExportXml(object):
                                 node_conf_data = doc.createElement('ConfData')
                                 conf_data = val['conf_data'].get(parameter_k)
                                 conf_data = [(v[0], v[1]) for v in conf_data if v[0] and v[1]]
-                                print(conf_data)
 
                                 if not conf_data:
                                     node_conf_data.setAttribute('useConfData', 'no')
