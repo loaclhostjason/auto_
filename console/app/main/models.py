@@ -197,6 +197,8 @@ class ProjectData(db.Model):
         project_relation_id = request.form.getlist('project_relation_id')
         result = []
         # print(project_relation_id)
+
+        default_val = None
         for index, val in enumerate(project_relation_id):
             d = {
                 'project_id': project_id,
@@ -206,20 +208,19 @@ class ProjectData(db.Model):
             for v in key:
                 d['las'] = request.form.getlist('las')[index]
                 d['name'] = request.form.getlist('name')[index]
+
+                if d['las'].lower() == 'all' and request.form.get('%s_%s' % (val, v)):
+                    default_val = request.form.get('%s_%s' % (val, v))
+
                 # if request.form.get('%s_%s' % (val, v)):
                 if request.form.get('%s_%s' % (val, v)):
-
-                    bit_len, start_bit, byte_info = AttrContent.get_attr_info(val)
                     _this_val = request.form.get('%s_%s' % (val, v))
-
-                    print(v, _this_val)
                     d['content'][v] = _this_val
-                    # d['content'][v] = split_default_val(_this_val, math.ceil(bit_len / (math.ceil((bit_len + start_bit) / 8) - 1)))
                 else:
                     d['content'][v] = ''
 
             result.append(d)
-        return [v for v in result if v.get('content')]
+        return [v for v in result if v.get('content')], default_val
 
 
 class ProjectGroup(db.Model):

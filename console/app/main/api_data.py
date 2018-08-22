@@ -103,7 +103,7 @@ def split_default_val(data, bit_len):
     return data
 
 
-def get_default_conf():
+def get_default_conf(default_val=None):
     project_relation_id = request.form.getlist('project_relation_id')
     default_conf = request.form.get('default_conf')
     result = dict()
@@ -111,7 +111,11 @@ def get_default_conf():
         for index, v in enumerate(project_relation_id):
             if default_conf:
                 bit_len, *args = AttrContent.get_attr_info(v)
-                result[v] = default_conf if len(default_conf) == bit_len else split_default_val(default_conf, bit_len)
+                if default_val:
+                    result[v] = default_val if len(default_val) == bit_len else split_default_val(default_val, bit_len)
+                else:
+                    result[v] = default_conf if len(default_conf) == bit_len else split_default_val(default_conf,
+                                                                                                    bit_len)
 
     return result
 
@@ -126,8 +130,8 @@ def edit_project_data_api(project_id):
         return jsonify({'success': False, 'message': '没数据，不能保持'})
 
     project_relation = ProjectRelation.query.filter_by(id=data_relation_id).first()
-    data = ProjectData().get_content(project_id, project_relation.parent_id)
-    default_conf = get_default_conf()
+    data, default_val = ProjectData().get_content(project_id, project_relation.parent_id)
+    default_conf = get_default_conf(default_val)
 
     if not data:
         return jsonify({'success': False, 'message': 'project_id不存在'})
