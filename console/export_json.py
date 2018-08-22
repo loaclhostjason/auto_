@@ -4,6 +4,7 @@ import os
 from .app import create_app
 from .app.main.models import Project, ProjectRelation, ProjectData
 from console.config import Config
+from collections import defaultdict
 
 app = create_app()
 app.app_context().push()
@@ -16,7 +17,7 @@ class ExportJson(object):
 
         self.file_path = Config.JSON_FILE_PATH
 
-        self.pr_result = []
+        self.pr_result = defaultdict(list)
 
     @property
     def file_name(self):
@@ -33,16 +34,25 @@ class ExportJson(object):
         if project_relation:
             for pr_info in project_relation:
                 children = ProjectRelation.query.filter_by(parent_id=pr_info.id).all()
-                self.pr_result.append(pr_info.to_dict())
+                self.pr_result[pr_info.parent_id].append(pr_info.to_json())
+                for v in self.pr_result.values():
+                    for val in v:
+                        if val['id'] == pr_info.parent_id:
+                            val['info'] = pr_info.to_json()
+
                 self.__project_relation_children(children)
 
     def get_project_relation(self):
         project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, parent_id=None).all()
 
         if project_relation:
-            print(self.__project_relation_children(project_relation))
+            self.__project_relation_children(project_relation)
+        print(self.pr_result)
+
         project_relations = self.project.project_relation
         project_relation = [info.to_json() for info in project_relations if info]
+
+        self.pr_result = []
 
         return project_relation
 
@@ -66,5 +76,4 @@ class ExportJson(object):
             'project_data': None,
             'attr_content': None,
         }
-        print(data)
         self.create_json(data)

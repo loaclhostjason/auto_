@@ -193,21 +193,23 @@ class ExportXml(object):
                         __init_val_01 = init_val[byte_info][::-1]
                         __init_val_02 = init_val[int(byte_info) + 1][::-1]
 
-                        __init_val_01 = __init_val_01[0:start_bit] + d1
-                        __init_val_02 = __init_val_02[0:ext_bit] + d2 + __init_val_02[b_len + ext_bit:]
+                        __init_val_01 = __init_val_01[0:start_bit] + d1[::-1]
+                        __init_val_02 = __init_val_02[0:ext_bit] + d2[::-1] + __init_val_02[b_len + ext_bit:]
 
                         init_val[byte_info] = __init_val_01[::-1]
                         init_val[int(byte_info) + 1] = __init_val_02[::-1]
 
                     else:
                         __init_val = init_val[byte_info][::-1]
-                        __init_val = __init_val[0:start_bit] + info.default_conf + __init_val[end_bit:]
+                        __init_val = __init_val[0:start_bit] + info.default_conf[::-1] + __init_val[end_bit:]
 
+                        # print(__init_val)
                         init_val[byte_info] = __init_val[::-1]
 
                 r[parent_id] = init_val
 
         r = {k: ''.join([v for v in list_val]) for k, list_val in r.items()}
+        # print(r)
         return r
 
     def set_path(self):
