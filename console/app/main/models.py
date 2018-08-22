@@ -146,23 +146,24 @@ class ProjectData(db.Model):
             return
 
         for index, key in enumerate(extra_key):
-            if content.get(key):
-                if real_bit_len <= 8:
-                    this_val = content[key] + '0' * bit_info['start_bit']
-                    result.append(this_val)
-                else:
-                    if index == 0:
-                        this_val = content[key] + '0' * bit_info['start_bit']
-                        result.append(this_val)
-                    else:
-                        if index == len(extra_key) - 1:
-                            this_val = content[key] + '0' * bit_info['ext_bit']
-                            result.append(this_val)
-                        else:
-                            pass
-                            # todo 跨3个？
-                            # this_val = content[key] + '0' * 8
-                            # result.append(this_val)
+            result.append(content[key])
+            # todo 不补充
+            # if real_bit_len <= 8:
+            #     this_val = content[key] + '0' * bit_info['start_bit']
+            #     result.append(this_val)
+            # else:
+            #     if index == 0:
+            #         this_val = content[key] + '0' * bit_info['start_bit']
+            #         result.append(this_val)
+            #     else:
+            #         if index == len(extra_key) - 1:
+            #             this_val = content[key] + '0' * bit_info['ext_bit']
+            #             result.append(this_val)
+            #         else:
+            #             pass
+            # todo 跨3个？
+            # this_val = content[key] + '0' * 8
+            # result.append(this_val)
 
         return result
 
