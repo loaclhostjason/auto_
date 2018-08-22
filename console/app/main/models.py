@@ -33,12 +33,15 @@ class Project(db.Model):
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
 
-    def to_json(self):
+    def to_json(self, user_id=None):
         d = self.to_dict()
         if d.get('first_time'):
-            d['first_time'] = d['first_time'].strftime('%Y-%m-%d %H:%M:%S')
+            del d['first_time']
         if d.get('last_time'):
-            d['last_time'] = d['last_time'].strftime('%Y-%m-%d %H:%M:%S')
+            del d['last_time']
+
+        d['user_id'] = user_id
+        del d['id']
         return d
 
 
@@ -61,6 +64,12 @@ class ProjectRelation(db.Model):
 
     def __init__(self, *args, **kwargs):
         super(ProjectRelation, self).__init__(*args, **kwargs)
+
+    def to_json(self):
+        d = self.to_dict()
+        if d.get('timestamp'):
+            del d['timestamp']
+        return d
 
     @classmethod
     def add_project_relation(cls, data, content, project_id):
@@ -97,6 +106,12 @@ class ProjectData(db.Model):
     project = db.relationship('Project', backref=db.backref("project_data", cascade="all, delete-orphan"))
     project_relation = db.relationship('ProjectRelation',
                                        backref=db.backref("project_data", cascade="all, delete-orphan"))
+
+    def to_json(self):
+        d = self.to_dict()
+        if d.get('timestamp'):
+            del d['timestamp']
+        return d
 
     @staticmethod
     def p_did_len(project_id, did_relation_id):
