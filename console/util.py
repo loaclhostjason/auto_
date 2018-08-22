@@ -465,7 +465,6 @@ class ExportXml(object):
                 project = ProjectData.query.filter_by(project_id=self.project_id).order_by(
                     ProjectData.project_relation_id).all()
                 conf_data = defaultdict(list)
-                ext_conf_data = defaultdict(list)
                 if project:
                     for pro in project:
                         parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
@@ -484,16 +483,11 @@ class ExportXml(object):
                         # print(conf_datas)
                         if conf_datas:
                             for index, cd_info in enumerate(conf_datas):
-                                if len(conf_datas) == 1 or index == 0:
-                                    conf_data[parent_relation.parent_id].append((self.str_to_hex(cd_info), pro.las))
-                                else:
-                                    ext_conf_data[parent_relation.parent_id].append((self.str_to_hex(cd_info), pro.las))
+                                conf_data[parent_relation.parent_id].append((self.str_to_hex(cd_info), pro.las))
 
                 conf_data = {k: v for k, v in conf_data.items()}
-                ext_conf_data = {k: v for k, v in ext_conf_data.items()}
                 conf_data = {
                     'conf_data': conf_data,
-                    'ext_conf_data': ext_conf_data,
                 }
                 new_result[address] = dict(conf_data, **self.__get_(projects))
 
@@ -709,12 +703,6 @@ class ExportXml(object):
                             _config_data_las = dict(val['conf_data'].get(parameter_val_kk))
                         except Exception as e:
                             _config_data_las = {}
-
-                        try:
-                            _ext_config_data_las = dict(val['ext_conf_data'].get(parameter_val_kk))
-                        except Exception as e:
-                            _ext_config_data_las = {}
-                       
                         # print(_config_data_las)
 
                         if 'all' not in _config_data_las.values():
