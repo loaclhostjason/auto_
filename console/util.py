@@ -63,14 +63,14 @@ def las_change_data(new_data_init):
     if not new_data_init:
         return ''
     data = re.split(r'(\w{4})+', str(new_data_init).strip())
+
     data = [v for v in data if v]
     r = list()
     if data:
         for info in data:
             if len(info) == 4:
                 info = '$' + info
-            if info == '&':
-                info = '.'
+            info = info.replace('&', '.')
             r.append(info)
     r = ''.join(r)
     return r
