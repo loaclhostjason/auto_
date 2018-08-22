@@ -705,7 +705,7 @@ class ExportXml(object):
                             _config_data_las = {}
                         # print(_config_data_las)
 
-                        if 'all' not in _config_data_las.values():
+                        if 'all' not in [v.lower() for v in _config_data_las.values() if v]:
                             node_parameter.setAttribute('ParamDefaultValue', self.str_to_hex(str(default_val or '')))
                             for parameter_k, parameter_v in parameter_val.items():
 
@@ -746,7 +746,7 @@ class ExportXml(object):
                                             break
 
                         # if _config_data_las:
-                        if 'all' not in _config_data_las.values():
+                        if 'all' not in [v.lower() for v in _config_data_las.values() if v]:
                             node_modification_item.appendChild(node_parameter)
                     node_modification.appendChild(node_modification_item)
         root.appendChild(node_modification)
