@@ -152,7 +152,7 @@ $(document).ready(function () {
 
                     ext_bitPosition = Number(ext_bitPosition);
                     // alert(_n)
-                    for (var j = ext_bitPosition; j <= _n + ext_bitPosition; j++) {
+                    for (var j = ext_bitPosition; j <= _n + ext_bitPosition - 1; j++) {
                         new_bit_position.push(j)
                     }
 
