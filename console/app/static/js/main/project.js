@@ -102,8 +102,9 @@ $(document).ready(function () {
                     if (content['byte' + num]) {
                         html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="' + (content['byte' + num] || '') + '">';
                     } else {
-                        if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
-                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="">';
+                        // if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
+                        if (num == byte_position) {
+                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="">'; // show or hide
                         } else
                             html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="" disabled>';
                     }

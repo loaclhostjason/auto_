@@ -146,8 +146,15 @@ class ProjectData(db.Model):
             return
 
         for index, key in enumerate(extra_key):
-            result.append(content[key])
-            # todo 不补充
+            if real_bit_len > 8:
+                b_len = real_bit_len - 8
+                b1 = content[key][:-b_len]
+                b2 = content[key][-b_len:]
+                result = [b1, b2]
+            else:
+                result.append(content[key])
+
+            # todo 分割 补充
             # if real_bit_len <= 8:
             #     this_val = content[key] + '0' * bit_info['start_bit']
             #     result.append(this_val)

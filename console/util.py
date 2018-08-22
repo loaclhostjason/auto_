@@ -175,16 +175,35 @@ class ExportXml(object):
             init_val = []
             for info in datas:
                 did_len = AttrContent.get_did_len(parent_id)
-                bit_len, start_bit, byte_info = AttrContent.get_attr_info(info.project_relation_id)
+                bit_len, start_bit, byte_info, ext_bit = AttrContent.get_attr_info(info.project_relation_id,
+                                                                                   show_ext_bit=True)
 
                 end_bit = start_bit + bit_len
 
                 init_val = get_test(did_len, init_val)
 
-                __init_val = init_val[byte_info]
+                # 跨字节 默认值
                 if info.default_conf:
-                    __init_val = __init_val[0:start_bit] + info.default_conf[::-1] + __init_val[end_bit:]
-                init_val[byte_info] = __init_val[::-1]
+                    if end_bit > 8:
+                        b_len = end_bit - 8
+
+                        d1 = info.default_conf[:-b_len]
+                        d2 = info.default_conf[-b_len:]
+
+                        __init_val_01 = init_val[byte_info][::-1]
+                        __init_val_02 = init_val[int(byte_info) + 1][::-1]
+
+                        __init_val_01 = __init_val_01[0:start_bit] + d1
+                        __init_val_02 = __init_val_02[0:ext_bit] + d2 + __init_val_02[b_len + ext_bit:]
+
+                        init_val[byte_info] = __init_val_01[::-1]
+                        init_val[int(byte_info) + 1] = __init_val_02[::-1]
+
+                    else:
+                        __init_val = init_val[byte_info][::-1]
+                        __init_val = __init_val[0:start_bit] + info.default_conf + __init_val[end_bit:]
+
+                        init_val[byte_info] = __init_val[::-1]
 
                 r[parent_id] = init_val
 
@@ -459,7 +478,7 @@ class ExportXml(object):
                         }
 
                         conf_datas = ProjectData().conf_data(pro.content, self.project_id, pev_did.parent_id, bit_info)
-                        #print(conf_datas)
+                        # print(conf_datas)
                         if conf_datas:
                             for cd_info in conf_datas:
                                 conf_data[parent_relation.parent_id].append((self.str_to_hex(cd_info), pro.las))
@@ -701,7 +720,7 @@ class ExportXml(object):
                                 # ConfData
                                 node_conf_data = doc.createElement('ConfData')
                                 conf_data = val['conf_data'].get(parameter_k)
-                                conf_data = [(v[0], v[1]) for v in conf_data if  v[0] and v[1]] if conf_data else None
+                                conf_data = [(v[0], v[1]) for v in conf_data if v[0] and v[1]] if conf_data else None
 
                                 if not conf_data:
                                     node_conf_data.setAttribute('useConfData', 'no')
