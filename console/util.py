@@ -700,11 +700,11 @@ class ExportXml(object):
                             default_val = ''
 
                         try:
-                            _config_data_las = val['conf_data'].get(parameter_val_kk)[0][1]
-                        except Exception:
-                            _config_data_las = ''
-                        # if _config_data_las:
-                        # print(val['conf_data'])
+                            _config_data_las = dict(val['conf_data'].get(parameter_val_kk))
+                        except Exception as e:
+                            _config_data_las = {}
+                        # print(_config_data_las)
+
                         if True:
                             node_parameter.setAttribute('ParamDefaultValue', self.str_to_hex(str(default_val or '')))
                             for parameter_k, parameter_v in parameter_val.items():
@@ -746,7 +746,7 @@ class ExportXml(object):
                                             break
 
                         # if _config_data_las:
-                        if _config_data_las != 'all':
+                        if 'all' not in _config_data_las.values():
                             node_modification_item.appendChild(node_parameter)
                     node_modification.appendChild(node_modification_item)
         root.appendChild(node_modification)
