@@ -6,6 +6,7 @@ from .func import *
 from ..manage.models import *
 import json
 from console.util import ExportXml
+from ..models import Modification
 
 
 # main attr content
@@ -154,6 +155,8 @@ def edit_project_data_api(project_id):
 
     # export_xml = ExportXml(project_id)
     # export_xml.run()
+
+    Modification.add_edit(project_id)
     return jsonify({'success': True, 'message': '更新成功'})
 
 

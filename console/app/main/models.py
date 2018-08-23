@@ -51,13 +51,13 @@ class ProjectRelation(db.Model):
     parent_id = db.Column(db.Integer, index=True)
 
     # 名称
-    name = db.Column(db.String(32))
-    level = db.Column(db.Integer, default=1, nullable=False)
+    name = db.Column(db.String(32), index=True)
+    level = db.Column(db.Integer, default=1, nullable=False, index=True)
     type = db.Column(db.Enum(ProjectRelationType), default='worker', nullable=False)
 
     timestamp = db.Column(db.DateTime, default=datetime.now)
 
-    relation_order = db.Column(db.Integer, default=1)
+    relation_order = db.Column(db.Integer, default=1, index=True)
 
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     project = db.relationship('Project', backref=db.backref("project_relation", cascade="all, delete-orphan"))

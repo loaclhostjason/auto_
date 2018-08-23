@@ -5,6 +5,7 @@ import json
 from .app import create_app
 from .app.main.models import Project, ProjectRelation, ProjectData
 from .app.manage.models import AttrContent, Attr
+from .app.models import Modification
 from collections import defaultdict, OrderedDict
 import datetime
 import re
@@ -217,46 +218,13 @@ class ExportXml(XmlData):
 
         if r:
             for address, projects in r.items():
-                project = ProjectData.query.filter_by(project_id=self.project_id).order_by(
-                    ProjectData.project_relation_id).all()
-                conf_data = defaultdict(list)
-                ext_conf_data = dict()
-                _ext_conf_data = {
-                    'info': '',
-                    'data': []
-                }
-                if project:
-                    for pro in project:
-                        parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
-                        pev_did = ProjectRelation.query.filter_by(id=parent_relation.parent_id).first()
+                modification = Modification.query.filter_by(project_id=self.project_id).first()
+                modification = json.loads((modification.content or '{}'))
+                conf_data = modification.get('conf_data')
+                ext_conf_data = modification.get('ext_conf_data')
 
-                        bit_line, start_bit, byte_info, ext_bit = AttrContent.get_attr_info(pro.project_relation_id,
-                                                                                            show_ext_bit=True)
-                        bit_info = {
-                            'bit_len': bit_line,
-                            'start_bit': start_bit,
-                            'byte_info': byte_info,
-                            'ext_bit': ext_bit,
-                        }
-
-                        conf_datas = ProjectData().conf_data(pro.content, self.project_id, pev_did.parent_id, bit_info)
-                        if conf_datas:
-                            for index, cd_info in enumerate(conf_datas):
-                                if len(conf_datas) == 1 or index == 0:
-                                    conf_data[parent_relation.parent_id].append((self.str_to_hex(cd_info), pro.las))
-                                else:
-                                    ext_config_data = (self.str_to_hex(cd_info), pro.las)
-                                    default_conf = self.__default_conf
-                                    if default_conf.get(parent_relation.parent_id):
-                                        default_val = default_conf[parent_relation.parent_id]
-                                    else:
-                                        default_val = ''
-
-                                    _ext_conf_data['info'] = self.get_ext_conf_data(bit_info, default_val)
-                                    _ext_conf_data['data'].append(ext_config_data)
-                                    ext_conf_data[parent_relation.parent_id] = _ext_conf_data
-
-                conf_data = {k: v for k, v in conf_data.items()}
+                conf_data = {int(k): v for k, v in conf_data.items() if k}
+                ext_conf_data = {int(k): v for k, v in ext_conf_data.items() if k}
                 conf_data = {
                     'conf_data': conf_data,
                     'ext_conf_data': ext_conf_data,
@@ -267,19 +235,14 @@ class ExportXml(XmlData):
 
     @property
     def __default_conf(self):
-        data = ProjectData.query. \
-            filter(ProjectData.project_id == self.project_id, ProjectData.default_conf.isnot(None)).all()
-        default_ = dict()
-        if data:
-            for d in data:
-                parent_relation = ProjectRelation.query.get_or_404(d.project_relation_id)
+        mod_data = Modification.query.filter_by(project_id=self.project_id).first()
 
-                bit_line, start_bit, byte_info = AttrContent.get_attr_info(d.project_relation_id)
-                if d.default_conf:
-                    if len(d.default_conf) <= 8:
-                        default_[parent_relation.parent_id] = d.default_conf
-                    else:
-                        default_[parent_relation.parent_id] = d.default_conf[:(8 - start_bit)]
+        default_ = dict()
+        if mod_data:
+            default_ = json.loads(mod_data.default_conf or '{}')
+
+        if default_:
+            default_ = {int(k): v for k, v in default_.items() if k}
         return default_
 
     def xml_section_attr(self, did_name, type_result):

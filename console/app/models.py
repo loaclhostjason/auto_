@@ -8,6 +8,8 @@ from . import db, login_manager
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from enum import Enum
+from collections import defaultdict, OrderedDict
+import json
 
 
 class RoleType(Enum):
@@ -96,3 +98,105 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+class Modification(db.Model):
+    __tablename__ = 'modification'
+    id = db.Column(db.Integer, primary_key=True)
+
+    content = db.Column(db.Text)
+    default_conf = db.Column(db.Text)
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project = db.relationship('Project', backref=db.backref("modification", cascade="all, delete-orphan"))
+
+    @staticmethod
+    def set_default_conf(project_id):
+        from .main.models import ProjectRelation, ProjectData, AttrContent
+        data = ProjectData.query.filter(ProjectData.project_id == project_id,
+                                        ProjectData.default_conf.isnot(None)).all()
+        default_ = dict()
+        if data:
+            for d in data:
+                parent_relation = ProjectRelation.query.get_or_404(d.project_relation_id)
+
+                bit_line, start_bit, byte_info = AttrContent.get_attr_info(d.project_relation_id)
+
+                if d.default_conf:
+                    if (bit_line + start_bit) <= 8:
+                        default_[parent_relation.parent_id] = d.default_conf
+                    else:
+                        default_[parent_relation.parent_id] = d.default_conf[-(bit_line + start_bit - 8):]
+        return default_
+
+    def set_content(self, project_id):
+        from .main.models import ProjectRelation, ProjectData, AttrContent
+        from console.util import ExportXml
+
+        export_xml = ExportXml(project_id)
+
+        conf_data = defaultdict(list)
+        ext_conf_data = dict()
+        _ext_conf_data = {
+            'info': '',
+            'data': []
+        }
+
+        project = ProjectData.query.filter_by(project_id=project_id).order_by(ProjectData.project_relation_id).all()
+        if project:
+            for pro in project:
+                parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
+                pev_did = ProjectRelation.query.filter_by(id=parent_relation.parent_id).first()
+
+                bit_line, start_bit, byte_info, ext_bit = AttrContent.get_attr_info(pro.project_relation_id,
+                                                                                    show_ext_bit=True)
+                bit_info = {
+                    'bit_len': bit_line,
+                    'start_bit': start_bit,
+                    'byte_info': byte_info,
+                    'ext_bit': ext_bit,
+                }
+
+                conf_datas = ProjectData().conf_data(pro.content, project_id, pev_did.parent_id, bit_info)
+                if conf_datas:
+                    for index, cd_info in enumerate(conf_datas):
+                        if len(conf_datas) == 1 or index == 0:
+                            conf_data[parent_relation.parent_id].append((export_xml.str_to_hex(cd_info), pro.las))
+                        else:
+                            ext_config_data = (export_xml.str_to_hex(cd_info), pro.las)
+                            default_conf = self.set_default_conf(project_id)
+                            if default_conf.get(parent_relation.parent_id):
+                                default_val = default_conf[parent_relation.parent_id]
+                            else:
+                                default_val = ''
+
+                            _ext_conf_data['info'] = export_xml.get_ext_conf_data(bit_info, default_val)
+                            _ext_conf_data['data'].append(ext_config_data)
+                            ext_conf_data[parent_relation.parent_id] = _ext_conf_data
+
+        result = {
+            'conf_data': conf_data,
+            'ext_conf_data': ext_conf_data,
+        }
+        return result
+
+    @classmethod
+    def add_edit(cls, project_id):
+        modification = cls.query.filter(cls.project_id == project_id).first()
+
+        default_conf = cls.set_default_conf(project_id)
+        content = cls().set_content(project_id)
+
+        if modification:
+            modification.content = json.dumps(content or {})
+            modification.default_conf = json.dumps(default_conf or {})
+        else:
+            d = {
+                'project_id': project_id,
+                'default_conf': json.dumps(default_conf or {}),
+                'content': json.dumps(content or {}),
+            }
+            modification = cls(**d)
+
+        db.session.add(modification)
+        db.session.commit()

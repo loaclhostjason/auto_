@@ -13,7 +13,7 @@ def before_request():
     if not current_user.is_authenticated:
         return
 
-    if not request.url_rule.rule.startswith('/auth'):
+    if not (request.url_rule and request.url_rule.rule.startswith('/auth')):
         if not OperateLog.is_can_login(current_user.id):
             logout_user()
             return redirect(url_for('auth.login'))
