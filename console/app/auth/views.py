@@ -28,7 +28,7 @@ def login():
                 return redirect(request.url)
 
             # print(form.remember_me.data)
-            login_user(user, True)
+            login_user(user, False)
             current_user.update_time_ip()
             OperateLog.add_operate_log(user.id, '登录')
             return redirect(request.args.get('next') or url_for('main.projects'))
