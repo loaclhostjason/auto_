@@ -219,9 +219,9 @@ class ExportXml(XmlData):
         if r:
             for address, projects in r.items():
                 modification = Modification.query.filter_by(project_id=self.project_id).first()
-                modification = json.loads((modification.content or '{}'))
-                conf_data = modification.get('conf_data')
-                ext_conf_data = modification.get('ext_conf_data')
+                modification = json.loads((modification.content or '{}')) if modification else None
+                conf_data = modification.get('conf_data') if modification else {}
+                ext_conf_data = modification.get('ext_conf_data') if modification else {}
 
                 conf_data = {int(k): v for k, v in conf_data.items() if k}
                 ext_conf_data = {int(k): v for k, v in ext_conf_data.items() if k}

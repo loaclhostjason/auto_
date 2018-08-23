@@ -126,7 +126,7 @@ class Modification(db.Model):
                     if (bit_line + start_bit) <= 8:
                         default_[parent_relation.parent_id] = d.default_conf
                     else:
-                        default_[parent_relation.parent_id] = d.default_conf[-(bit_line + start_bit - 8):]
+                        default_[parent_relation.parent_id] = d.default_conf[:-(bit_line + start_bit - 8)]
         return default_
 
     def set_content(self, project_id):
