@@ -127,6 +127,7 @@ class XmlData(object):
         slen = bit_info['bit_len'] - start
         d = {
             'ParamDefaultValue': default_val[-slen:],
+            'ParameterName': bit_info['parameter_name'],
             'BytePosition': bit_info['byte_info'] + 1,
             'BitPosition': bit_info['ext_bit'],
             'BitLength': bit_info['start_bit'] + bit_info['bit_len'] - 8,

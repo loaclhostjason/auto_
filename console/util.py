@@ -165,12 +165,8 @@ class ExportXml(XmlData):
                         if not content.get(k):
                             content[k] = t_did.get(k, '')
 
-                    if content.get('BytePosition'):
-                        content['BytePosition'] = int(content['BytePosition']) + 1
-                    if content.get('BitPosition'):
-                        content['BitPosition'] = int(content['BitPosition']) + (
-                                int(content['BitLength']) - 1) if content.get('BitLength') and int(
-                            content['BitLength']) > 0 else 0
+                    if int(content.get('BitLength', 0)) + int(content.get('BitPosition'), 0) > 8:
+                        content['BitLength'] = 8 - int(content.get('BitPosition'))
                     r[ac.project_relation_id].append(content)
 
         this_id = [v.project_relation_id for v in attr_content]
@@ -197,7 +193,8 @@ class ExportXml(XmlData):
             if (data_len - (len(hex_data) // 2)) >= 1:
                 dif_len = data_len - (len(hex_data) // 2)
                 hex_data = (init_de * dif_len) + hex_data
-        except:
+        except Exception as e:
+            print(e)
             hex_data = data
         return hex_data
 
@@ -494,6 +491,11 @@ class ExportXml(XmlData):
                             if ext_info:
                                 ext_parameter.setAttribute('ParamDefaultValue',
                                                            self.str_to_hex(str(ext_info.get('ParamDefaultValue', ''))))
+
+                                ext_parameter_name = doc.createElement('ParameterName')
+                                ext_parameter_name.appendChild(doc.createTextNode(str(ext_info.get('ParameterName', ''))))
+                                ext_parameter.appendChild(ext_parameter_name)
+
                                 ext_byte_name = doc.createElement('BytePosition')
                                 ext_byte_name.appendChild(doc.createTextNode(str(ext_info.get('BytePosition', ''))))
                                 ext_parameter.appendChild(ext_byte_name)

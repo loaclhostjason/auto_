@@ -148,21 +148,26 @@ class Modification(db.Model):
                 parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
                 pev_did = ProjectRelation.query.filter_by(id=parent_relation.parent_id).first()
 
-                bit_line, start_bit, byte_info, ext_bit = AttrContent.get_attr_info(pro.project_relation_id,
-                                                                                    show_ext_bit=True)
+                bit_line, start_bit, byte_info, ext_bit, parameter_name = AttrContent.get_attr_info(pro.project_relation_id,
+                                                                                    show_param=True)
                 bit_info = {
                     'bit_len': bit_line,
                     'start_bit': start_bit,
                     'byte_info': byte_info,
                     'ext_bit': ext_bit,
+                    'parameter_name': parameter_name,
                 }
 
                 conf_datas = ProjectData().conf_data(pro.content, project_id, pev_did.parent_id, bit_info)
+                print(conf_datas)
                 if conf_datas:
                     for index, cd_info in enumerate(conf_datas):
-                        if len(conf_datas) == 1 or index == 0:
+                        if index == 0:
+                            if len(conf_datas) >= 1:
+                                cd_info = cd_info if cd_info else '0'
                             conf_data[parent_relation.parent_id].append((export_xml.str_to_hex(cd_info), pro.las))
                         else:
+                            cd_info = cd_info if cd_info else '0'
                             ext_config_data = (export_xml.str_to_hex(cd_info), pro.las)
                             default_conf = self.set_default_conf(project_id)
                             if default_conf.get(parent_relation.parent_id):

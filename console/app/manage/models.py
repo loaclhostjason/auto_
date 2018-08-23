@@ -97,7 +97,7 @@ class AttrContent(db.Model):
         return _len_did
 
     @staticmethod
-    def get_attr_info(project_relation_id, is_parent=False, show_ext_bit=False):
+    def get_attr_info(project_relation_id, is_parent=False, show_ext_bit=False, show_param=False):
         from ..main.models import ProjectRelation
         project_relation = ProjectRelation.query.filter_by(id=project_relation_id).first()
 
@@ -113,6 +113,7 @@ class AttrContent(db.Model):
         start_bit = 0
         byte_info = 0
         ext_bit = 0
+        parameter_name = ''
         if attr:
             try:
 
@@ -120,13 +121,18 @@ class AttrContent(db.Model):
                 start_bit = int(attr.get('BitPosition') or 0) or 0
                 byte_info = int(attr.get('BytePosition') or 0) or 0
                 ext_bit = int(attr.get('ExtBitPosition') or 0) or 0
+                parameter_name = attr.get('ParameterName') or ''
             except Exception as e:
                 print(e)
                 pass
-        if not show_ext_bit:
-            return bit_line, start_bit, byte_info
-        else:
+
+        if show_ext_bit:
             return bit_line, start_bit, byte_info, ext_bit
+
+        if show_param:
+            return bit_line, start_bit, byte_info, ext_bit, parameter_name
+
+        return bit_line, start_bit, byte_info
 
     def get_insert_data(self, data, project_id):
         if not data:
