@@ -274,15 +274,14 @@ $(document).ready(function () {
         toastr.options.timeOut = null;
         toastr.info('正在保存中...，请稍等');
         $.post('/manage/attr/content/add?project_id=' + project_id, form_data, function (resp) {
+            toastr.clear();
+            toastr.options.timeOut = 2000;
             if (resp.success) {
                 projects.get_project_data(project_id, $('[name="project_relation_id"]').val());
-                toastr.clear();
                 toastr.success(resp['message']);
-                toastr.options.timeOut = 2000;
             } else {
-                toastr.clear();
                 toastr.error(resp['message']);
-                toastr.options.timeOut = 2000;
+
             }
 
         })

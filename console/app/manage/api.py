@@ -55,7 +55,8 @@ def add_attr_content():
 
     update_project_config_name(form_data, project_id)
 
-    Modification.add_edit(project_id)
+    if level and int(level) == 3:
+        Modification.add_edit(project_id)
     return jsonify({'success': True, 'message': '更新成功'})
 
 
