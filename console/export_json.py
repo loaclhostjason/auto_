@@ -2,7 +2,8 @@
 import json
 import os
 from .app import create_app
-from .app.main.models import Project, ProjectRelation, ProjectData
+from .app.main.models import Project, ProjectRelation, ProjectData, AttrContent
+from .app.manage.models import ExtraAttrData
 from console.config import Config
 from collections import defaultdict
 
@@ -33,7 +34,9 @@ class ExportJson(object):
     def get_project_relation_children(self):
         result = list()
         first_relation = ProjectRelation.query.filter_by(project_id=self.project_id, level=1).first()
-        fr_json = first_relation.to_json(remove_key=['id', 'parent_id', 'project_id'])
+        fr_json = first_relation.to_json(remove_key=['id'])
+        fr_json['attr'] = self.get_attr(first_relation.id)
+        fr_json['extra_attr'] = self.get_extra_attr(first_relation.id)
         d = {
             'project_relation': fr_json,
         }
@@ -43,19 +46,22 @@ class ExportJson(object):
             return d
 
         for v in second_relation:
-            sec_json = v.to_json(remove_key=['id', 'parent_id', 'project_id'])
+            sec_json = v.to_json(remove_key=['id'])
+            sec_json['attr'] = self.get_attr(v.id)
+            sec_json['extra_attr'] = self.get_extra_attr(v.id)
             fr_json['child'].append(sec_json)
 
             third_relation = ProjectRelation.query.filter_by(parent_id=v.id, level=3).all()
             if third_relation:
                 for th in third_relation:
-                    third_json = th.to_json(remove_key=['id', 'parent_id', 'project_id'])
+                    third_json = th.to_json(remove_key=['id'])
+                    third_json['attr'] = self.get_attr(th.id)
                     sec_json['child'].append(third_json)
 
                     forth_relation = ProjectRelation.query.filter_by(parent_id=th.id, level=4).all()
                     if forth_relation:
                         for forth in forth_relation:
-                            forth_json = forth.to_json(remove_key=['id', 'parent_id', 'project_id'])
+                            forth_json = forth.to_json(remove_key=['id'])
                             third_json['child'].append(forth_json)
 
                             project_data = ProjectData.query.filter_by(project_relation_id=forth.id).all()
@@ -64,8 +70,7 @@ class ExportJson(object):
                                     'project_data': None
                                 }
                                 for pd in project_data:
-                                    real_dict['project_data'] = pd.to_json(
-                                        remove_key=['id', 'project_id', 'project_relation_id'])
+                                    real_dict['project_data'] = pd.to_json(remove_key=['id'])
 
                                 forth_json['child'].append(real_dict)
                             result.append(d.copy())
@@ -81,6 +86,24 @@ class ExportJson(object):
         with open(file_name, 'w') as f:
             json.dump(data, f, indent=4)
 
+    @staticmethod
+    def get_attr(project_relation_id):
+        attr_content = AttrContent.query.filter_by(project_relation_id=project_relation_id).first()
+        if not attr_content:
+            return
+
+        attr_content = attr_content.to_json(remove_key=['id']) if attr_content else None
+        return attr_content
+
+    @staticmethod
+    def get_extra_attr(project_relation_id):
+        extra_data = ExtraAttrData.query.filter_by(project_relation_id=project_relation_id).first()
+        if not extra_data:
+            return
+
+        extra_data = extra_data.to_json(remove_key=['id']) if extra_data else None
+        return extra_data
+
     def run(self):
         if not self.get_project():
             return
@@ -93,7 +116,5 @@ class ExportJson(object):
         data = {
             'project': project,
             'project_relation': project_relation['project_relation'],
-            'project_data': None,
-            'attr_content': None,
         }
         self.create_json(data)

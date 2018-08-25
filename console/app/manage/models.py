@@ -84,6 +84,20 @@ class AttrContent(db.Model):
     project_relation = db.relationship('ProjectRelation',
                                        backref=db.backref("attr_content", cascade="all, delete-orphan"))
 
+    def to_json(self, remove_key=None):
+        data = self.to_dict()
+        if remove_key:
+            for rk in remove_key:
+                try:
+                    del data[rk]
+                except Exception as e:
+                    print(e)
+                    pass
+
+        data['project_id'] = None
+        data['project_relation_id'] = None
+        return data
+
     @staticmethod
     def get_did_len(project_relation_id):
         attr = AttrContent.query.filter_by(project_relation_id=project_relation_id).first()
@@ -240,6 +254,20 @@ class ExtraAttrData(db.Model):
     project = db.relationship('Project', backref=db.backref("extra_attr_data", cascade="all, delete-orphan"))
     project_relation = db.relationship('ProjectRelation',
                                        backref=db.backref("extra_attr_data", cascade="all, delete-orphan"))
+
+    def to_json(self, remove_key=None):
+        data = self.to_dict()
+        if remove_key:
+            for rk in remove_key:
+                try:
+                    del data[rk]
+                except Exception as e:
+                    print(e)
+                    pass
+
+        data['project_id'] = None
+        data['project_relation_id'] = None
+        return data
 
     @classmethod
     def create_edit(cls, data, project_id, project_relation_id):

@@ -41,6 +41,8 @@ class Project(db.Model):
             del d['last_time']
 
         d['user_id'] = user_id
+        d['attr'] = None
+        d['extra_attr'] = None
         del d['id']
         return d
 
@@ -70,14 +72,20 @@ class ProjectRelation(db.Model):
         if d.get('timestamp'):
             del d['timestamp']
 
+        d['attr'] = None
+        d['extra_attr'] = None
+        d['project_id'] = None
+        d['project_relation_id'] = None
+        d['parent_id'] = None
         d['child'] = list()
 
-        for rk in remove_key:
-            try:
-                del d[rk]
-            except Exception as e:
-                print(e)
-                pass
+        if remove_key:
+            for rk in remove_key:
+                try:
+                    del d[rk]
+                except Exception as e:
+                    print(e)
+                    pass
         return d
 
     @classmethod
@@ -121,12 +129,18 @@ class ProjectData(db.Model):
         if d.get('timestamp'):
             del d['timestamp']
 
-        for rk in remove_key:
-            try:
-                del d[rk]
-            except Exception as e:
-                print(e)
-                pass
+        if remove_key:
+            for rk in remove_key:
+                try:
+                    del d[rk]
+                except Exception as e:
+                    print(e)
+                    pass
+
+        d['attr'] = None
+        d['extra_attr'] = None
+        d['project_id'] = None
+        d['project_relation_id'] = None
         return d
 
     @staticmethod
