@@ -275,6 +275,7 @@ myDiagram.nodeTemplateMap.add("FirstNode",
                 // extra config
                 $('.add-extra-config').show();
                 $('.add-extra-config').attr('level', 1);
+                $('.add-extra-config').attr('project_relation_id', parent_id);
                 $('.submit-project-data').hide();
             }
         }, {
@@ -301,6 +302,7 @@ myDiagram.nodeTemplateMap.add("SecondNode",
                 $('.add-extra-config').show();
                 $('.add-extra-config').attr('level', 2);
                 $('.add-extra-config').attr('name', node['name']);
+                $('.add-extra-config').attr('project_relation_id', parent_id);
                 $('.submit-project-data').hide();
             }
         }, {

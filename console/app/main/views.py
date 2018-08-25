@@ -20,6 +20,7 @@ from console.util import ExportXml
 from console.export_json import ExportJson
 from ..manage.models import Attr, ExtraAttrContent
 from .func_extra import *
+from ..manage.models import ExtraAttrData
 
 
 @main.route('/sorry')
@@ -69,67 +70,49 @@ def edit_file(project_id):
 def edit_extra_attr_file(project_id):
     project = Project.query.get_or_404(project_id)
     level = request.args.get('level') or 0
+    project_relation_id = request.args.get('project_relation_id') or 0
     attr = Attr.query.filter_by(level=level).first()
     extra_attr = attr.extra_attr_content
+
+    # todo
+    extra_data = ExtraAttrData.query.filter_by(project_id=project_id, project_relation_id=project_relation_id).first()
     if not attr or not extra_attr:
         abort(404)
 
     if request.method == 'POST':
-        content_val = json.loads(extra_attr.content_val) if extra_attr.content_val else {}
-        content_section_val = json.loads(extra_attr.content_section_val) if extra_attr.content_section_val else {}
 
-        pin_num = request.form.get('pin_num')
-        if pin_num:
-            content = get_extra_content()
-            content.append({'pin_num': pin_num})
-            content = {project_id: [v for v in content if v]}
+        if int(level) == 1:
+            pin_num = request.form.get('pin_num')
+            pin = get_extra_content()
+            pin.append({'pin_num': pin_num})
 
-            content_section = get_extra_section_content()
-            content_section = {project_id: [v for v in content_section if v]}
-            if not content_val.get(str(project_id)):
-                content_val = dict(content, **content_val)
-                content_section_val = dict(content_section, **content_section_val)
-            else:
-                content_val[str(project_id)] = content[project_id]
-                content_section_val[str(project_id)] = content_section[project_id]
+            reset_sec = get_extra_section_content()
 
-            extra_attr.content_val = json.dumps(content_val)
-            extra_attr.content_section_val = json.dumps(content_section_val)
+            d = {
+                'level': 1,
+                'project_id': project_id,
+                'project_relation_id': project_relation_id,
+                'pin': json.dumps(pin),
+                'reset_sec': json.dumps(reset_sec),
+            }
+            ExtraAttrData.create_edit(d, project_id, project_relation_id)
 
         else:
-            name = request.args.get('name')
-            reset_section = request.form.get('reset_section')
-
-            c_all = content_val.values()
-            resetsection = [v['resetsection'] for v in c_all if v['resetsection']]
-
+            # name = request.args.get('name')
+            is_open_reset = request.form.get('reset_section')
             content = get_extra_content2(project_id)
 
-            reset_section_d = defaultdict(list)
-            if resetsection:
-                for v in resetsection:
-                    for kk, vv in v.items():
-                        reset_section_d[kk].append(vv)
+            d = {
+                'level': 2,
+                'project_id': project_id,
+                'project_relation_id': project_relation_id,
+                'is_open_reset': bool(is_open_reset == 'y'),
+                'read_sec': json.dumps(content['readsection']),
+                'write_sec': json.dumps(content['writsection']),
+            }
+            ExtraAttrData.create_edit(d, project_id, project_relation_id)
 
-            reset_section_d = {k: list(set(sum(v, []))) for k, v in reset_section_d.items()}
-            content['resetsection'] = {project_id: reset_section_d.get(project_id) or []}
-
-            r = reset_section_d.get(project_id) or []
-            if reset_section and name not in r:
-                r.append(name)
-                content['resetsection'][project_id].append(name)
-            else:
-                if content['resetsection'].get(project_id):
-                    content['resetsection'][project_id].remove(name)
-
-            if not name:
-                abort(404)
-            if not content_val.get(name):
-                content_val = dict({name: content}, **content_val)
-            else:
-                content_val[name] = content
-            extra_attr.content_val = json.dumps(content_val)
-        db.session.add(extra_attr)
+        flash({'success': '更新成功'})
         return redirect(url_for('.edit_file', project_id=project_id))
 
     # todo ruan
@@ -156,9 +139,11 @@ def edit_extra_attr_file(project_id):
 
     if int(level) == 1:
         return render_template('main/create_edit_extra_attr_file.html', project=project, extra_attr=extra_attr,
+                               extra_data=extra_data,
                                default_attr=default_attr, default_sec=default_sec)
     else:
         return render_template('main/create_edit_extra_attr_file2.html', project=project, extra_attr=extra_attr,
+                               extra_data=extra_data,
                                default_read_attr=default_read_attr, default_write_attr=default_write_attr)
 
 

@@ -4,6 +4,12 @@
 {% set active = 'file' %}
 {% set menu_open = 'file' %}
 
+{% set extra_content = extra_attr.content | loads_jason if extra_attr and extra_attr.content else [] %}
+{% set extra_content_section = extra_attr.content_section | loads_jason if extra_attr and extra_attr.content_section else [] %}
+
+{% set pin = extra_data.pin | loads_jason if extra_data and extra_data.pin else None %}
+{% set reset_sec = extra_data.reset_sec | loads_jason if extra_data and extra_data.reset_sec else None %}
+
 {% block main_content %}
 
     <div class="col-sm-12 console-title clearfix">
@@ -21,9 +27,6 @@
             <div class="form-group">
                 <div class="col-sm-2"><label for="" class="control-label pull-right"><span>PIN数目:</span></label></div>
                 <div class="col-sm-3">
-                    {% set extra_content = extra_attr.content | loads_jason if extra_attr and extra_attr.content else [] %}
-                    {% set extra_content_val = extra_attr.content_val | loads_jason if extra_attr and extra_attr.content_val else {} %}
-                    {% set content_val = extra_content_val.get(project.id | string) or [] %}
                     <input class="form-control pull-left" name="pin_num"
                            value="{{ extra_content[-1].get('pin_num') or '' }}" type="number" readonly>
                     <div>注：暂时不支持配置 有管理员配置</div>
@@ -44,7 +47,6 @@
                         </thead>
                         <tbody>
                         <tr>
-
                             {% if extra_attr and extra_attr.content %}
                                 {% set extra_attr_pin_num =  extra_content[-1].get('pin_num') or 0 %}
                                 {% for index in range(1, extra_attr_pin_num | int + 1) %}
@@ -63,7 +65,7 @@
                                                 <td>
                                                     <input name="item" value="{{ attr['item'] }}" type="hidden"/>
                                                     <input name="item_value" class="td-input" required
-                                                           value="{{ content_val[loop_root * 2+ loop.index0 - 2]['item_value'] if content_val else default_attr.get(attr['item'], '') }}"/>
+                                                           value="{{ pin[loop_root * 2+ loop.index0 - 2]['item_value'] if pin else default_attr.get(attr['item'], '') }}"/>
                                                 </td>
                                             </tr>
                                         {% endif %}
@@ -94,10 +96,6 @@
                         </thead>
                         <tbody>
                         <tr>
-                            {% set extra_content_section = extra_attr.content_section | loads_jason if extra_attr and extra_attr.content_section else [] %}
-                            {% set extra_content_section_val = extra_attr.content_section_val | loads_jason if extra_attr and extra_attr.content_section_val else {} %}
-                            {% set content_section_val = extra_content_section_val.get(project.id | string) or [] %}
-
                             {% if extra_content_section %}
                                 {% for attr in extra_content_section %}
                                     <tr>
@@ -108,7 +106,7 @@
                                             <input name="resetsection_item" value="{{ attr['resetsection_item'] }}"
                                                    type="hidden"/>
                                             <input name="resetsection_item_value" class="td-input" required
-                                                   value="{{ content_section_val[loop.index0]['resetsection_item_value']  if content_section_val else default_sec.get(attr['resetsection_item'], '') }}"/>
+                                                   value="{{ reset_sec[loop.index0]['resetsection_item_value']  if reset_sec else default_sec.get(attr['resetsection_item'], '') }}"/>
                                         </td>
                                     </tr>
 

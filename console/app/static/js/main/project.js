@@ -527,6 +527,7 @@ $(document).ready(function () {
     $('.add-extra-config').click(function () {
         var level = $(this).attr('level');
         var name = $(this).attr('name');
-        window.location.href = '/project/edit/' + project_id + '/extra?level=' + (level || 0) + '&name=' + name || '';
+        var project_relation_id = $(this).attr('project_relation_id');
+        window.location.href = '/project/edit/' + project_id + '/extra?level=' + (level || 0) + '&name=' + (name || '') + '&project_relation_id=' + project_relation_id || '';
     })
 });

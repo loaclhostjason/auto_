@@ -5,10 +5,11 @@
 {% set menu_open = 'file' %}
 
 {% set attr_extra_content  = extra_attr.content | loads_jason if extra_attr and extra_attr.content  else {} %}
-{% set attr_extra_content_val  = extra_attr.content_val | loads_jason if extra_attr and extra_attr.content_val  else {} %}
-{% set extra_content_val  = attr_extra_content_val.get(request.args.get('name') or '') or {} %}
-{% block main_content %}
 
+{% set extra_read_sec = extra_data.read_sec | loads_jason  if extra_data and extra_data.read_sec else None %}
+{% set extra_write_sec = extra_data.write_sec | loads_jason  if extra_data and extra_data.write_sec else None %}
+
+{% block main_content %}
     <div class="col-sm-12 console-title clearfix">
         <div class="pull-left">
             <h4>编辑项目文件额外属性</h4>
@@ -43,8 +44,6 @@
                         </thead>
                         <tbody>
                         <tr>
-                            {% set readsection = extra_content_val.get('readsection') %}
-
                             {% if attr_extra_content.get('readsection') %}
                                 {% for attr in attr_extra_content['readsection'] %}
                                     <tr>
@@ -54,7 +53,7 @@
                                         <td>
                                             <input name="readsection_item" value="{{ attr['item'] }}" type="hidden"/>
                                             <input name="readsection_item_value" class="td-input" required
-                                                   value="{{ readsection[loop.index0]['item_value'] if readsection else default_read_attr.get(attr['item'], '') }}"/>
+                                                   value="{{ extra_read_sec[loop.index0]['item_value'] if extra_read_sec else default_read_attr.get(attr['item'], '') }}"/>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -79,11 +78,8 @@
                         </thead>
                         <tbody>
                         <tr>
-                            {% set writsection = extra_content_val.get('writsection') %}
-
                             {% if attr_extra_content.get('writsection') %}
                                 {% for attr in attr_extra_content.get('writsection') %}
-
                                     <tr>
                                         <td>
                                             {{ attr['item'] }}
@@ -91,7 +87,7 @@
                                         <td>
                                             <input name="writsection_item" value="{{ attr['item'] }}" type="hidden"/>
                                             <input name="writsection_item_value" class="td-input" required
-                                                   value="{{ writsection[loop.index0]['item_value'] if writsection else default_write_attr.get(attr['item'], '') }}"/>
+                                                   value="{{ extra_write_sec[loop.index0]['item_value'] if extra_write_sec else default_write_attr.get(attr['item'], '') }}"/>
                                         </td>
 
                                     </tr>
@@ -107,10 +103,8 @@
             <div class="form-group">
                 <div class="col-sm-2"></div>
                 <div class="col-sm-3">
-                    {% set resetsection = extra_content_val.get('resetsection') or {} %}
-                    {% set resetsection_v = resetsection.get(project.id | string) or [] %}
                     <input name="reset_section" value="y" type="checkbox"
-                           {% if request.args.get('name') in resetsection_v %}checked{% endif %}> 使用reset_section
+                           {% if extra_data.is_open_reset %}checked{% endif %}> 使用reset_section
                 </div>
             </div>
 

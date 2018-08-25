@@ -167,10 +167,7 @@ class ExtraAttrContent(db.Model):
     attr_id = db.Column(db.Integer, db.ForeignKey('attr.id'))
 
     content = db.Column(db.Text)
-    content_val = db.Column(db.Text)
-
     content_section = db.Column(db.Text)
-    content_section_val = db.Column(db.Text)
     attr = db.relationship('Attr',
                            backref=db.backref("extra_attr_content", uselist=False, cascade="all, delete-orphan"))
 
@@ -221,6 +218,39 @@ class ExtraAttrContent(db.Model):
             return
         result = [cls(**attr_1), cls(**attr_2)]
         db.session.add_all(result)
+        db.session.commit()
+        return
+
+
+class ExtraAttrData(db.Model):
+    __tablename__ = 'extra_attr_data'
+    id = db.Column(db.Integer, primary_key=True)
+
+    level = db.Column(db.Integer)
+    project_relation_id = db.Column(db.Integer, db.ForeignKey('project_relation.id'))
+
+    pin = db.Column(db.Text)
+    reset_sec = db.Column(db.Text)
+    read_sec = db.Column(db.Text)
+    write_sec = db.Column(db.Text)
+    is_open_reset = db.Column(db.Boolean, default=False)
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+
+    project = db.relationship('Project', backref=db.backref("extra_attr_data", cascade="all, delete-orphan"))
+    project_relation = db.relationship('ProjectRelation',
+                                       backref=db.backref("extra_attr_data", cascade="all, delete-orphan"))
+
+    @classmethod
+    def create_edit(cls, data, project_id, project_relation_id):
+        is_extra_content = cls.query.filter_by(project_id=project_id, project_relation_id=project_relation_id).first()
+
+        if not is_extra_content:
+            content = cls(**data)
+            db.session.add(content)
+            return
+
+        cls.update_model(is_extra_content, data)
         db.session.commit()
         return
 
