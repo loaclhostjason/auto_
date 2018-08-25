@@ -601,7 +601,7 @@ class ExportXml(XmlData):
             doc.writexml(f, indent='', addindent='  ', newl=operate, encoding="utf-8")
 
         file_data = ""
-        with open(files_path, 'r') as f:
+        with open(files_path, 'r', encoding='UTF-8') as f:
             for line in f:
                 if '<DefaultValue' in line:
                     line = line[:20] + (('"' + line[20:-16] + '"') if line[20:-16] else '') + line[-16:-1] + operate
@@ -622,7 +622,7 @@ class ExportXml(XmlData):
             doc.writexml(f, indent='', addindent='  ', newl=operate, encoding="utf-8")
 
         file_data = ""
-        with open(files_path, 'r') as f:
+        with open(files_path, 'r', encoding='UTF-8') as f:
             for line in f:
                 if '<DefaultValue' in line:
                     line = line[:20] + (('"' + line[20:-16] + '"') if line[20:-16] else '') + line[-16:-1] + operate

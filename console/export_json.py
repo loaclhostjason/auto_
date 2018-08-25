@@ -30,29 +30,49 @@ class ExportJson(object):
     def get_project(self):
         return self.project.to_json() if self.project else None
 
-    def __project_relation_children(self, project_relation):
-        if project_relation:
-            for pr_info in project_relation:
-                children = ProjectRelation.query.filter_by(parent_id=pr_info.id).all()
-                self.pr_result[pr_info.parent_id].append(pr_info.to_json())
-                for v in self.pr_result.values():
-                    for val in v:
-                        if val['id'] == pr_info.parent_id:
-                            val['info'] = pr_info.to_json()
+    def get_project_relation_children(self):
+        result = list()
+        first_relation = ProjectRelation.query.filter_by(project_id=self.project_id, level=1).first()
+        fr_json = first_relation.to_json(remove_key=['id', 'parent_id', 'project_id'])
+        d = {
+            'project_relation': fr_json,
+        }
 
-                self.__project_relation_children(children)
+        second_relation = ProjectRelation.query.filter_by(parent_id=first_relation.id, level=2).all()
+        if not second_relation:
+            return d
+
+        for v in second_relation:
+            sec_json = v.to_json(remove_key=['id', 'parent_id', 'project_id'])
+            fr_json['child'].append(sec_json)
+
+            third_relation = ProjectRelation.query.filter_by(parent_id=v.id, level=3).all()
+            if third_relation:
+                for th in third_relation:
+                    third_json = th.to_json(remove_key=['id', 'parent_id', 'project_id'])
+                    sec_json['child'].append(third_json)
+
+                    forth_relation = ProjectRelation.query.filter_by(parent_id=th.id, level=4).all()
+                    if forth_relation:
+                        for forth in forth_relation:
+                            forth_json = forth.to_json(remove_key=['id', 'parent_id', 'project_id'])
+                            third_json['child'].append(forth_json)
+
+                            project_data = ProjectData.query.filter_by(project_relation_id=forth.id).all()
+                            if project_data:
+                                real_dict = {
+                                    'project_data': None
+                                }
+                                for pd in project_data:
+                                    real_dict['project_data'] = pd.to_json(
+                                        remove_key=['id', 'project_id', 'project_relation_id'])
+
+                                forth_json['child'].append(real_dict)
+                            result.append(d.copy())
+        return d
 
     def get_project_relation(self):
-        project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, parent_id=None).all()
-
-        if project_relation:
-            self.__project_relation_children(project_relation)
-        print(self.pr_result)
-
-        project_relations = self.project.project_relation
-        project_relation = [info.to_json() for info in project_relations if info]
-
-        self.pr_result = []
+        project_relation = self.get_project_relation_children()
 
         return project_relation
 
@@ -72,7 +92,7 @@ class ExportJson(object):
 
         data = {
             'project': project,
-            'project_relation': project_relation,
+            'project_relation': project_relation['project_relation'],
             'project_data': None,
             'attr_content': None,
         }

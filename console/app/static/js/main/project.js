@@ -271,12 +271,20 @@ $(document).ready(function () {
     // submit attr
     $(document).on('click', '.submit-add-attr', function () {
         var form_data = $('form#attr-form').serialize();
+        toastr.options.timeOut = null;
+        toastr.info('正在保存中...，请稍等');
         $.post('/manage/attr/content/add?project_id=' + project_id, form_data, function (resp) {
             if (resp.success) {
                 projects.get_project_data(project_id, $('[name="project_relation_id"]').val());
-                toastr.success(resp['message'])
-            } else
-                toastr.error(resp['message'])
+                toastr.clear();
+                toastr.success(resp['message']);
+                toastr.options.timeOut = 2000;
+            } else {
+                toastr.clear();
+                toastr.error(resp['message']);
+                toastr.options.timeOut = 2000;
+            }
+
         })
     });
 

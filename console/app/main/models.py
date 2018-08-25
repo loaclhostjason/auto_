@@ -65,10 +65,19 @@ class ProjectRelation(db.Model):
     def __init__(self, *args, **kwargs):
         super(ProjectRelation, self).__init__(*args, **kwargs)
 
-    def to_json(self):
+    def to_json(self, remove_key=None):
         d = self.to_dict()
         if d.get('timestamp'):
             del d['timestamp']
+
+        d['child'] = list()
+
+        for rk in remove_key:
+            try:
+                del d[rk]
+            except Exception as e:
+                print(e)
+                pass
         return d
 
     @classmethod
@@ -107,10 +116,17 @@ class ProjectData(db.Model):
     project_relation = db.relationship('ProjectRelation',
                                        backref=db.backref("project_data", cascade="all, delete-orphan"))
 
-    def to_json(self):
+    def to_json(self, remove_key=None):
         d = self.to_dict()
         if d.get('timestamp'):
             del d['timestamp']
+
+        for rk in remove_key:
+            try:
+                del d[rk]
+            except Exception as e:
+                print(e)
+                pass
         return d
 
     @staticmethod

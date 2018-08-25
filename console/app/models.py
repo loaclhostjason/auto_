@@ -148,8 +148,9 @@ class Modification(db.Model):
                 parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
                 pev_did = ProjectRelation.query.filter_by(id=parent_relation.parent_id).first()
 
-                bit_line, start_bit, byte_info, ext_bit, parameter_name = AttrContent.get_attr_info(pro.project_relation_id,
-                                                                                    show_param=True)
+                bit_line, start_bit, byte_info, ext_bit, parameter_name = AttrContent.get_attr_info(
+                    pro.project_relation_id,
+                    show_param=True)
                 bit_info = {
                     'bit_len': bit_line,
                     'start_bit': start_bit,

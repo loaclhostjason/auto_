@@ -8,6 +8,7 @@ from .models import *
 from ..main.models import ProjectRelation, Project
 import math
 from ..main.models import ProjectData
+from ..models import Modification
 
 
 @manage.route('/attr/content/add', methods=['POST'])
@@ -54,26 +55,7 @@ def add_attr_content():
 
     update_project_config_name(form_data, project_id)
 
-    # update project data len
-    # p_data = ProjectData.query.filter_by(project_id=project_id).all()
-
-    # bit_line, start_bit, byte_info = AttrContent.get_attr_info(project_relation_id, is_parent=True)
-
-    # dif_did_len = math.ceil((bit_line + start_bit) / 8)
-    # __byte_ = []
-    # if dif_did_len == 1 or dif_did_len == 0:
-    #     __byte_.append('byte{}'.format(byte_info))
-    # else:
-    #     for i in range(dif_did_len):
-    #         __byte_.append('byte{}'.format(i))
-    #
-    # if p_data:
-    #     for nf in p_data:
-    #         contents = json.loads(nf.content or '{}')
-    #         _content = {k: v for k, v in contents.items() if k in __byte_}
-            # nf.content = json.dumps(_content)
-            # db.session.add(nf)
-
+    Modification.add_edit(project_id)
     return jsonify({'success': True, 'message': '更新成功'})
 
 
