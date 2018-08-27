@@ -232,7 +232,7 @@ class UtilXml(object):
         r = list()
         if data:
             for info in data:
-                if len(info) == 4:
+                if re.findall(r"(\w{4})+", info):
                     info = '$' + info
                 info = info.replace('&', '.')
                 r.append(info)
