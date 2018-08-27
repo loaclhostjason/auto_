@@ -504,45 +504,45 @@ class ExportXml(XmlData):
                         if 'all' not in _config_data_las:
                             node_modification_item.appendChild(node_parameter)
 
-                        _ext_conf_data = val['ext_conf_data'].get(parameter_val_kk)
-                        if _ext_conf_data:
-                            ext_parameter = doc.createElement('Parameter')
-                            ext_info = _ext_conf_data.get('info') or {}
-                            ext_data = _ext_conf_data['data']
-                            # print(_ext_conf_data)
-                            if ext_info:
-                                ext_parameter.setAttribute('ParamDefaultValue',
-                                                           self.str_to_hex(
-                                                               str(ext_info.get('ParamDefaultValue', ''))))
+                        _ext_conf_datas = val['ext_conf_data'].get(parameter_val_kk)
+                        if _ext_conf_datas:
+                            for _ext_conf_data in _ext_conf_datas:
+                                ext_parameter = doc.createElement('Parameter')
+                                ext_info = _ext_conf_data.get('info') or {}
+                                ext_data = _ext_conf_data['data']
+                                if ext_info:
+                                    ext_parameter.setAttribute('ParamDefaultValue',
+                                                               self.str_to_hex(
+                                                                   str(ext_info.get('ParamDefaultValue', ''))))
 
-                                ext_parameter_name = doc.createElement('ParameterName')
-                                ext_parameter_name.appendChild(
-                                    doc.createTextNode(str(ext_info.get('ParameterName', ''))))
-                                ext_parameter.appendChild(ext_parameter_name)
+                                    ext_parameter_name = doc.createElement('ParameterName')
+                                    ext_parameter_name.appendChild(
+                                        doc.createTextNode(str(ext_info.get('ParameterName', ''))))
+                                    ext_parameter.appendChild(ext_parameter_name)
 
-                                ext_byte_name = doc.createElement('BytePosition')
-                                ext_byte_name.appendChild(doc.createTextNode(str(ext_info.get('BytePosition', ''))))
-                                ext_parameter.appendChild(ext_byte_name)
+                                    ext_byte_name = doc.createElement('BytePosition')
+                                    ext_byte_name.appendChild(doc.createTextNode(str(ext_info.get('BytePosition', ''))))
+                                    ext_parameter.appendChild(ext_byte_name)
 
-                                ext_bit = doc.createElement('BitPosition')
-                                ext_bit.appendChild(doc.createTextNode(str(ext_info.get('BitPosition', ''))))
-                                ext_parameter.appendChild(ext_bit)
+                                    ext_bit = doc.createElement('BitPosition')
+                                    ext_bit.appendChild(doc.createTextNode(str(ext_info.get('BitPosition', ''))))
+                                    ext_parameter.appendChild(ext_bit)
 
-                                ext_bit_len = doc.createElement('BitLength')
-                                ext_bit_len.appendChild(doc.createTextNode(str(ext_info.get('BitLength', ''))))
-                                ext_parameter.appendChild(ext_bit_len)
+                                    ext_bit_len = doc.createElement('BitLength')
+                                    ext_bit_len.appendChild(doc.createTextNode(str(ext_info.get('BitLength', ''))))
+                                    ext_parameter.appendChild(ext_bit_len)
 
-                                ext_conf_d = doc.createElement('ConfData')
-                                ext_conf_d.setAttribute('useConfData', 'true')
+                                    ext_conf_d = doc.createElement('ConfData')
+                                    ext_conf_d.setAttribute('useConfData', 'true')
 
-                                # print(ext_data)
-                                for v in ext_data:
-                                    ext_config_data = doc.createElement('ConfigData')
-                                    ext_config_data.setAttribute('Value', v[0])
-                                    ext_config_data.setAttribute('ConfigExpression', UtilXml.change_las_data(v[1]))
-                                    ext_conf_d.appendChild(ext_config_data)
+                                    # print(ext_data)
+                                    for v in ext_data:
+                                        ext_config_data = doc.createElement('ConfigData')
+                                        ext_config_data.setAttribute('Value', v[0])
+                                        ext_config_data.setAttribute('ConfigExpression', UtilXml.change_las_data(v[1]))
+                                        ext_conf_d.appendChild(ext_config_data)
 
-                                ext_parameter.appendChild(ext_conf_d)
+                                    ext_parameter.appendChild(ext_conf_d)
 
                                 node_modification_item.appendChild(ext_parameter)
 

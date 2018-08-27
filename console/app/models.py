@@ -137,6 +137,7 @@ class Modification(db.Model):
 
         conf_data = defaultdict(list)
         ext_conf_data = dict()
+        new_relation = defaultdict(list)
         _ext_conf_data = {
             'info': '',
             'data': []
@@ -161,6 +162,7 @@ class Modification(db.Model):
 
                 conf_datas = ProjectData().conf_data(pro.content, project_id, pev_did.parent_id, bit_info)
                 # print(conf_datas)
+                new_relation[parent_relation.parent_id].append(pro.project_relation_id)
                 if conf_datas:
                     for index, cd_info in enumerate(conf_datas):
                         if index == 0:
@@ -169,16 +171,22 @@ class Modification(db.Model):
                             conf_data[parent_relation.parent_id].append((export_xml.str_to_hex(cd_info), pro.las))
                         else:
                             cd_info = cd_info if cd_info else '0'
-                            ext_config_data = (export_xml.str_to_hex(cd_info), pro.las)
-                            default_conf = self.set_default_conf(project_id)
-                            if default_conf.get(parent_relation.parent_id):
-                                default_val = default_conf[parent_relation.parent_id]
-                            else:
-                                default_val = ''
+                            if str(pro.las).lower() != 'all':
+                                ext_config_data = (export_xml.str_to_hex(cd_info), pro.las)
+                                default_conf = self.set_default_conf(project_id)
+                                if default_conf.get(parent_relation.parent_id):
+                                    default_val = default_conf[parent_relation.parent_id]
+                                else:
+                                    default_val = ''
 
-                            _ext_conf_data['info'] = export_xml.get_ext_conf_data(bit_info, default_val)
-                            _ext_conf_data['data'].append(ext_config_data)
-                            ext_conf_data[parent_relation.parent_id] = _ext_conf_data
+                                _ext_conf_data['info'] = export_xml.get_ext_conf_data(bit_info, default_val)
+                                _ext_conf_data['data'].append(ext_config_data)
+                                ext_conf_data[parent_relation.id] = _ext_conf_data
+
+        ext_conf_data = {
+            k: [ext_conf_data[val] for val in v if ext_conf_data.get(val)] for k, v in new_relation.items()}
+
+        ext_conf_data = {k: v for k, v in ext_conf_data.items() if v}
 
         result = {
             'conf_data': conf_data,
