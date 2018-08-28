@@ -11,6 +11,7 @@
     {% include "main/modals/update_name.html" %}
     {% include "main/modals/update_las.html" %}
     {% include "main/modals/update_las_bak.html" %}
+    {% include "main/modals/import_json_file.html" %}
 
     <div class="col-sm-12 console-title clearfix">
         <div class="pull-left">
@@ -41,6 +42,9 @@
 {#                                       class="btn btn-primary btn-xs add-project">添加项目</a>#}
 {#                                    <span class="text-explode">|</span>#}
 {#                                {% endif %}#}
+                                    <a href="javascript:void (0)"
+                                       class="btn btn-primary btn-xs import-json-file">导入模板</a>
+                                    <span class="text-explode">|</span>
                                     <a href="javascript:void (0)"
                                        class="btn btn-primary btn-xs add-project-file">添加项目文件</a>
                                 </label>
@@ -101,7 +105,8 @@
                             </form>
                         </div>
                         <div style="margin-top: 10px">
-                            <button class="btn btn-primary submit-project-data" type="button" style="display: none">保存</button>
+                            <button class="btn btn-primary submit-project-data" type="button" style="display: none">保存
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -124,6 +129,7 @@
     <script src="{{ url_for('static', filename='js/main/project_bak.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main/project_file.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main/content.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main/import_json.js') }}"></script>
 
     <script>
         project_id = "{{ project.id if project else '' }}";

@@ -41,8 +41,6 @@ class Project(db.Model):
             del d['last_time']
 
         d['user_id'] = user_id
-        d['attr'] = None
-        d['extra_attr'] = None
         del d['id']
         return d
 
@@ -75,7 +73,6 @@ class ProjectRelation(db.Model):
         d['attr'] = None
         d['extra_attr'] = None
         d['project_id'] = None
-        d['project_relation_id'] = None
         d['parent_id'] = None
         d['child'] = list()
 

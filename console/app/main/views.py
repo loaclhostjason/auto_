@@ -21,6 +21,8 @@ from console.export_json import ExportJson
 from ..manage.models import Attr, ExtraAttrContent
 from .func_extra import *
 from ..manage.models import ExtraAttrData
+import time
+from console.import_json import ImportJson
 
 
 @main.route('/sorry')
@@ -244,3 +246,38 @@ def edit_project_name():
 
     return jsonify(
         {'success': True, 'message': '更新成功', 'level': project_relation.level, 'parent_id': project_relation.parent_id})
+
+
+JSON = ['json']
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1] in JSON
+
+
+@main.route('/import/json', methods=['POST'])
+@login_required
+def import_json():
+    file = request.files['json_file']
+    if not file or not allowed_file(file.filename):
+        return jsonify({'success': False, 'message': '格式不对'})
+
+    data = file.stream.read().decode('utf-8')
+    data = json.loads(data or '{}')
+    if not data:
+        return jsonify({'success': False, 'message': '文件没有数据'})
+
+    project = data['project']
+    project_relation = data['project_relation']
+    name = '{}_{}'.format(project['name'], int(time.time()))
+    project['user_id'] = current_user.id
+    project['name'] = name
+
+    new_project = Project(**project)
+    db.session.add(new_project)
+    db.session.flush()
+
+    project_id = new_project.id
+    _json = ImportJson(name, project_id, project_relation)
+    _json.run()
+    return jsonify({'success': True, 'message': '上传成功', 'project_id': project_id})
