@@ -259,9 +259,11 @@ var thirdContextMenu =
     );
 
 myDiagram.nodeTemplateMap.add("FirstNode",
-    $$(go.Node, "Auto",
-        $$(go.Shape, "RoundedRectangle", {strokeWidth: 1, fill: 'white'}),
-        $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name")),
+    $$(go.Node, "Horizontal", {selectionObjectName: "FirstNode"},
+        $$(go.Panel, "Auto", {name: "FirstNode"},
+            $$(go.Shape, "RoundedRectangle", {strokeWidth: 1, fill: 'white'}),
+            $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name"))
+        ),
         {
             click: function (e, obj) {
                 var node = obj.part.data;
@@ -280,14 +282,17 @@ myDiagram.nodeTemplateMap.add("FirstNode",
             }
         }, {
             contextMenu: firstContextMenu
-        }
+        },
+        $$(go.Panel, {height: 15}, $$("TreeExpanderButton"))
     ));
 
 
 myDiagram.nodeTemplateMap.add("SecondNode",
-    $$(go.Node, "Auto",
-        $$(go.Shape, "RoundedRectangle", {strokeWidth: 1, fill: 'white'}),
-        $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name")),
+    $$(go.Node, "Horizontal", {selectionObjectName: "SecondNode"},
+        $$(go.Panel, "Auto", {name: "SecondNode"},
+            $$(go.Shape, "RoundedRectangle", {strokeWidth: 1, fill: 'white'}),
+            $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name"))
+        ),
         {
             click: function (e, obj) {
                 var node = obj.part.data;
@@ -307,7 +312,8 @@ myDiagram.nodeTemplateMap.add("SecondNode",
             }
         }, {
             contextMenu: secondContextMenu
-        }
+        },
+        $$(go.Panel, {height: 15}, $$("TreeExpanderButton"))
     ));
 
 
