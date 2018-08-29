@@ -2,15 +2,17 @@
 from .app import db
 from .app.main.models import ProjectRelation, AttrContent, ProjectData
 from .app.manage.models import ExtraAttrData
+from .app.models import Modification
 import json
 
 
 class ImportJson(object):
 
-    def __init__(self, name, project_id, project_relation, now):
+    def __init__(self, name, project_id, project_relation, modification, now):
         self.name = name
         self.project_id = project_id
         self.project_relation = project_relation
+        self.modification = modification
 
         self.now = now
 
@@ -94,12 +96,21 @@ class ImportJson(object):
             db.session.add(ProjectData(**project_data))
             db.session.commit()
 
+    def set_modification(self):
+        modification = self.modification
+        if modification:
+            modification['project_id'] = self.project_id
+            db.session.add(Modification(**modification))
+            db.session.commit()
+
     def run(self):
         if not self.project_relation:
             return
 
         pr_one_child, pr_one_id = self.set_project_relation_one()
         self.set_project_relation_other(pr_one_child, pr_one_id)
+
+        self.set_modification()
 
 
 '''

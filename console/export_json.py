@@ -4,6 +4,7 @@ import os
 from .app import create_app
 from .app.main.models import Project, ProjectRelation, ProjectData, AttrContent
 from .app.manage.models import ExtraAttrData
+from .app.models import Modification
 from console.config import Config
 from collections import defaultdict
 
@@ -104,6 +105,11 @@ class ExportJson(object):
         extra_data = extra_data.to_json(remove_key=['id']) if extra_data else None
         return extra_data
 
+    def get_modification(self):
+        modification = Modification.query.filter_by(project_id=self.project_id).first()
+
+        return modification.to_json() if modification else None
+
     def run(self):
         if not self.get_project():
             return
@@ -116,5 +122,6 @@ class ExportJson(object):
         data = {
             'project': project,
             'project_relation': project_relation['project_relation'],
+            'modification': self.get_modification()
         }
         self.create_json(data)

@@ -110,6 +110,12 @@ class Modification(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     project = db.relationship('Project', backref=db.backref("modification", cascade="all, delete-orphan"))
 
+    def to_json(self):
+        result = self.to_dict()
+        del result['id']
+        result['project_id'] = None
+        return result
+
     @staticmethod
     def set_default_conf(project_id):
         from .main.models import ProjectRelation, ProjectData, AttrContent

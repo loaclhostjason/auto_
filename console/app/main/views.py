@@ -259,6 +259,10 @@ def allowed_file(filename):
 @main.route('/import/json', methods=['POST'])
 @login_required
 def import_json():
+    project_group_id = request.form.get('project_group')
+    if not project_group_id:
+        return jsonify({'success': False, 'message': '文件项目没有'})
+
     file = request.files['json_file']
     if not file or not allowed_file(file.filename):
         return jsonify({'success': False, 'message': '格式不对'})
@@ -270,17 +274,20 @@ def import_json():
 
     project = data['project']
     project_relation = data['project_relation']
+    modification = data['modification']
+
     now = int(time.time())
     name = '{}_{}'.format(project['name'], now)
     project['user_id'] = current_user.id
     project['name'] = name
     project['project_config_name'] = '{}_{}'.format(project['project_config_name'], now)
+    project['project_group_id'] = project_group_id
 
     new_project = Project(**project)
     db.session.add(new_project)
     db.session.flush()
 
     project_id = new_project.id
-    _json = ImportJson(name, project_id, project_relation, now)
+    _json = ImportJson(name, project_id, project_relation, modification, now)
     _json.run()
     return jsonify({'success': True, 'message': '上传成功', 'project_id': project_id})
