@@ -2,20 +2,29 @@
 from .app import db
 from .app.main.models import ProjectRelation, AttrContent, ProjectData
 from .app.manage.models import ExtraAttrData
+import json
 
 
 class ImportJson(object):
 
-    def __init__(self, name, project_id, project_relation):
+    def __init__(self, name, project_id, project_relation, now):
         self.name = name
         self.project_id = project_id
         self.project_relation = project_relation
+
+        self.now = now
 
     def set_project_relation_one(self):
         pr_parent = self.project_relation.copy()
         pr_one_child = pr_parent['child']
 
         attr = pr_parent['attr']
+        if attr.get('real_content'):
+            attr_content = json.loads(attr['real_content'])
+            if attr_content.get('ConfigurationFileNumber'):
+                attr_content['ConfigurationFileNumber'] = '{}_{}'.format(attr_content['ConfigurationFileNumber'],
+                                                                         self.now)
+            attr['real_content'] = json.dumps(attr_content)
         extra_attr = pr_parent['extra_attr']
         del pr_parent['attr']
         del pr_parent['extra_attr']

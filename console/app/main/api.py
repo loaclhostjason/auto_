@@ -163,7 +163,8 @@ def del_DF(file_root, file_name, dir_name):
 
 
 def delete_project_file(project):
-    xml_file = '{}_{}.95'.format(project.project_group.name, project.name)
+    # xml_file = '{}_{}.95'.format(project.project_group.name, project.name)
+    xml_file = '%s.95' % project.project_config_name.lower()
     xml_root = Config.FILE_PATH_ROOT
 
     json_file = '[{}]{}_{}.json'.format(project.id, project.project_group.name, project.name)

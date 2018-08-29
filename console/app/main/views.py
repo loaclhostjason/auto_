@@ -183,7 +183,8 @@ def download_file():
     export_xml.mk_dir(project.project_group.name)
     export_xml.run()
 
-    file = '{}_{}'.format(project.project_group.name, project.name)
+    # file = '{}_{}'.format(project.project_group.name, project.name)
+    file = project.project_config_name.lower()
 
     filename = '%s.95' % file
     filename_path = os.path.join(current_app.config['FILE_PATH'], filename)
@@ -269,15 +270,17 @@ def import_json():
 
     project = data['project']
     project_relation = data['project_relation']
-    name = '{}_{}'.format(project['name'], int(time.time()))
+    now = int(time.time())
+    name = '{}_{}'.format(project['name'], now)
     project['user_id'] = current_user.id
     project['name'] = name
+    project['project_config_name'] = '{}_{}'.format(project['project_config_name'], now)
 
     new_project = Project(**project)
     db.session.add(new_project)
     db.session.flush()
 
     project_id = new_project.id
-    _json = ImportJson(name, project_id, project_relation)
+    _json = ImportJson(name, project_id, project_relation, now)
     _json.run()
     return jsonify({'success': True, 'message': '上传成功', 'project_id': project_id})
