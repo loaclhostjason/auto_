@@ -8,13 +8,17 @@ import json
 
 class ImportJson(object):
 
-    def __init__(self, name, project_id, project_relation, modification, now):
+    def __init__(self, name, project_id, project_relation, now):
         self.name = name
         self.project_id = project_id
         self.project_relation = project_relation
-        self.modification = modification
 
         self.now = now
+        self.default_conf = dict()
+        self.content = {
+            'ext_conf_data': dict(),
+            'conf_data': dict(),
+        }
 
     def set_project_relation_one(self):
         pr_parent = self.project_relation.copy()
@@ -48,7 +52,14 @@ class ImportJson(object):
                 if not c.get('project_data'):
                     attr_info, ext_attr_info = get_attr(c)
 
+                    default_conf = c.get('default_conf')
+                    conf_data = c.get('conf_data')
+                    ext_conf_data = c.get('ext_conf_data')
+
                     err_pass(c)
+                    err_ext(c)
+                    if c.get('id'):
+                        del c['id']
 
                     try:
                         pr_child = c['child']
@@ -66,6 +77,13 @@ class ImportJson(object):
                     new_data = ProjectRelation(**c)
                     db.session.add(new_data)
                     db.session.flush()
+
+                    if default_conf:
+                        self.default_conf[new_data.id] = default_conf
+                    if conf_data:
+                        self.content['conf_data'][new_data.id] = conf_data
+                    if ext_conf_data:
+                        self.content['ext_conf_data'][new_data.id] = ext_conf_data
 
                     self.set_attr(attr_info, new_data.id)
                     self.set_extra_attr(ext_attr_info, new_data.id)
@@ -97,11 +115,17 @@ class ImportJson(object):
             db.session.commit()
 
     def set_modification(self):
-        modification = self.modification
-        if modification:
-            modification['project_id'] = self.project_id
-            db.session.add(Modification(**modification))
-            db.session.commit()
+        if not self.default_conf:
+            return
+        d = {
+            'project_id': self.project_id,
+            'default_conf': json.dumps(self.default_conf),
+            'content': json.dumps(self.content),
+        }
+        print(self.default_conf)
+        print(self.content)
+        db.session.add(Modification(**d))
+        db.session.commit()
 
     def run(self):
         if not self.project_relation:
@@ -125,6 +149,21 @@ def err_pass(c):
         pass
     try:
         del c['extra_attr']
+    except KeyError:
+        pass
+
+
+def err_ext(c):
+    try:
+        del c['default_conf']
+    except KeyError:
+        pass
+    try:
+        del c['conf_data']
+    except KeyError:
+        pass
+    try:
+        del c['ext_conf_data']
     except KeyError:
         pass
 

@@ -274,7 +274,6 @@ def import_json():
 
     project = data['project']
     project_relation = data['project_relation']
-    modification = data['modification']
 
     now = int(time.time())
     name = '{}_{}'.format(project['name'], now)
@@ -288,6 +287,6 @@ def import_json():
     db.session.flush()
 
     project_id = new_project.id
-    _json = ImportJson(name, project_id, project_relation, modification, now)
+    _json = ImportJson(name, project_id, project_relation, now)
     _json.run()
     return jsonify({'success': True, 'message': '上传成功', 'project_id': project_id})

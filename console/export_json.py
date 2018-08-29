@@ -20,6 +20,11 @@ class ExportJson(object):
         self.file_path = Config.JSON_FILE_PATH
 
         self.pr_result = defaultdict(list)
+        self.default_conf = dict()
+        self.content = {
+            'ext_conf_data': dict(),
+            'conf_data': dict(),
+        }
 
     @property
     def file_name(self):
@@ -33,6 +38,10 @@ class ExportJson(object):
         return self.project.to_json() if self.project else None
 
     def get_project_relation_children(self):
+        # old
+        old_default_conf = self.get_mod_default_conf()
+        ext_conf_data, conf_data = self.get_mod_content()
+
         result = list()
         first_relation = ProjectRelation.query.filter_by(project_id=self.project_id, level=1).first()
         fr_json = first_relation.to_json(remove_key=['id'])
@@ -57,6 +66,10 @@ class ExportJson(object):
                 for th in third_relation:
                     third_json = th.to_json(remove_key=['id'])
                     third_json['attr'] = self.get_attr(th.id)
+                    third_json['default_conf'] = old_default_conf.get(str(th.id))
+                    third_json['conf_data'] = conf_data.get(str(th.id))
+                    third_json['ext_conf_data'] = ext_conf_data.get(str(th.id))
+
                     sec_json['child'].append(third_json)
 
                     forth_relation = ProjectRelation.query.filter_by(parent_id=th.id, level=4).all()
@@ -105,10 +118,24 @@ class ExportJson(object):
         extra_data = extra_data.to_json(remove_key=['id']) if extra_data else None
         return extra_data
 
-    def get_modification(self):
+    def __get_modification(self):
         modification = Modification.query.filter_by(project_id=self.project_id).first()
+        if not modification:
+            return None, None
 
-        return modification.to_json() if modification else None
+        default_conf = json.loads(modification.default_conf or '{}')
+        content = json.loads(modification.content or '{}')
+        return default_conf, content
+
+    def get_mod_default_conf(self):
+        result, *args = self.__get_modification()
+        return result
+
+    def get_mod_content(self):
+        *args, result = self.__get_modification()
+        if not result:
+            return dict(), dict()
+        return result['ext_conf_data'], result['conf_data']
 
     def run(self):
         if not self.get_project():
@@ -122,6 +149,5 @@ class ExportJson(object):
         data = {
             'project': project,
             'project_relation': project_relation['project_relation'],
-            'modification': self.get_modification()
         }
         self.create_json(data)

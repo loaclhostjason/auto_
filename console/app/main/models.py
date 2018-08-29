@@ -76,6 +76,12 @@ class ProjectRelation(db.Model):
         d['parent_id'] = None
         d['child'] = list()
 
+        # ext
+        if self.level == 3:
+            d['default_conf'] = None
+            d['conf_data'] = None
+            d['ext_conf_data'] = None
+
         if remove_key:
             for rk in remove_key:
                 try:
