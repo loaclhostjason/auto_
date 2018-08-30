@@ -406,7 +406,10 @@ class ExportXml(XmlData):
                 if val:
                     for k in UtilXml.get_did_order():
                         did_item_s = doc.createElement(k)
-                        did_item_s.appendChild(doc.createTextNode(str(val.get(k) or '')))
+                        if k == 'FeatureCode':
+                            did_item_s.appendChild(doc.createTextNode(UtilXml.change_las_data(str(val.get(k) or ''))))
+                        else:
+                            did_item_s.appendChild(doc.createTextNode(str(val.get(k) or '')))
                         node_did_item.appendChild(did_item_s)
                     node_did_list.appendChild(node_did_item)
         root.appendChild(node_did_list)
