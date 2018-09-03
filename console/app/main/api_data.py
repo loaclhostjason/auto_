@@ -178,25 +178,21 @@ def get_las_info():
     return jsonify({'data': data})
 
 
-@main.route('/project/part/number/get', methods=['GET', 'POST'])
+@main.route('/project/part/number/get')
 @login_required
 def project_part_number():
     # get attr 参数
     project_id = request.args.get('project_id')
-    project_relation_id = request.args.get('project_relation_id')
-    if not project_id or not project_relation_id:
+    if not project_id:
         return jsonify({'success': False, 'message': '参数不对'})
-
-    project_relation = ProjectRelation.query.get_or_404(project_relation_id)
 
     result = {
         'success': True,
-        'level': project_relation.level,
+        'level': 1,
         'data': []
     }
 
-    part_number = ProjectPartNumber.query.filter_by(project_id=project_id,
-                                                    project_relation_id=project_relation_id).all()
+    part_number = ProjectPartNumber.query.filter_by(project_id=project_id).all()
 
     if not part_number:
         return jsonify(result)
@@ -204,3 +200,14 @@ def project_part_number():
     result['data'] = [v.to_dict() for v in part_number]
 
     return jsonify(result)
+
+
+@main.route('/project/part/number/submit/<int:project_id>', methods=['POST'])
+@login_required
+def submit_part_number(project_id):
+    part_number = ProjectPartNumber.query.filter_by(project_id=project_id).all()
+
+    if not part_number:
+        return jsonify({'success': False, 'message': '请填写完整'})
+
+    return jsonify({'success': True, 'message': '更新成功'})

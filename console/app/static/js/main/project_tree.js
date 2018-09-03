@@ -154,7 +154,7 @@ var secondContextMenu =
                     toastr.error(resp.message)
                 }
             })
-        }),
+        })
     );
 
 
@@ -255,7 +255,7 @@ var thirdContextMenu =
                     toastr.error(resp.message)
                 }
             })
-        }),
+        })
     );
 
 myDiagram.nodeTemplateMap.add("FirstNode",
@@ -271,16 +271,15 @@ myDiagram.nodeTemplateMap.add("FirstNode",
 
                 var parent_id = node['key'];
                 var level = node['level'];
-                $.g_projects.get_project_data(project_id, parent_id);
-                $.g_projects.get_attr_input(project_id, level, parent_id);
 
-                $.g_projects.get_part_number(project_id, parent_id);
+                $.g_projects.get_attr_input(project_id, level, parent_id);
+                $.g_projects.get_part_number(project_id);
 
                 // extra config
                 $('.add-extra-config').show();
                 $('.add-extra-config').attr('level', 1);
                 $('.add-extra-config').attr('project_relation_id', parent_id);
-                $('.submit-project-data').hide();
+                $('.submit-project-data').show();
             }
         }, {
             contextMenu: firstContextMenu

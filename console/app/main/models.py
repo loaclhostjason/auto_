@@ -271,6 +271,3 @@ class ProjectPartNumber(db.Model):
 
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     project = db.relationship('Project', backref=db.backref("part_number", cascade="all, delete-orphan"))
-
-    project_relation_id = db.Column(db.Integer, db.ForeignKey('project_relation.id'))
-    project_relation = db.relationship('ProjectRelation', backref=db.backref("part_number", cascade="all"))

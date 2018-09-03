@@ -174,7 +174,7 @@ $(document).ready(function () {
             function div_html(html, one_list, byte_position, i) {
                 var this_bool = true;
                 if (byte_position && i)
-                  this_bool = byte_position == i;
+                    this_bool = byte_position == i;
 
 
                 for (var j = 7; j >= 0; j--) {
@@ -207,7 +207,7 @@ $(document).ready(function () {
                             }
                         }
                     } else {
-                        a += div_html(a, bit_position,byte_position, i);
+                        a += div_html(a, bit_position, byte_position, i);
                     }
 
                     html += a;
@@ -218,13 +218,15 @@ $(document).ready(function () {
             return html;
         };
 
-        this.project_thead_par_number_html = function () {
+        this.project_thead_part_number_html = function (level) {
             var html = '';
             html += '<tr>';
-            html += '<th width="100" style="min-width: 100px"></th>';
+            html += '<th width="60" style="min-width: 60px"></th>';
             html += '<th width="120" style="min-width: 120px">零件号</th>';
             html += '<th width="120" style="min-width: 120px">Las</th>';
             html += '</tr>';
+
+            html += '<input type="hidden" name="level" value="' + level + '"/>';
             return html
         };
 
@@ -241,16 +243,19 @@ $(document).ready(function () {
 
             if (!data || !data.length)
                 return add_html;
+
+
         };
 
-        this.get_part_number = function (project_id, parent_id) {
+        this.get_part_number = function (project_id) {
             var _this = this;
-            $.get('/project/part/number/get?project_id=' + project_id + '&project_relation_id=' + parent_id, function (resp) {
+            $.get('/project/part/number/get?project_id=' + project_id, function (resp) {
                 if (resp.success) {
                     data = resp['data'];
+                    var level = resp['level'];
 
                     if (resp['level'] && resp['level'] === 1) {
-                        $('.table-project-data thead').html(_this.project_thead_par_number_html());
+                        $('.table-project-data thead').html(_this.project_thead_part_number_html(level));
                         $('.table-project-data tbody').html(_this.project_tbody_par_number_html(data));
                     } else {
                         $('.table-project-data thead').html('');
@@ -262,6 +267,27 @@ $(document).ready(function () {
                 }
             });
         };
+
+        this.add_part_number = function () {
+            var html_tr2 = '';
+
+            html_tr2 += '<tr>';
+            html_tr2 += '<td><a href="javascript:void(0);" class="td-remove">移除</a></td>';
+            html_tr2 += '<td><input name="number" class="td-input" required/></td>';
+            html_tr2 += '<td><input name="las" class="td-input" required/></td>';
+
+            html_tr2 += '</tr>';
+
+            $(document).on('click', '.td-add-par-number', function () {
+                $(this).parents('tr').before(html_tr2);
+            });
+        };
+
+        this.remove_part_number = function () {
+            $(document).on('click', '.td-remove', function () {
+                $(this).parents('tr').remove();
+            });
+        }
     }
 
     Projects.prototype = Object.create(AppCommonClass.prototype);
@@ -269,6 +295,10 @@ $(document).ready(function () {
 
     var projects = new Projects();
     $.g_projects = new Projects();
+
+    // init func
+    projects.add_part_number();
+    projects.remove_part_number();
 
     var create_project_modal = $('#create_project_modal');
     $('.add-project').click(function () {
@@ -358,18 +388,32 @@ $(document).ready(function () {
 
     // submit project data
     $('.submit-project-data').click(function () {
-        var params = $('form#project-data-form').serialize();
-        toastr.options.timeOut = null;
-        toastr.info('正在保存中...');
-        $.post('/project/data/submit/' + project_id + '?data_relation_id=' + $('[name="project_relation_id"]').val(), params, function (resp) {
-            toastr.clear();
-            toastr.options.timeOut = 2000;
-            if (resp.success) {
-                toastr.success(resp.message);
-                projects.get_project_data(project_id, $.g_parent_id);
-            } else
-                toastr.error(resp.message);
-        })
+        var this_form = $('form#project-data-form');
+        var params = this_form.serialize();
+
+        var level = this_form.find('[name="level"]').val();
+        if (level && level == 1) {
+            // alert(level)
+            $.post('/project/part/number/submit/' + project_id, params, function (resp) {
+                if (resp.success) {
+                    toastr.success(resp.message);
+                } else
+                    toastr.error(resp.message);
+            })
+        } else {
+            toastr.options.timeOut = null;
+            toastr.info('正在保存中...');
+            $.post('/project/data/submit/' + project_id + '?data_relation_id=' + $('[name="project_relation_id"]').val(), params, function (resp) {
+                toastr.clear();
+                toastr.options.timeOut = 2000;
+                if (resp.success) {
+                    toastr.success(resp.message);
+                    projects.get_project_data(project_id, $.g_parent_id);
+                } else
+                    toastr.error(resp.message);
+            })
+        }
+
     });
 
     // show las modal todo
