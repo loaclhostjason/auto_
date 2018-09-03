@@ -17,6 +17,7 @@ from sqlalchemy import or_, func
 
 import json
 from console.util import ExportXml
+from console.util_partnum import UtilPartNum
 from console.export_json import ExportJson
 from ..manage.models import Attr, ExtraAttrContent
 from .func_extra import *
@@ -188,6 +189,22 @@ def download_file():
 
     filename = '%s.95' % file
     filename_path = os.path.join(current_app.config['FILE_PATH'], filename)
+    return download_files(filename_path, filename)
+
+
+@main.route('/download_file_part_number')
+@login_required
+def download_file_part_number():
+    project_id = request.args.get('project_id')
+    project = Project.query.filter_by(id=project_id).first()
+    if not project:
+        return jsonify({}), 200
+
+    export_xml_part = UtilPartNum(project_id)
+    export_xml_part.run()
+
+    filename = '{}_{}_partnum.xml'.format(project.project_group.name.lower(), project.name)
+    filename_path = os.path.join(current_app.config['PART_PATH_ROOT'], filename)
     return download_files(filename_path, filename)
 
 
