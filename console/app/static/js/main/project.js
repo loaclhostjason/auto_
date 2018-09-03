@@ -46,8 +46,15 @@ $(document).ready(function () {
                     var byte_position = resp['byte_position'];
                     var default_conf = resp['default_conf'];
                     var ext_bitPosition = resp['ext_bitPosition'];
-                    $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position, ext_bitPosition));
-                    $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf, bit_position));
+
+                    if (resp['level'] && resp['level'] === 3) {
+                        $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position, ext_bitPosition));
+                        $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf, bit_position));
+                    } else {
+                        $('.table-project-data thead').html('');
+                        $('.table-project-data tbody').html('');
+                    }
+
                 } else {
                     toastr.error(resp.message)
                 }

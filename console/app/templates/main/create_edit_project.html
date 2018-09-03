@@ -84,16 +84,7 @@
                     <div class="charttable-title">
                         <span class="title-text">项目--数据编辑区</span>
                     </div>
-                    <div style="margin: 0 10px;">
-                        <div class="alert alert-warning" style="margin-top: 10px">
-                            <span>
-                                <b>提示：</b>
-                                <span>1 字节数 根据 did配置项【DidLength】</span>
-                                <span>2 先填完las后，才能对字节进行编辑！</span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="charttable-w" style="padding: 0 10px 10px 10px">
+                    <div class="charttable-w">
                         <div style="overflow-y: auto;min-height: 200px;">
                             <form method="post" id="project-data-form">
                                 <table class="table table-hover table-bordered table-project-data">
@@ -136,4 +127,24 @@
         project_group_id = "{{ project.project_group_id if project else '' }}";
         user_id = "{{ current_user.id }}"
     </script>
+{% endblock %}
+
+
+{% block head %}
+
+    {{ super() }}
+    <style>
+        .table-bordered.table-project-data {
+            margin: 0;
+            margin-bottom: 20px;
+        }
+
+        .table-bordered.table-project-data thead th:first-child {
+            border-left: 0;
+        }
+
+        .table-bordered.table-project-data tbody tr td {
+            border-left: 0 !important;
+        }
+    </style>
 {% endblock %}

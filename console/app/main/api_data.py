@@ -43,6 +43,7 @@ def option_project_data():
 
     r1 = {
         'success': True,
+        'level': project_relation.level,
         'result': result,
         'project_data': project_dict,
         'byte_position': cot.get('BytePosition'),
@@ -83,6 +84,7 @@ def option_project_data():
     r2 = {
         'success': True,
         'result': result,
+        'level': project_relation.level,
         'project_data': project_dict,
         'did_len': did_len,
         'bit_position': bit_position,
