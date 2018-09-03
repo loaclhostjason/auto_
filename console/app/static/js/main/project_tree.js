@@ -274,6 +274,8 @@ myDiagram.nodeTemplateMap.add("FirstNode",
                 $.g_projects.get_project_data(project_id, parent_id);
                 $.g_projects.get_attr_input(project_id, level, parent_id);
 
+                $.g_projects.get_part_number(project_id, parent_id);
+
                 // extra config
                 $('.add-extra-config').show();
                 $('.add-extra-config').attr('level', 1);

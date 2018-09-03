@@ -133,7 +133,7 @@ def edit_project_data_api(project_id):
         return jsonify({'success': False, 'message': '没数据，不能保持'})
 
     project_relation = ProjectRelation.query.filter_by(id=data_relation_id).first()
-    data, default_val = ProjectData().get_content(project_id, project_relation.parent_id)
+    data, default_val = ProjectData().get_content(project_id, project_relation.parent_id, project_relation.id)
     default_conf = get_default_conf(default_val)
 
     if not data:
@@ -176,3 +176,31 @@ def get_las_info():
 
     data = read_excel(path, las.file if las else None)
     return jsonify({'data': data})
+
+
+@main.route('/project/part/number/get', methods=['GET', 'POST'])
+@login_required
+def project_part_number():
+    # get attr 参数
+    project_id = request.args.get('project_id')
+    project_relation_id = request.args.get('project_relation_id')
+    if not project_id or not project_relation_id:
+        return jsonify({'success': False, 'message': '参数不对'})
+
+    project_relation = ProjectRelation.query.get_or_404(project_relation_id)
+
+    result = {
+        'success': True,
+        'level': project_relation.level,
+        'data': []
+    }
+
+    part_number = ProjectPartNumber.query.filter_by(project_id=project_id,
+                                                    project_relation_id=project_relation_id).all()
+
+    if not part_number:
+        return jsonify(result)
+
+    result['data'] = [v.to_dict() for v in part_number]
+
+    return jsonify(result)

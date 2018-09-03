@@ -214,11 +214,11 @@ class ProjectData(db.Model):
             key.append('%s_%s' % (str_key, index))
         return key
 
-    def get_content(self, project_id, did_relation_id):
+    def get_content(self, project_id, did_relation_id, relation_id=None):
         from .api_data import split_default_val
 
         did_len = self.p_did_len(project_id, did_relation_id)
-        # print(did_len)
+        bit_len, *args = AttrContent.get_attr_info(relation_id, is_parent=True)
         key = list()
         if not did_len:
             return list()
@@ -248,7 +248,7 @@ class ProjectData(db.Model):
                 # if request.form.get('%s_%s' % (val, v)):
                 if request.form.get('%s_%s' % (val, v)):
                     _this_val = request.form.get('%s_%s' % (val, v))
-                    d['content'][v] = split_default_val(_this_val, did_len)
+                    d['content'][v] = split_default_val(_this_val, bit_len)
                 else:
                     d['content'][v] = ''
 
@@ -260,3 +260,17 @@ class ProjectGroup(db.Model):
     __tablename__ = 'project_group'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32))
+
+
+class ProjectPartNumber(db.Model):
+    __tablename__ = 'project_part_number'
+    id = db.Column(db.Integer, primary_key=True)
+
+    number = db.Column(db.String(120))
+    las = db.Column(db.String(120))
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project = db.relationship('Project', backref=db.backref("part_number", cascade="all, delete-orphan"))
+
+    project_relation_id = db.Column(db.Integer, db.ForeignKey('project_relation.id'))
+    project_relation = db.relationship('ProjectRelation', backref=db.backref("part_number", cascade="all"))

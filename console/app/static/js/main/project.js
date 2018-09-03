@@ -171,6 +171,23 @@ $(document).ready(function () {
             }
             console.log(aaaa)
 
+            function div_html(html, one_list, byte_position, i) {
+                var this_bool = true;
+                if (byte_position && i)
+                  this_bool = byte_position == i;
+
+
+                for (var j = 7; j >= 0; j--) {
+                    if ($.inArray(j, one_list) > -1 && this_bool) {
+                        html += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
+                    } else {
+                        html += '<div style="width: 12.5%; float: left;text-align: center"><span>' + j + '</span>';
+                    }
+                    html += '</div>';
+                }
+                return html
+            }
+
             if (did_len) {
                 for (var i = 0; i < did_len; i++) {
                     html += '<th colspan="8"><div class="text-center with-bottom-border"><span>BYTE' + i + '</span></div>';
@@ -178,14 +195,7 @@ $(document).ready(function () {
                     var a = '';
                     if (_new_byte_position.length && $.inArray(i, _new_byte_position) > -1) {
                         if (!aaaa.length) {
-                            for (var j = 7; j >= 0; j--) {
-                                if ($.inArray(j, new_bit_position) > -1) {
-                                    a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
-                                } else {
-                                    a += '<div style="width: 12.5%; float: left;text-align: center"><span>' + j + '</span>';
-                                }
-                                a += '</div>';
-                            }
+                            a += div_html(a, new_bit_position);
                         } else {
                             if ($.inArray(i, aaaa) > -1) {
                                 for (var j = 7; j >= 0; j--) {
@@ -193,25 +203,11 @@ $(document).ready(function () {
                                     a += '</div>';
                                 }
                             } else {
-                                for (var j = 7; j >= 0; j--) {
-                                    if ($.inArray(j, new_bit_position) > -1) {
-                                        a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
-                                    } else {
-                                        a += '<div style="width: 12.5%; float: left;text-align: center"><span>' + j + '</span>';
-                                    }
-                                    a += '</div>';
-                                }
+                                a += div_html(a, new_bit_position);
                             }
                         }
                     } else {
-                        for (var j = 7; j >= 0; j--) {
-                            if ($.inArray(j, bit_position) > -1 && byte_position == i) {
-                                a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
-                            } else {
-                                a += '<div style="width: 12.5%; float: left;text-align: center"><span>' + j + '</span>';
-                            }
-                            a += '</div>';
-                        }
+                        a += div_html(a, bit_position,byte_position, i);
                     }
 
                     html += a;
@@ -220,7 +216,52 @@ $(document).ready(function () {
             }
             html += '</tr>';
             return html;
-        }
+        };
+
+        this.project_thead_par_number_html = function () {
+            var html = '';
+            html += '<tr>';
+            html += '<th width="100" style="min-width: 100px"></th>';
+            html += '<th width="120" style="min-width: 120px">零件号</th>';
+            html += '<th width="120" style="min-width: 120px">Las</th>';
+            html += '</tr>';
+            return html
+        };
+
+        this.project_tbody_par_number_html = function (data) {
+            var add_html = '';
+            add_html += '<tr>';
+            add_html += '<td colspan="3" style="font-size: 15px">';
+            add_html += '<a class="monitor-dialog-add" href="javascript:void(0)">';
+            add_html += '<i class="blue-add-icon"></i>';
+            add_html += '<span class="td-add-par-number" style="position: relative;top: -1px;">添加</span>';
+            add_html += '</a>';
+            add_html += '</td>';
+            add_html += '</tr>';
+
+            if (!data || !data.length)
+                return add_html;
+        };
+
+        this.get_part_number = function (project_id, parent_id) {
+            var _this = this;
+            $.get('/project/part/number/get?project_id=' + project_id + '&project_relation_id=' + parent_id, function (resp) {
+                if (resp.success) {
+                    data = resp['data'];
+
+                    if (resp['level'] && resp['level'] === 1) {
+                        $('.table-project-data thead').html(_this.project_thead_par_number_html());
+                        $('.table-project-data tbody').html(_this.project_tbody_par_number_html(data));
+                    } else {
+                        $('.table-project-data thead').html('');
+                        $('.table-project-data tbody').html('');
+                    }
+
+                } else {
+                    toastr.error(resp.message)
+                }
+            });
+        };
     }
 
     Projects.prototype = Object.create(AppCommonClass.prototype);
