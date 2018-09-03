@@ -230,7 +230,7 @@ $(document).ready(function () {
             return html
         };
 
-        this.project_tbody_par_number_html = function (data) {
+        this.project_tbody_part_number_html = function (data) {
             var add_html = '';
             add_html += '<tr>';
             add_html += '<td colspan="3" style="font-size: 15px">';
@@ -244,19 +244,29 @@ $(document).ready(function () {
             if (!data || !data.length)
                 return add_html;
 
-
+            var html = '';
+            data.forEach(function (val) {
+                html += '<tr>';
+                html += '<td><a href="javascript:void(0);" class="td-remove">移除</a></td>';
+                html += '<td><input name="number" class="td-input" required value="' + (val['number'] || '') + '" /></td>';
+                html += '<td><input name="las" class="td-input" required value="' + (val['las'] || '') + '" />';
+                html += '<a href="javascript:void(0)" class="show-las-modal"  data-value="' + val['number'] + '"><i class="glyphicon glyphicon-edit"></i></a></td>';
+                html += '</tr>';
+            });
+            html += add_html;
+            return html
         };
 
         this.get_part_number = function (project_id) {
             var _this = this;
             $.get('/project/part/number/get?project_id=' + project_id, function (resp) {
                 if (resp.success) {
-                    data = resp['data'];
+                    var resp_data = resp['data'];
                     var level = resp['level'];
 
                     if (resp['level'] && resp['level'] === 1) {
                         $('.table-project-data thead').html(_this.project_thead_part_number_html(level));
-                        $('.table-project-data tbody').html(_this.project_tbody_par_number_html(data));
+                        $('.table-project-data tbody').html(_this.project_tbody_part_number_html(resp_data));
                     } else {
                         $('.table-project-data thead').html('');
                         $('.table-project-data tbody').html('');
@@ -274,7 +284,8 @@ $(document).ready(function () {
             html_tr2 += '<tr>';
             html_tr2 += '<td><a href="javascript:void(0);" class="td-remove">移除</a></td>';
             html_tr2 += '<td><input name="number" class="td-input" required/></td>';
-            html_tr2 += '<td><input name="las" class="td-input" required/></td>';
+            html_tr2 += '<td><input name="las" class="td-input" required/>';
+            html_tr2 += '<a href="javascript:void(0)" class="show-las-modal"  data-value=""><i class="glyphicon glyphicon-edit"></i></a></td>';
 
             html_tr2 += '</tr>';
 
@@ -397,6 +408,7 @@ $(document).ready(function () {
             $.post('/project/part/number/submit/' + project_id, params, function (resp) {
                 if (resp.success) {
                     toastr.success(resp.message);
+                    projects.get_part_number(project_id);
                 } else
                     toastr.error(resp.message);
             })
@@ -421,7 +433,10 @@ $(document).ready(function () {
     var update_las_modal = $("#update-las-modal");
     $(document).on('click', '.show-las-modal', function () {
         projects.show_modal(update_las_modal, $(this));
-        update_las_modal.find('.modal-title').text('Las【' + $(this).data('value') + '】编辑信息');
+        if ($(this).data('value'))
+            update_las_modal.find('.modal-title').text('零件号【' + $(this).data('value') + '】编辑信息');
+        else
+            update_las_modal.find('.modal-title').text('零件号Las信息');
     });
     update_las_modal.on('hide.bs.modal', function () {
         $(this).find('input').val('');
@@ -462,8 +477,8 @@ $(document).ready(function () {
             las_name = String(las_name).replace(/[$]/g, '');
             // console.log(String(aa));
 
-            las_val = las_name.split(/[/.#+&,-]/);
-            las_f = [];
+            var las_val = las_name.split(/[/.#+&,-]/);
+            var las_f = [];
             las_val.forEach(function (value) {
 
                 try {

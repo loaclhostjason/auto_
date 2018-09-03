@@ -192,7 +192,7 @@ def project_part_number():
         'data': []
     }
 
-    part_number = ProjectPartNumber.query.filter_by(project_id=project_id).all()
+    part_number = ProjectPartNumber.query.filter_by(project_id=project_id).order_by(ProjectPartNumber.id).all()
 
     if not part_number:
         return jsonify(result)
@@ -205,9 +205,35 @@ def project_part_number():
 @main.route('/project/part/number/submit/<int:project_id>', methods=['POST'])
 @login_required
 def submit_part_number(project_id):
-    part_number = ProjectPartNumber.query.filter_by(project_id=project_id).all()
+    # part_number = ProjectPartNumber.query.filter_by(project_id=project_id).all()
+    number = request.form.getlist('number')
+    las = request.form.getlist('las')
+    # las = sorted(las)
+    number = [v for v in number if v]
+    if not number:
+        ProjectPartNumber.query.filter_by(project_id=project_id).delete()
+        return jsonify({'success': True, 'message': '更新成功'})
 
-    if not part_number:
-        return jsonify({'success': False, 'message': '请填写完整'})
+    result = list()
+    try:
+        for index, n in enumerate(number):
+            d = {
+                'project_id': project_id,
+                'number': n,
+                'las': las[index],
+            }
+            result.append(d)
+    except KeyError:
+        return jsonify({'success': False, 'message': '填写完整'})
 
+    try:
+        ProjectPartNumber.query.filter_by(project_id=project_id).delete()
+    except:
+        pass
+
+    db_list = list()
+    for r in result:
+        db_list.append(ProjectPartNumber(**r))
+
+    db.session.add_all(db_list)
     return jsonify({'success': True, 'message': '更新成功'})

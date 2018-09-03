@@ -2,7 +2,6 @@
 from console.dom import minidom
 import os
 import json
-from .app import create_app
 from .app.main.models import Project, ProjectRelation, ProjectData
 from .app.manage.models import AttrContent, Attr, ExtraAttrData
 from .app.models import Modification
@@ -14,9 +13,6 @@ from .util_xml import XmlData, UtilXml
 
 os_name = sys.platform
 operate = '\n' if os_name.startswith('win') else '\r\n'
-
-app = create_app()
-app.app_context().push()
 
 sty = {
     '#': '+',
@@ -646,8 +642,3 @@ class ExportXml(XmlData):
 
         with open(files_path, 'w', encoding='utf-8') as f:
             f.write(file_data)
-
-
-if __name__ == '__main__':
-    export_xml = ExportXml(4)
-    export_xml.run()
