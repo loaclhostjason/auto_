@@ -248,7 +248,7 @@ class ProjectData(db.Model):
                 # if request.form.get('%s_%s' % (val, v)):
                 if request.form.get('%s_%s' % (val, v)):
                     _this_val = request.form.get('%s_%s' % (val, v))
-                    d['content'][v] = _this_val
+                    d['content'][v] = split_default_val(_this_val, did_len)
                 else:
                     d['content'][v] = ''
 
