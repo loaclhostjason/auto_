@@ -28,6 +28,10 @@ def add_attr_content():
     did_byte_len = json.loads(prev_attr_content.real_content).get('DidLength',
                                                                   0) if prev_attr_content and prev_attr_content.real_content else 0
 
+    byte_val = 0
+    if prev_attr_content and prev_attr_content.real_content:
+        byte_val = json.loads(prev_attr_content.real_content).get('BytePosition', 0)
+
     form_data = request.form.to_dict()
 
     attr = Attr.query.filter_by(level=level).first()
@@ -57,6 +61,18 @@ def add_attr_content():
 
     if level and int(level) == 3:
         Modification.add_edit(project_id)
+
+    # change byte project data
+    if form_data.get('BytePosition') and int(form_data['BytePosition']) != int(byte_val):
+        pd_ids = ProjectRelation.query.filter_by(parent_id=project_relation.id).all()
+        pd_ids = [v.id for v in pd_ids]
+        print(pd_ids)
+        project_data = ProjectData.query.filter(ProjectData.project_relation_id.in_(pd_ids) if pd_ids else False).all()
+        if project_data:
+            for pd in project_data:
+                pd.content = json.dumps({})
+                db.session.add(pd)
+
     return jsonify({'success': True, 'message': '更新成功'})
 
 
