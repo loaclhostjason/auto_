@@ -2,7 +2,7 @@ import json
 import sys
 import os
 from .config import Config
-from .app.main.models import Project, ProjectRelation
+from .app.main.models import Project, ProjectRelation, ProjectPartNumber
 from .app.manage.models import AttrContent, Attr
 from console.dom import minidom
 from collections import OrderedDict, defaultdict
@@ -31,6 +31,25 @@ class UtilPartNum(ExportXml):
         files_path = os.path.join(real_path,
                                   '{}_{}.Part'.format(project.project_group.name, project.name))
         return files_path
+
+    @property
+    def part_list(self):
+        part_num = ProjectPartNumber.query.filter_by(project_id=self.project_id).order_by(ProjectPartNumber.id).all()
+        return part_num
+
+    @property
+    def did_info(self):
+        project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, level=2).order_by(
+            ProjectRelation.relation_order).all()
+        if not project_relation:
+            return
+        project_relation = [v.id for v in project_relation]
+        pd = list()
+        for pr in project_relation:
+            project_data = AttrContent.query.filter_by(project_relation_id=pr).first()
+            if project_data:
+                pd.append(json.loads(project_data.real_content or '{}'))
+        return pd
 
     def set_part_xml(self):
         doc = minidom.Document()
@@ -88,6 +107,24 @@ class UtilPartNum(ExportXml):
                         header_manager.appendChild(node_name)
         root.appendChild(header_manager)
 
+        part_list = doc.createElement('PartList')
+        part_num_data = self.part_list
+        did_info = self.did_info
+        print(did_info)
+        if did_info:
+            for dids in did_info:
+                part_num_doc = doc.createElement('PartNums')
+                part_num_doc.setAttribute('Name', dids.get('Name'))
+                part_num_doc.setAttribute('DID', dids.get('DidNo'))
+                if part_num_data:
+                    for pn in part_num_data:
+                        part_num_info_doc = doc.createElement('PartNum')
+                        part_num_info_doc.setAttribute('Value', pn.number)
+                        part_num_info_doc.setAttribute('Condition', UtilXml().change_data(pn.las))
+                        part_num_doc.appendChild(part_num_info_doc)
+                part_list.appendChild(part_num_doc)
+
+        root.appendChild(part_list)
         root.appendChild(self.xml_log(manager_dict, doc))
         return doc
 
