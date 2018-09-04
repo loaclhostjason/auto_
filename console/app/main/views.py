@@ -203,7 +203,7 @@ def download_file_part_number():
     export_xml_part = UtilPartNum(project_id)
     export_xml_part.run()
 
-    filename = '{}_{}_partnum.xml'.format(project.project_group.name.lower(), project.name)
+    filename = '{}_{}.Part'.format(project.project_group.name, project.name)
     filename_path = os.path.join(current_app.config['PART_PATH_ROOT'], filename)
     return download_files(filename_path, filename)
 

@@ -174,6 +174,15 @@ def delete_project_file(project):
 
     del_DF(json_root, json_file, project.name)
 
+    part_file = '{}_{}.Part'.format(project.project_group.name, project.name)
+    part_root = Config.PART_PATH_ROOT
+
+    try:
+        del_DF(part_root, part_file, project.name)
+    except ExtraAttrData as e:
+        print(e)
+        pass
+
     project_group_id = project.project_group_id
     db.session.commit()
     func_project = Project.query.filter_by(project_group_id=project_group_id).all()

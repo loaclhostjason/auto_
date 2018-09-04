@@ -576,6 +576,12 @@ class ExportXml(XmlData):
         root.appendChild(node_reset_section)
 
         # RevisionLog
+        root.appendChild(self.xml_log(manager_dict, doc))
+
+        return doc
+
+    def xml_log(self, manager_dict, doc):
+        # RevisionLog
         node_log = doc.createElement('RevisionLog')
         node_log_entry = doc.createElement('RevisionLogEntry')
 
@@ -597,9 +603,7 @@ class ExportXml(XmlData):
         node_log_entry.appendChild(node_log_author)
 
         node_log.appendChild(node_log_entry)
-        root.appendChild(node_log)
-
-        return doc
+        return node_log
 
     def run(self):
         files_path = self.set_path()
