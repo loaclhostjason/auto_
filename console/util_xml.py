@@ -123,10 +123,8 @@ class XmlData(object):
 
     @staticmethod
     def get_ext_conf_data(bit_info, default_val):
-        start = 8 - bit_info['start_bit']
-        slen = bit_info['bit_len'] - start
         d = {
-            'ParamDefaultValue': default_val[-slen:],
+            'ParamDefaultValue': default_val,
             'ParameterName': bit_info['parameter_name'],
             'BytePosition': bit_info['byte_info'] + 2,
             'BitPosition': bit_info['ext_bit'],

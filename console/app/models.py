@@ -117,7 +117,7 @@ class Modification(db.Model):
         return result
 
     @staticmethod
-    def set_default_conf(project_id):
+    def set_default_conf(project_id, ext_default=False):
         from .main.models import ProjectRelation, ProjectData, AttrContent
         data = ProjectData.query.filter(ProjectData.project_id == project_id,
                                         ProjectData.default_conf.isnot(None)).all()
@@ -132,7 +132,10 @@ class Modification(db.Model):
                     if (bit_line + start_bit) <= 8:
                         default_[parent_relation.parent_id] = d.default_conf
                     else:
-                        default_[parent_relation.parent_id] = d.default_conf[:-(bit_line + start_bit - 8)]
+                        if ext_default:
+                            default_[parent_relation.parent_id] = d.default_conf[-(bit_line + start_bit - 8):]
+                        else:
+                            default_[parent_relation.parent_id] = d.default_conf[:-(bit_line + start_bit - 8)]
         return default_
 
     def set_content(self, project_id):
@@ -179,11 +182,8 @@ class Modification(db.Model):
                             cd_info = cd_info if cd_info else '0'
                             if str(pro.las).lower() != 'all':
                                 ext_config_data = (export_xml.str_to_hex(cd_info), pro.las)
-                                default_conf = self.set_default_conf(project_id)
-                                if default_conf.get(parent_relation.parent_id):
-                                    default_val = default_conf[parent_relation.parent_id]
-                                else:
-                                    default_val = ''
+                                default_conf = self.set_default_conf(project_id, ext_default=True)
+                                default_val = default_conf.get(parent_relation.parent_id, '')
 
                                 _ext_conf_data['info'] = export_xml.get_ext_conf_data(bit_info, default_val)
                                 _ext_conf_data['data'].append(ext_config_data)
