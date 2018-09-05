@@ -168,7 +168,7 @@ class Modification(db.Model):
 
                 conf_datas = ProjectData().conf_data(pro.content, project_id, pev_did.parent_id, bit_info)
                 # print(conf_datas)
-                new_relation[parent_relation.parent_id].append(pro.project_relation_id)
+                new_relation[parent_relation.parent_id].append(int(pro.project_relation_id))
                 if conf_datas:
                     for index, cd_info in enumerate(conf_datas):
                         if index == 0:
