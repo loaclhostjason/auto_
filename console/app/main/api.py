@@ -81,7 +81,7 @@ def create_project():
     if not form_data.get('name'):
         return jsonify({'success': False, 'message': '项目名称不能为空'})
 
-    project = Project.query.filter_by(name=form_data['name']).first()
+    project = Project.query.filter_by(project_group_id=form_data.get('project_group'), name=form_data['name']).first()
     if project:
         return jsonify({'success': False, 'message': '项目名称重复'})
 
