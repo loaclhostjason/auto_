@@ -143,8 +143,13 @@ myPartDiagram.nodeTemplateMap.add("FirstNode",
                 var node = obj.part.data;
                 if (node === null) return false;
                 $.g_part.get_part_number(project_id, '', true);
-                $('.submit-project-part').hide();
                 $('.part-panel').find('[name="part_num_relation_id"]').val('');
+
+                $('.submit-project-part').hide();
+
+                var part_attr_form = $('#part-attr-form');
+                part_attr_form.hide();
+                part_attr_form.find('[name="part_num_relation_id"]').val('');
             }
         }, {
             contextMenu: firstMenu
@@ -169,6 +174,11 @@ myPartDiagram.nodeTemplateMap.add("SecondNode",
 
                 $('.submit-project-part').show();
 
+                var part_attr_form = $('#part-attr-form');
+                part_attr_form.show();
+                part_attr_form.find('[name="part_num_relation_id"]').val(part_id);
+
+                $.g_part.get_part_attr(part_id);
 
             }
         }, {

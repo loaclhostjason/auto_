@@ -85,6 +85,37 @@ def add_part_number_content(id):
     return jsonify({'success': True, 'type': form_data.get('type')})
 
 
+@main.route('/project/part/number/attr/post', methods=['POST'])
+@login_required
+def project_part_number_attr_post():
+    project_id = request.args.get('project_id')
+    part_num_relation_id = request.form.get('part_num_relation_id')
+    part_number_attr = ProjectPartNumberAttr.query.filter_by(part_num_relation_id=part_num_relation_id).first()
+
+    form_data = request.form.to_dict()
+    form_data['project_id'] = project_id
+    if not form_data.get('name') or not form_data.get('did'):
+        return jsonify({'success': False, 'message': '参数不对'})
+
+    if not part_number_attr:
+        part_attr = ProjectPartNumberAttr(**form_data)
+        db.session.add(part_attr)
+    else:
+        ProjectPartNumberAttr.update_model(part_number_attr, form_data)
+
+    return jsonify({'success': True, 'message': '更新成功'})
+
+
+@main.route('/project/part/number/attr/get')
+@login_required
+def project_part_number_attr_get():
+    part_num_relation_id = request.args.get('part_num_relation_id')
+    part_number_attr = ProjectPartNumberAttr.query.filter_by(part_num_relation_id=part_num_relation_id).first()
+    result = part_number_attr.to_dict() if part_number_attr else None
+
+    return jsonify({'success': True, 'data': result})
+
+
 @main.route('/project/part/number/get')
 @login_required
 def project_part_number():

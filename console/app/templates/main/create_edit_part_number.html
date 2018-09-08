@@ -31,6 +31,46 @@
                     </div>
                 </div>
 
+                <div class="panel-border" style="margin-top: 10px">
+                    <div class="charttable-title">
+                        <span class="title-text">零件号属性</span>
+                    </div>
+                    <div class="charttable-w">
+                        <div style="min-height: 300px">
+                            <div class="col-sm-12">
+                                <form method="post" class="form-horizontal" id="part-attr-form" style="display: none">
+                                    <input name="part_num_relation_id" value="" type="hidden">
+                                    <div class="form-group">
+                                        <div class="col-sm-4">
+                                            <label class="control-label pull-right">
+                                                <span class="text-danger">*</span>Name
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <input class="form-control pull-left" name="name" value="" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-4">
+                                            <label class="control-label pull-right">
+                                                <span class="text-danger">*</span>DID
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <input class="form-control pull-left" name="did" value="" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-4"></div>
+                                        <div class="col-sm-7">
+                                            <button type="button" class="btn btn-primary submit-add-part-attr">保存</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="col-sm-6">

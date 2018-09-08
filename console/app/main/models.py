@@ -276,6 +276,20 @@ class ProjectPartNumber(db.Model):
     part_num_relation = db.relationship('ProjectPartNumRelation', backref=db.backref("part_number", cascade="all"))
 
 
+class ProjectPartNumberAttr(db.Model):
+    __tablename__ = 'project_part_number_attr'
+    id = db.Column(db.Integer, primary_key=True)
+
+    did = db.Column(db.String(120))
+    name = db.Column(db.String(120))
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project = db.relationship('Project', backref=db.backref("part_number_attr", cascade="all, delete-orphan"))
+
+    part_num_relation_id = db.Column(db.Integer, db.ForeignKey('project_part_number_relation.id'))
+    part_num_relation = db.relationship('ProjectPartNumRelation', backref=db.backref("part_number_attr", cascade="all"))
+
+
 class ProjectPartNumRelation(db.Model):
     __tablename__ = 'project_part_number_relation'
     id = db.Column(db.Integer, primary_key=True)

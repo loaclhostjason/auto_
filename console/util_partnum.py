@@ -2,7 +2,7 @@ import json
 import sys
 import os
 from .config import Config
-from .app.main.models import Project, ProjectRelation, ProjectPartNumber
+from .app.main.models import Project, ProjectRelation, ProjectPartNumber, ProjectPartNumRelation, ProjectPartNumberAttr
 from .app.manage.models import AttrContent, Attr
 from console.dom import minidom
 from collections import OrderedDict, defaultdict
@@ -32,24 +32,33 @@ class UtilPartNum(ExportXml):
                                   '{}_{}.Part'.format(project.project_group.name, project.name))
         return files_path
 
-    @property
-    def part_list(self):
-        part_num = ProjectPartNumber.query.filter_by(project_id=self.project_id).order_by(ProjectPartNumber.id).all()
-        return part_num
+    def get_part_list(self, part_num_relation_id):
+        part_num = ProjectPartNumber.query. \
+            filter_by(project_id=self.project_id, part_num_relation_id=part_num_relation_id). \
+            order_by(ProjectPartNumber.id).all()
+
+        if not part_num:
+            return
+        r = [{
+            'number': v.number,
+            'las': v.las} for v in part_num]
+        return r
 
     @property
-    def did_info(self):
-        project_relation = ProjectRelation.query.filter_by(project_id=self.project_id, level=2).order_by(
-            ProjectRelation.relation_order).all()
-        if not project_relation:
+    def part_relation_info(self):
+        part_relation = ProjectPartNumRelation.query.filter_by(project_id=self.project_id, level=2).order_by(
+            ProjectPartNumRelation.relation_order).all()
+        if not part_relation:
             return
-        project_relation = [v.id for v in project_relation]
-        pd = list()
-        for pr in project_relation:
-            project_data = AttrContent.query.filter_by(project_relation_id=pr).first()
-            if project_data:
-                pd.append(json.loads(project_data.real_content or '{}'))
-        return pd
+        part_relation = [v.id for v in part_relation if v.id]
+        return part_relation
+
+    def part_attr_info(self, part_num_relation_id):
+        part_attr = ProjectPartNumberAttr.query. \
+            filter_by(project_id=self.project_id, part_num_relation_id=part_num_relation_id).first()
+        if not part_attr:
+            return '', ''
+        return part_attr.name, part_attr.did
 
     def set_part_xml(self):
         doc = minidom.Document()
@@ -108,19 +117,21 @@ class UtilPartNum(ExportXml):
         root.appendChild(header_manager)
 
         part_list = doc.createElement('PartList')
-        part_num_data = self.part_list
-        did_info = self.did_info
-        print(did_info)
-        if did_info:
-            for dids in did_info:
+
+        part_info = self.part_relation_info
+        if part_info:
+            for part_id in part_info:
+                part_attr_name, part_attr_did = self.part_attr_info(part_id)
                 part_num_doc = doc.createElement('PartNums')
-                part_num_doc.setAttribute('Name', dids.get('Name'))
-                part_num_doc.setAttribute('DID', dids.get('DidNo'))
+                part_num_doc.setAttribute('Name', part_attr_name)
+                part_num_doc.setAttribute('DID', part_attr_did)
+
+                part_num_data = self.get_part_list(part_id)
                 if part_num_data:
                     for pn in part_num_data:
                         part_num_info_doc = doc.createElement('PartNum')
-                        part_num_info_doc.setAttribute('Value', pn.number)
-                        part_num_info_doc.setAttribute('Condition', UtilXml().change_data(pn.las))
+                        part_num_info_doc.setAttribute('Value', pn['number'])
+                        part_num_info_doc.setAttribute('Condition', UtilXml().change_data(pn['las']))
                         part_num_doc.appendChild(part_num_info_doc)
                 part_list.appendChild(part_num_doc)
 

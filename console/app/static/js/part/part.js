@@ -13,6 +13,15 @@ $(document).ready(function () {
             });
         };
 
+        this.get_part_attr = function (part_num_relation_id) {
+            var form_ = $('form#part-attr-form');
+            $.get('/project/part/number/attr/get?part_num_relation_id=' + part_num_relation_id, function (resp) {
+                var data = resp['data'];
+                form_.find('[name="name"]').val(data ? data['name'] : '');
+                form_.find('[name="did"]').val(data ? data['did'] : '');
+            })
+        };
+
 
         this.project_thead_part_number_html = function (level) {
             var html = '';
@@ -324,6 +333,18 @@ $(document).ready(function () {
                 update_name.modal('hide');
             } else {
                 toastr.error(resp.message)
+            }
+        })
+    });
+
+    // update attr
+    $(document).on('click', '.submit-add-part-attr', function () {
+        var form_data = $('form#part-attr-form').serialize();
+        $.post('/project/part/number/attr/post?project_id=' + project_id, form_data, function (resp) {
+            if (resp.success) {
+                toastr.success(resp['message']);
+            } else {
+                toastr.error(resp['message']);
             }
         })
     });
