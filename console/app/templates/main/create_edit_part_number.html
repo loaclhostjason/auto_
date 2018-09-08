@@ -5,6 +5,7 @@
 {% set menu_open = 'file' %}
 
 {% block main_content %}
+    {% include "main/modals/update_name.html" %}
     {% include "main/modals/update_las.html" %}
     {% include 'main/modals/add_content.html' %}
 
@@ -40,7 +41,7 @@
                     <div class="charttable-w part-panel">
                         <div style="overflow-y: auto;min-height: 390px">
                             <form method="post" id="project-data-form">
-                                <input name="part_num_relation_id" value="">
+                                <input name="part_num_relation_id" value="" type="hidden">
                                 <table class="table table-hover table-bordered table-project-data">
                                     <thead></thead>
                                     <tbody></tbody>

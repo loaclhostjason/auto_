@@ -65,10 +65,10 @@ var secondMenu =
 
             var thisemp = node.data;
             var id = thisemp['key'];
-            $.post('/project/tree/delete/' + id, '', function (resp) {
+            $.post('/part/number/tree/delete/' + id, '', function (resp) {
                 if (resp.success) {
                     toastr.success(resp.message);
-                    $.g_projects.get_protect_relation(project_id);
+                    $.g_part.get_part_relation(project_id);
                 } else {
                     toastr.error(resp.message)
                 }
@@ -88,10 +88,10 @@ var secondMenu =
                 'level': level,
                 'content': name
             };
-            $.post('/project/content/add/' + project_id + '?copy_id=' + key + '&action=copy', params, function (resp) {
+            $.post('/part/number/content/add/' + project_id + '?copy_id=' + key + '&action=copy', params, function (resp) {
                 if (resp.success) {
                     toastr.success('复制成功');
-                    $.g_projects.get_protect_relation(project_id);
+                    $.g_part.get_part_relation(project_id);
                 } else {
                     toastr.error(resp.message)
                 }
@@ -105,10 +105,10 @@ var secondMenu =
             var thisemp = node.data;
             var key = thisemp['key'];
 
-            $.post('/project/relation?id=' + key + '&type=up', '', function (resp) {
+            $.post('/part/number/relation?id=' + key + '&type=up', '', function (resp) {
                 if (resp.success) {
                     toastr.success(resp.message);
-                    $.g_projects.get_protect_relation(project_id)
+                    $.g_part.get_part_relation(project_id)
                 } else {
                     toastr.error(resp.message)
                 }
@@ -121,10 +121,10 @@ var secondMenu =
             var thisemp = node.data;
             var key = thisemp['key'];
 
-            $.post('/project/relation?id=' + key + '&type=down', '', function (resp) {
+            $.post('/part/number/relation?id=' + key + '&type=down', '', function (resp) {
                 if (resp.success) {
                     toastr.success(resp.message);
-                    $.g_projects.get_protect_relation(project_id)
+                    $.g_part.get_part_relation(project_id)
                 } else {
                     toastr.error(resp.message)
                 }

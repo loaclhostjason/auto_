@@ -14,6 +14,14 @@ def get_copy_parent_id(copy_id):
     return copy_parent_id
 
 
+def get_copy_part_info(copy_id):
+    if not copy_id:
+        return
+
+    info = ProjectPartNumRelation.query.filter_by(id=copy_id).first()
+    return info
+
+
 def delete_project_children(id):
     relations = ProjectRelation.query.filter_by(parent_id=id).all()
     if not relations:
@@ -161,7 +169,6 @@ def get_project_children_v2(project_id, last_relation_id):
 def download_files(filename_path, filename):
     try:
         from urllib.parse import quote
-
 
         print(filename_path)
 
