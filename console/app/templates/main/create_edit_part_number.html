@@ -1,0 +1,95 @@
+{% extends "main.html" %}
+{% import "macro/macro_content.html" as content %}}
+
+{% set active = 'file' %}
+{% set menu_open = 'file' %}
+
+{% block main_content %}
+    {% include "main/modals/update_las.html" %}
+    {% include 'main/modals/add_content.html' %}
+
+    <div class="col-sm-12 console-title clearfix">
+        <div class="pull-left">
+            <h4>编辑项目文件</h4>
+            <a href="{{ url_for('.projects') }}" class="btn btn-xs btn-toinstlist">
+                <span class="icon-toinstlist"></span>
+                <span>返回</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-sm-12 padding-0">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="panel-border">
+                    <div class="charttable-title">
+                        <span class="title-text" style="margin-right: 5px">项目--工作区</span>
+                    </div>
+                    <div class="charttable-w">
+                        <div id="myDiagramProjectPart" style="min-height: 400px"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-sm-6">
+                <div class="panel-border">
+                    <div class="charttable-title">
+                        <span class="title-text">项目--零件号编辑区</span>
+                    </div>
+                    <div class="charttable-w part-panel">
+                        <div style="overflow-y: auto;min-height: 390px">
+                            <form method="post" id="project-data-form">
+                                <input name="part_num_relation_id" value="">
+                                <table class="table table-hover table-bordered table-project-data">
+                                    <thead></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </form>
+                            <button class="btn btn-primary submit-project-part" type="button" style="display: none">保存
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ super() }}
+    <script src="{{ url_for("static", filename="js/gojs/go.js") }}"></script>
+    {% assets "go_js" %}
+        <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    <script src="{{ url_for('static', filename='js/part/part.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/part/part_tree.js') }}"></script>
+
+    <script>
+        project_id = "{{ project.id if project else '' }}";
+        project_group_id = "{{ project.project_group_id if project else '' }}";
+        user_id = "{{ current_user.id }}"
+    </script>
+{% endblock %}
+
+
+{% block head %}
+
+    {{ super() }}
+    <style>
+        .table-bordered.table-project-data {
+            margin: 0;
+            margin-bottom: 20px;
+        }
+
+        .table-bordered.table-project-data thead th:first-child {
+            border-left: 0;
+        }
+
+        .table-bordered.table-project-data tbody tr td {
+            border-left: 0 !important;
+        }
+    </style>
+{% endblock %}

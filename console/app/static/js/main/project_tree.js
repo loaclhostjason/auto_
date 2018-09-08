@@ -273,13 +273,12 @@ myDiagram.nodeTemplateMap.add("FirstNode",
                 var level = node['level'];
 
                 $.g_projects.get_attr_input(project_id, level, parent_id);
-                $.g_projects.get_part_number(project_id);
 
                 // extra config
                 $('.add-extra-config').show();
                 $('.add-extra-config').attr('level', 1);
                 $('.add-extra-config').attr('project_relation_id', parent_id);
-                $('.submit-project-data').show();
+                $('.submit-project-data').hide();
             }
         }, {
             contextMenu: firstContextMenu
