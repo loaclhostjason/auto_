@@ -275,6 +275,13 @@ class ProjectPartNumber(db.Model):
     part_num_relation_id = db.Column(db.Integer, db.ForeignKey('project_part_number_relation.id'))
     part_num_relation = db.relationship('ProjectPartNumRelation', backref=db.backref("part_number", cascade="all"))
 
+    def to_json(self):
+        data = self.to_dict()
+        del data['id']
+        data['project_id'] = None
+        data['part_num_relation_id'] = None
+        return data
+
 
 class ProjectPartNumberAttr(db.Model):
     __tablename__ = 'project_part_number_attr'
@@ -288,6 +295,13 @@ class ProjectPartNumberAttr(db.Model):
 
     part_num_relation_id = db.Column(db.Integer, db.ForeignKey('project_part_number_relation.id'))
     part_num_relation = db.relationship('ProjectPartNumRelation', backref=db.backref("part_number_attr", cascade="all"))
+
+    def to_json(self):
+        data = self.to_dict()
+        del data['id']
+        data['project_id'] = None
+        data['part_num_relation_id'] = None
+        return data
 
 
 class ProjectPartNumRelation(db.Model):
@@ -306,6 +320,22 @@ class ProjectPartNumRelation(db.Model):
 
     def __init__(self, *args, **kwargs):
         super(ProjectPartNumRelation, self).__init__(*args, **kwargs)
+
+    def to_json(self, remove_key=None):
+        data = self.to_dict()
+        data['child'] = list()
+        data['part'] = list()
+        data['attr'] = None
+        if remove_key:
+            for rk in remove_key:
+                try:
+                    del data[rk]
+                except Exception as e:
+                    print(e)
+                    pass
+        data['project_id'] = None
+        data['parent_id'] = None
+        return data
 
     @classmethod
     def add_info(cls, data):

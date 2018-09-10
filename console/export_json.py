@@ -2,7 +2,8 @@
 import json
 import os
 from .app import create_app
-from .app.main.models import Project, ProjectRelation, ProjectData, AttrContent
+from .app.main.models import Project, ProjectRelation, ProjectData, AttrContent, ProjectPartNumRelation, \
+    ProjectPartNumber, ProjectPartNumberAttr
 from .app.manage.models import ExtraAttrData
 from .app.models import Modification
 from console.config import Config
@@ -137,6 +138,42 @@ class ExportJson(object):
             return dict(), dict()
         return result['ext_conf_data'], result['conf_data']
 
+    def get_part_attr(self, part_num_relation_id):
+        part_attr = ProjectPartNumberAttr.query. \
+            filter_by(project_id=self.project_id, part_num_relation_id=part_num_relation_id).first()
+        if not part_attr:
+            return
+        result = part_attr.to_json()
+        return result
+
+    def get_part_number(self, part_num_relation_id):
+        part_number = ProjectPartNumber.query.order_by(ProjectPartNumber.id). \
+            filter_by(project_id=self.project_id, part_num_relation_id=part_num_relation_id).all()
+        if not part_number:
+            return
+        result = list()
+        for pn in part_number:
+            result.append(pn.to_json())
+        return result
+
+    def get_part_relation(self):
+        part_relation = ProjectPartNumRelation.query.filter_by(project_id=self.project_id, level=1).first()
+        if not part_relation:
+            return
+        result = part_relation.to_json(remove_key=['id', 'part', 'attr'])
+        part_all = ProjectPartNumRelation.query.filter_by(parent_id=part_relation.id). \
+            order_by(ProjectPartNumRelation.relation_order, ProjectPartNumRelation.id).all()
+        if not part_all:
+            return result
+        for pa in part_all:
+            pa_attr = self.get_part_attr(pa.id)
+            pa_number = self.get_part_number(pa.id)
+            pa_data = pa.to_json(remove_key=['id', 'child'])
+            pa_data['attr'] = pa_attr
+            pa_data['part'] = pa_number
+            result['child'].append(pa_data)
+        return result
+
     def run(self):
         if not self.get_project():
             return
@@ -146,8 +183,13 @@ class ExportJson(object):
         # project relation
         project_relation = self.get_project_relation()
 
+        # get_part_relation
+        part_relation = self.get_part_relation()
+        print(part_relation)
+
         data = {
             'project': project,
             'project_relation': project_relation['project_relation'],
+            'part_relation': part_relation,
         }
         self.create_json(data)

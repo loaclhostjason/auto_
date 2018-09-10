@@ -1,6 +1,7 @@
 # coding: utf-8
 from .app import db
-from .app.main.models import ProjectRelation, AttrContent, ProjectData
+from .app.main.models import ProjectRelation, AttrContent, ProjectData, ProjectPartNumber, ProjectPartNumRelation, \
+    ProjectPartNumberAttr
 from .app.manage.models import ExtraAttrData
 from .app.models import Modification
 import json
@@ -8,10 +9,12 @@ import json
 
 class ImportJson(object):
 
-    def __init__(self, name, project_id, project_relation, now):
+    def __init__(self, name, project_id, project_relation, part_relation, now):
         self.name = name
         self.project_id = project_id
         self.project_relation = project_relation
+
+        self.part_relation = part_relation
 
         self.now = now
         self.default_conf = dict()
@@ -127,6 +130,51 @@ class ImportJson(object):
         db.session.add(Modification(**d))
         db.session.commit()
 
+    def set_part_num_relation(self):
+        part_relation = self.part_relation.copy()
+        if not part_relation:
+            return
+        part_relation_child = part_relation.get('child')
+        del part_relation['child']
+
+        part_relation['project_id'] = self.project_id
+        part_relation_db = ProjectPartNumRelation(**part_relation)
+        db.session.add(part_relation_db)
+        db.session.flush()
+
+        part_num_relation_id = part_relation_db.id
+        if not part_relation_child:
+            return
+
+        result_attr = list()
+        result_part = list()
+        for pr in part_relation_child:
+            pr_part = pr.get('part')
+            attr = pr.get('attr')
+            pr['parent_id'] = part_num_relation_id
+            pr['project_id'] = self.project_id
+
+            del pr['part']
+            del pr['attr']
+
+            result_relation = ProjectPartNumRelation(**pr)
+            db.session.add(result_relation)
+            db.session.flush()
+            if attr:
+                attr['project_id'] = self.project_id
+                attr['part_num_relation_id'] = result_relation.id
+                result_attr.append(ProjectPartNumberAttr(**attr))
+
+            if pr_part:
+                for pp in pr_part:
+                    pp['project_id'] = self.project_id
+                    pp['part_num_relation_id'] = result_relation.id
+                    result_part.append(ProjectPartNumber(**pp))
+
+        db.session.add_all(result_attr)
+        db.session.add_all(result_part)
+        db.session.commit()
+
     def run(self):
         if not self.project_relation:
             return
@@ -135,6 +183,8 @@ class ImportJson(object):
         self.set_project_relation_other(pr_one_child, pr_one_id)
 
         self.set_modification()
+
+        self.set_part_num_relation()
 
 
 '''
