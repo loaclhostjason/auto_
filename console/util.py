@@ -151,7 +151,8 @@ class ExportXml(XmlData):
                                 project.get('project_relation_id')]
 
         attr_content = AttrContent.query.filter(AttrContent.project_relation_id.in_(project_relation_ids)).all()
-        pro = ProjectRelation.query.filter(ProjectRelation.id.in_(project_relation_ids)).all()
+        pro = ProjectRelation.query.filter(ProjectRelation.id.in_(project_relation_ids)). \
+            order_by(ProjectRelation.relation_order).all()
 
         d['parameter_name'] = [{p.id: p.name} for p in pro]
         r = defaultdict(list)
