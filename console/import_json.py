@@ -131,7 +131,7 @@ class ImportJson(object):
         db.session.commit()
 
     def set_part_num_relation(self):
-        part_relation = self.part_relation.copy()
+        part_relation = self.part_relation
         if not part_relation:
             return
         part_relation_child = part_relation.get('child')
