@@ -161,7 +161,7 @@ class ProjectData(db.Model):
             did_len = 0
         return did_len
 
-    def conf_data(self, content, project_id, did_relation_id, bit_info):
+    def conf_data(self, content, project_id, did_relation_id, bit_info, las):
         did_len = self.p_did_len(project_id, did_relation_id)
         # print(did_len)
         if not content or not did_len:
@@ -175,36 +175,23 @@ class ProjectData(db.Model):
         real_bit_len = bit_info['start_bit'] + bit_info['bit_len']
 
         extra_key = [v for v in extra_key if content.get(v)]
+
+        if las and str(las).lower() == 'all' and not extra_key:
+            result.append('0')
+            extra_key = True
+
         if not extra_key:
             return
-
-        for index, key in enumerate(extra_key):
-            if real_bit_len > 8:
-                b_len = real_bit_len - 8
-                b1 = content[key][:-b_len]
-                b2 = content[key][-b_len:]
-                result = [b1, b2]
-            else:
-                result.append(content[key])
-
-            # todo 分割 补充
-            # if real_bit_len <= 8:
-            #     this_val = content[key] + '0' * bit_info['start_bit']
-            #     result.append(this_val)
-            # else:
-            #     if index == 0:
-            #         this_val = content[key] + '0' * bit_info['start_bit']
-            #         result.append(this_val)
-            #     else:
-            #         if index == len(extra_key) - 1:
-            #             this_val = content[key] + '0' * bit_info['ext_bit']
-            #             result.append(this_val)
-            #         else:
-            #             pass
-            # todo 跨3个？
-            # this_val = content[key] + '0' * 8
-            # result.append(this_val)
-
+        # print(extra_key)
+        if extra_key and isinstance(extra_key, list):
+            for index, key in enumerate(extra_key):
+                if real_bit_len > 8:
+                    b_len = real_bit_len - 8
+                    b1 = content[key][:-b_len]
+                    b2 = content[key][-b_len:]
+                    result = [b1, b2]
+                else:
+                    result.append(content[key])
         return result
 
     @staticmethod

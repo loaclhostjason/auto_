@@ -169,7 +169,7 @@ class Modification(db.Model):
                     'parameter_name': parameter_name,
                 }
 
-                conf_datas = ProjectData().conf_data(pro.content, project_id, pev_did.parent_id, bit_info)
+                conf_datas = ProjectData().conf_data(pro.content, project_id, pev_did.parent_id, bit_info, pro.las)
                 # print(conf_datas)
                 new_relation[parent_relation.parent_id].append(int(pro.project_relation_id))
                 if conf_datas:

@@ -453,11 +453,10 @@ class ExportXml(XmlData):
                             default_val = ''
 
                         try:
-                            _config_data_las = dict(val['conf_data'].get(parameter_val_kk))
+                            _config_data_las = sum(val['conf_data'].get(parameter_val_kk), [])
                         except Exception as e:
-                            _config_data_las = {}
+                            _config_data_las = []
 
-                        _config_data_las = [v.lower() for v in _config_data_las.values() if v]
                         if 'all' not in _config_data_las:
                             node_parameter.setAttribute('ParamDefaultValue',
                                                         self.str_to_hex(str(default_val or '')))
@@ -506,7 +505,7 @@ class ExportXml(XmlData):
                             node_modification_item.appendChild(node_parameter)
 
                         _ext_conf_datas = val['ext_conf_data'].get(parameter_val_kk)
-                        if _ext_conf_datas:
+                        if _ext_conf_datas and 'all' not in _config_data_las:
                             for _ext_conf_data in _ext_conf_datas:
                                 ext_parameter = doc.createElement('Parameter')
                                 ext_info = _ext_conf_data.get('info') or {}
