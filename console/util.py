@@ -454,6 +454,7 @@ class ExportXml(XmlData):
 
                         try:
                             _config_data_las = sum(val['conf_data'].get(parameter_val_kk), [])
+                            _config_data_las = [str(v).lower() for v in _config_data_las if v]
                         except Exception as e:
                             _config_data_las = []
 
