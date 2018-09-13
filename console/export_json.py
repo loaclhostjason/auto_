@@ -185,7 +185,7 @@ class ExportJson(object):
 
         # get_part_relation
         part_relation = self.get_part_relation()
-        print(part_relation)
+        # print(part_relation)
 
         data = {
             'project': project,
