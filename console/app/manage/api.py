@@ -22,7 +22,7 @@ def add_attr_content():
         return jsonify({'success': False, 'message': '提交参数缺失'})
 
     project_relation = ProjectRelation.query.get_or_404(project_relation_id)
-    
+
     # this is byte len
     prev_pr = ProjectRelation.query.filter_by(id=project_relation.parent_id).first()
     prev_attr_content = AttrContent.query.filter_by(project_relation_id=prev_pr.id if prev_pr else 0).first()
@@ -68,12 +68,19 @@ def add_attr_content():
     if form_data.get('BytePosition') and int(form_data['BytePosition']) != int(byte_val):
         pd_ids = ProjectRelation.query.filter_by(parent_id=project_relation.id).all()
         pd_ids = [v.id for v in pd_ids]
-        print(pd_ids)
+        # print(pd_ids)
         project_data = ProjectData.query.filter(ProjectData.project_relation_id.in_(pd_ids) if pd_ids else False).all()
         if project_data:
             for pd in project_data:
-                pd.content = json.dumps({})
-                db.session.add(pd)
+                content = json.loads(pd.content or '{}')
+                # print(content)
+                has_content = {k: v for k, v in content.items() if v}
+                if has_content:
+                    info_byte = content['byte%s' % byte_val]
+                    content['byte%s' % byte_val] = ""
+                    content['byte%s' % form_data['BytePosition']] = info_byte
+                    pd.content = json.dumps(content)
+                    db.session.add(pd)
 
     return jsonify({'success': True, 'message': '更新成功'})
 
