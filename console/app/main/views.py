@@ -38,7 +38,7 @@ def projects():
     user = User.query.get_or_404(current_user.id)
     project_group_id = user.project_group_id
 
-    project_query = Project.query.order_by(Project.project_group_id.asc())
+    project_query = Project.query.order_by(Project.project_group_id, Project.id)
     if current_user.is_admin:
         project_list = project_query.all()
     elif current_user.is_pm_admin:
@@ -50,8 +50,10 @@ def projects():
                                      func.count(Project.id).label('project_num')).group_by(
         Project.project_group_id).all()
 
-    group_project = {project_id: num for project_id, project_group_id, num in group_project}
-    print(group_project)
+    project_ = Project.query.order_by(Project.id.desc()).all()
+    this_pro = {v.project_group_id: v.id for v in project_ if v.id}
+    group_project = {this_pro.get(project_group_id): num for project_id, project_group_id, num in group_project if
+                     this_pro.get(project_group_id)}
     return render_template('main/projects.html', projects=project_list, group_project=group_project)
 
 
