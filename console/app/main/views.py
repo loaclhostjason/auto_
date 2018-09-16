@@ -38,7 +38,7 @@ def projects():
     user = User.query.get_or_404(current_user.id)
     project_group_id = user.project_group_id
 
-    project_query = Project.query.order_by(Project.project_group_id, Project.id)
+    project_query = Project.query.order_by(Project.project_group_id.asc())
     if current_user.is_admin:
         project_list = project_query.all()
     elif current_user.is_pm_admin:

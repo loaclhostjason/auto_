@@ -5,7 +5,7 @@ from setuptools import find_packages
 if __name__ == '__main__':
     setuptools.setup(
         name="auto_filling",
-        version="1.0.0",
+        version="1.0.1",
         description="auto_filling",
         author="jason",
         author_email="jason@gmail.com",
