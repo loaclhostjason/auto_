@@ -264,6 +264,10 @@ class ExportXml(XmlData):
         return result
 
     def xml_section_attr(self, did_name, type_result):
+        pro_relation = ProjectRelation.query. \
+            filter_by(project_id=self.project_id).order_by(ProjectRelation.relation_order).all()
+        pro_relation_name = [v.name for v in pro_relation if v.name]
+
         extra_data = ExtraAttrData.query.filter_by(project_id=self.project_id, level=2).all()
         attr = Attr.query.filter_by(level=2).first()
         if not attr:
@@ -280,26 +284,24 @@ class ExportXml(XmlData):
             write_section = self.get_default_rw_sec(de_content, 'writsection')
         else:
             for ed in extra_data:
-                read_sec = ed.read_sec
-                write_sec = ed.write_sec
-                if read_sec and ed.project_relation.name == did_name:
-                    read_section = json.loads(read_sec)
-                else:
-                    read_section = self.get_default_rw_sec(de_content, 'readsection')
+                if ed.project_relation.name == did_name:
+                    read_section = json.loads(ed.read_sec or '{}')
 
-                if write_sec and ed.project_relation.name == did_name:
-                    write_section = json.loads(write_sec)
-                else:
-                    write_section = self.get_default_rw_sec(de_content, 'writsection')
+                if ed.project_relation.name == did_name:
+                    write_section = json.loads(ed.write_sec or '{}')
 
         result = {
-            'read_section': read_section,
-            'write_section': write_section,
+            'read_section': read_section or self.get_default_rw_sec(de_content, 'readsection'),
+            'write_section': write_section or self.get_default_rw_sec(de_content, 'writsection'),
         }
         return result.get(type_result)
 
     @property
     def xml_reset_section(self):
+        pro_relation = ProjectRelation.query. \
+            filter_by(project_id=self.project_id).order_by(ProjectRelation.relation_order).all()
+        pro_relation_name = [v.name for v in pro_relation if v.name]
+
         attr = Attr.query.filter_by(level=1).first()
         extra_data = ExtraAttrData.query.filter_by(project_id=self.project_id, level=1).first()
         if not attr or not attr.extra_attr_content:
@@ -322,6 +324,7 @@ class ExportXml(XmlData):
                 if info.is_open_reset:
                     new_reset_section.append(info.project_relation.name)
 
+        new_reset_section = [v for v in pro_relation_name if v in new_reset_section]
         return content, new_reset_section
 
     @property
