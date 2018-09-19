@@ -61,13 +61,13 @@ def add_attr_content():
             return jsonify({'success': False, 'message': '只能跨2个字节，BitLength 请输入小于等于%d数字' % input_number})
 
     if form_data.get('DidLength') and form_data.get('DefaultValue'):
-        all_default_conf = get_did_default_val(project_id)
-        is_have = str(list(all_default_conf.values())[0]).replace('0', '')
-        if not is_have:
+        # all_default_conf = get_did_default_val(project_id)
+        # is_have = str(list(all_default_conf.values())[0]).replace('0', '')
+        # if not is_have:
             # form_data['DefaultValue'] = split_default_val(form_data['DefaultValue'], int(form_data['DidLength']) * 2)
             form_data['DefaultValue'] = split_default_val(form_data['DefaultValue'], int(form_data['DidLength']) * 2)
-        else:
-            form_data['DefaultValue'] = str_to_hex(all_default_conf[int(project_relation_id)])
+        # else:
+        #     form_data['DefaultValue'] = str_to_hex(all_default_conf[int(project_relation_id)])
 
     AttrContent.create_edit(form_data, project_id, project_relation_id)
 

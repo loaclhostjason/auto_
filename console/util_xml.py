@@ -42,6 +42,7 @@ class XmlData(object):
         return r
 
     def get_did_default_val(self):
+        from .app.main.api_data import split_default_val
         project_data = self._did_default_info
         if not project_data:
             return
@@ -60,6 +61,7 @@ class XmlData(object):
 
                 # 跨字节 默认值
                 if info.default_conf:
+                    info.default_conf = split_default_val(info.default_conf, bit_len)
                     if end_bit > 8:
                         b_len = end_bit - 8
 

@@ -156,8 +156,8 @@ def edit_project_data_api(project_id):
             new_project_data = ProjectData(**val)
             db.session.add(new_project_data)
 
-    db.session.commit()
-    update_default_val(project_id, project_relation.parent_id)
+    # db.session.commit()
+    # update_default_val(project_id, project_relation.parent_id)
 
     # export_xml = ExportXml(project_id)
     # export_xml.run()

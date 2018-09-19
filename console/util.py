@@ -104,6 +104,7 @@ class ExportXml(XmlData):
 
     @property
     def xml_did_list(self):
+        from .app.main.api_data import split_default_val
         # default
         default_val_did = self.get_did_default_val()
 
@@ -131,7 +132,7 @@ class ExportXml(XmlData):
             else:
                 did_len = real_content.get('DidLength')
                 # real_content['DefaultValue'] = self.str_to_hex(real_content.get('DefaultValue'), did_len)
-                real_content['DefaultValue'] = real_content.get('DefaultValue')
+                real_content['DefaultValue'] = split_default_val(real_content.get('DefaultValue'), int(did_len) * 2)
             result[pr.name] = real_content
 
         return result
