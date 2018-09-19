@@ -87,7 +87,7 @@ class XmlData(object):
                 r[parent_id] = init_val
 
         r = {k: ''.join([v for v in list_val]) for k, list_val in r.items()}
-        print(r)
+        # print(r)
         return r
 
     @staticmethod
