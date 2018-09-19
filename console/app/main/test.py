@@ -1,6 +1,26 @@
 from .models import *
 
 
+def str_to_hex(data, did_len=None):
+    if not data:
+        return
+    init_de = '00'
+    try:
+        data_len = len(data) // 8 if not did_len else int(did_len)
+
+        hex_data = hex(int(data, 2))
+        hex_data = hex_data.replace('0x', '')
+        hex_data = '0{}'.format(hex_data) if len(hex_data) % 2 else hex_data
+
+        if (data_len - (len(hex_data) // 2)) >= 1:
+            dif_len = data_len - (len(hex_data) // 2)
+            hex_data = (init_de * dif_len) + hex_data
+    except Exception as e:
+        print('hex %s' % e)
+        hex_data = data
+    return hex_data
+
+
 def _did_default_info(project_id):
     from collections import defaultdict
     project_data = ProjectData.query.filter_by(project_id=project_id).all()
@@ -84,7 +104,7 @@ def update_default_val(project_id, project_relation_id):
         if pr:
             _attr_content = AttrContent.query.filter_by(project_relation_id=pr.id).first()
             cc = json.loads(_attr_content.real_content or '{}') if _attr_content else {}
-            cc['DefaultValue'] = all_default_conf[pr.id]
+            cc['DefaultValue'] = str_to_hex(all_default_conf[pr.id])
             _attr_content.real_content = json.dumps(cc)
             db.session.add(_attr_content)
             db.session.commit()

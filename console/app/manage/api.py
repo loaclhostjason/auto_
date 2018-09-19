@@ -15,7 +15,7 @@ from ..models import Modification
 @login_required
 def add_attr_content():
     from ..main.api_data import split_default_val
-    from ..main.test import get_did_default_val, update_default_val
+    from ..main.test import get_did_default_val, str_to_hex
 
     project_id = request.args.get('project_id')
     level = request.form.get('level')
@@ -64,9 +64,10 @@ def add_attr_content():
         all_default_conf = get_did_default_val(project_id)
         is_have = str(list(all_default_conf.values())[0]).replace('0', '')
         if not is_have:
-            form_data['DefaultValue'] = split_default_val(form_data['DefaultValue'], int(form_data['DidLength']) * 8)
+            # form_data['DefaultValue'] = split_default_val(form_data['DefaultValue'], int(form_data['DidLength']) * 2)
+            form_data['DefaultValue'] = split_default_val(form_data['DefaultValue'], int(form_data['DidLength']) * 2)
         else:
-            form_data['DefaultValue'] = all_default_conf[int(project_relation_id)]
+            form_data['DefaultValue'] = str_to_hex(all_default_conf[int(project_relation_id)])
 
     AttrContent.create_edit(form_data, project_id, project_relation_id)
 

@@ -130,8 +130,8 @@ class ExportXml(XmlData):
                 real_content['DefaultValue'] = self.str_to_hex(default_val_did[pr.id])
             else:
                 did_len = real_content.get('DidLength')
-                # print(self.str_to_hex(real_content.get('DefaultValue'), did_len))
-                real_content['DefaultValue'] = self.str_to_hex(real_content.get('DefaultValue'), did_len)
+                # real_content['DefaultValue'] = self.str_to_hex(real_content.get('DefaultValue'), did_len)
+                real_content['DefaultValue'] = real_content.get('DefaultValue')
             result[pr.name] = real_content
 
         return result
