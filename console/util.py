@@ -126,10 +126,11 @@ class ExportXml(XmlData):
             else:
                 real_content = did_default
 
-            if default_val_did and default_val_did.get(pr.id):
+            if default_val_did and default_val_did.get(pr.id) and str(default_val_did.get(pr.id)).replace('0', ''):
                 real_content['DefaultValue'] = self.str_to_hex(default_val_did[pr.id])
             else:
                 did_len = real_content.get('DidLength')
+                # print(self.str_to_hex(real_content.get('DefaultValue'), did_len))
                 real_content['DefaultValue'] = self.str_to_hex(real_content.get('DefaultValue'), did_len)
             result[pr.name] = real_content
 
@@ -195,7 +196,7 @@ class ExportXml(XmlData):
             return
         init_de = '00'
         try:
-            data_len = len(data) // 8 if not did_len else did_len
+            data_len = len(data) // 8 if not did_len else int(did_len)
 
             hex_data = hex(int(data, 2))
             hex_data = hex_data.replace('0x', '')
@@ -205,7 +206,7 @@ class ExportXml(XmlData):
                 dif_len = data_len - (len(hex_data) // 2)
                 hex_data = (init_de * dif_len) + hex_data
         except Exception as e:
-            print(e)
+            print('hex %s' % e)
             hex_data = data
         return hex_data
 
@@ -264,9 +265,9 @@ class ExportXml(XmlData):
         return result
 
     def xml_section_attr(self, did_name, type_result):
-        pro_relation = ProjectRelation.query. \
-            filter_by(project_id=self.project_id).order_by(ProjectRelation.relation_order).all()
-        pro_relation_name = [v.name for v in pro_relation if v.name]
+        # pro_relation = ProjectRelation.query. \
+        #     filter_by(project_id=self.project_id).order_by(ProjectRelation.relation_order).all()
+        # pro_relation_name = [v.name for v in pro_relation if v.name]
 
         extra_data = ExtraAttrData.query.filter_by(project_id=self.project_id, level=2).all()
         attr = Attr.query.filter_by(level=2).first()

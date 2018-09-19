@@ -127,6 +127,7 @@ def get_default_conf(default_val=None):
 @main.route('/project/data/submit/<int:project_id>', methods=['POST'])
 @login_required
 def edit_project_data_api(project_id):
+    from .test import update_default_val
     # get attr 参数
     data_relation_id = request.args.get('data_relation_id')
     if not data_relation_id:
@@ -159,6 +160,8 @@ def edit_project_data_api(project_id):
     # export_xml.run()
 
     Modification.add_edit(project_id)
+
+    update_default_val(project_id, project_relation.parent_id)
     return jsonify({'success': True, 'message': '更新成功'})
 
 
