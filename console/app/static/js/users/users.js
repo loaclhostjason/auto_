@@ -173,6 +173,7 @@ $(document).ready(function () {
         pm_modal.find('.modal-title').text('分配【' + user + '】项目')
     });
 
+
     $('.submit_pm').click(function () {
         var params = pm_modal.find('form').serialize();
         $.post('/users/fp_pm?user_id=' + uid, params, function (resp) {
@@ -183,5 +184,30 @@ $(document).ready(function () {
             } else
                 toastr.error(resp.message)
         })
-    })
+    });
+
+    var pm_file_modal = $('#fp-file-modal');
+    pm_file_modal.on('hide.bs.modal', function () {
+        pm.hide_modal($(this));
+    });
+    pm_file_modal.on('show.bs.modal', function (event) {
+        var btn = $(event.relatedTarget);
+        uid = btn.data('uid');
+
+        var modal = $(this);
+        $.get('/project/group/pm', function (resp) {
+            var data = resp['data'];
+            var project_select = modal.find('[name="project_group"]');
+            console.log(data);
+            var project_select_html = pm.get_file_option(data);
+            project_select.html(project_select_html);
+        })
+    });
+
+    $('.fp_file').click(function () {
+        pm.show_modal(pm_file_modal, $(this));
+
+        var user = $(this).data('user');
+        pm_file_modal.find('.modal-title').text('分配【' + user + '】文件')
+    });
 });

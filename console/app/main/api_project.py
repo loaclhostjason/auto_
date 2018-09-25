@@ -25,3 +25,19 @@ def get_project_user():
     except Exception as e:
         project_groups = [(project_groups.id, project_groups.name)]
     return jsonify({'data': project_groups})
+
+
+@main.route('/project/group/file')
+@login_required
+def get_project_user_file():
+    project_group_id = request.args.get('project_group_id')
+    project_query = Project.query
+
+    if project_group_id:
+        projects = project_query.filter(Project.project_group_id == project_group_id).all()
+    else:
+        projects = []
+
+    projects = [(v.id, v.name) for v in projects if v.id]
+
+    return jsonify({'data': projects})
