@@ -44,7 +44,9 @@ def projects():
     elif current_user.is_pm_admin:
         project_list = project_query.filter_by(project_group_id=project_group_id).all()
     else:
-        project_list = project_query.filter_by(user_id=current_user.id).all()
+        user = User.query.get_or_404(current_user.id)
+        project_ids = str(user.project_id).split(',') if user.project_id else []
+        project_list = project_query.filter(or_(Project.id.in_(project_ids), Project.user_id == current_user.id)).all()
 
     group_project = db.session.query(Project.id, Project.project_group_id,
                                      func.count(Project.id).label('project_num')).group_by(

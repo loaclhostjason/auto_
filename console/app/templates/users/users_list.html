@@ -52,8 +52,9 @@
     </td>
 
     <td>
-        {% if user.project_group %}
+        {% if user.project_id %}
             {% if user.role.name == 'user' %}
+                {{ user.project_id }}
                 <label class="label_border">
                     <a href="javascript:void (0)" class="fp_file text-success" data-user="{{ user.username }}"
                        data-uid="{{ user.id }}"><i class="glyphicon glyphicon-edit"></i> 文件</a>

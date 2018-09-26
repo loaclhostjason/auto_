@@ -116,3 +116,20 @@ def fp_pm_users():
     db.session.add(user)
 
     return jsonify({'success': True, 'message': '更新成功'})
+
+
+@users.route('/fp_file', methods=['POST'])
+@login_required
+@role_admin_pm
+def fp_file_users():
+    user_id = request.args.get('user_id')
+    project_ids = request.form.getlist('project_id')
+
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return jsonify({'success': False, 'message': '没有记录'})
+
+    user.project_id = ','.join(project_ids)
+    db.session.add(user)
+
+    return jsonify({'success': True, 'message': '更新成功'})

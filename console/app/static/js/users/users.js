@@ -195,14 +195,41 @@ $(document).ready(function () {
         uid = btn.data('uid');
 
         var modal = $(this);
+        var data = [];
         $.get('/project/group/pm', function (resp) {
-            var data = resp['data'];
+            data = resp['data'];
             var project_select = modal.find('[name="project_group"]');
             console.log(data);
             var project_select_html = pm.get_file_option(data);
             project_select.html(project_select_html);
+        }).done(function () {
+            if (data) {
+                var project_group_id = data[0][0];
+                $.get('/project/group/file?project_group_id=' + project_group_id, function (resp) {
+                    var file_data = resp['data'];
+                    var project_id = modal.find('[name="project_id"]');
+                    var project_id_html = pm.get_file_option(file_data);
+                    project_id.html(project_id_html);
+                    multiselect(project_id);
+                })
+            }
         })
     });
+    pm_file_modal.find('[name="project_group"]').change(function () {
+        var selected_id = $(this).val();
+        $.get('/project/group/file?project_group_id=' + selected_id, function (resp) {
+            var file_data = resp['data'];
+            var project_id = pm_file_modal.find('[name="project_id"]');
+            var project_id_html = pm.get_file_option(file_data);
+            if (!file_data || !file_data.length) {
+                project_id_html = '<option value="">无数据</option>'
+            }
+            project_id.html(project_id_html);
+            $('#handler').multiselect('rebuild');
+            multiselect(project_id);
+        })
+    });
+
 
     $('.fp_file').click(function () {
         pm.show_modal(pm_file_modal, $(this));
@@ -210,4 +237,26 @@ $(document).ready(function () {
         var user = $(this).data('user');
         pm_file_modal.find('.modal-title').text('分配【' + user + '】文件')
     });
+    $('.submit_pm_file').click(function () {
+        var form_data = pm_file_modal.find('form').serialize();
+        $.post('/users/fp_file?user_id=' + uid, form_data, function (resp) {
+            if (resp.success) {
+                pm_file_modal.modal('hide');
+                sessionStorage.setItem('success', resp.message);
+                window.location.reload();
+            } else
+                toastr.error(resp.message)
+        })
+    });
+
+    function multiselect(obj) {  //初始化方法
+        $(obj).multiselect({
+            includeSelectAllOption: true,
+            selectAllText: '全选',
+            selectAllNumber: false,
+            nonSelectedText: '请选择',
+            selectAllNumber: false,
+            allSelectedText: false
+        });
+    }
 });
