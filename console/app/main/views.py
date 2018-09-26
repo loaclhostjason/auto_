@@ -38,25 +38,28 @@ def projects():
     user = User.query.get_or_404(current_user.id)
     project_group_id = user.project_group_id
 
-    project_query = Project.query.order_by(Project.project_group_id, Project.id)
+    project_query = Project.query
     if current_user.is_admin:
-        project_list = project_query.all()
+        project_list = project_query
     elif current_user.is_pm_admin:
-        project_list = project_query.filter_by(project_group_id=project_group_id).all()
+        project_list = project_query.filter_by(project_group_id=project_group_id)
     else:
         user = User.query.get_or_404(current_user.id)
         project_ids = str(user.project_id).split(',') if user.project_id else []
-        project_list = project_query.filter(or_(Project.id.in_(project_ids), Project.user_id == current_user.id)).all()
+        project_list = project_query.filter(or_(Project.id.in_(project_ids), Project.user_id == current_user.id))
 
     group_project = db.session.query(Project.id, Project.project_group_id,
-                                     func.count(Project.id).label('project_num')).group_by(
-        Project.project_group_id).all()
+                                     func.count(Project.id).label('project_num')).\
+        group_by(Project.project_group_id).all()
 
-    project_ = Project.query.order_by(Project.id.desc()).all()
+    project_ = project_list.order_by(Project.id.desc()).all()
     this_pro = {v.project_group_id: v.id for v in project_ if v.id}
+    # print(this_pro)
     group_project = {this_pro.get(project_group_id): num for project_id, project_group_id, num in group_project if
                      this_pro.get(project_group_id)}
-    return render_template('main/projects.html', projects=project_list, group_project=group_project)
+
+    nps = project_list.order_by(Project.project_group_id, Project.id).all()
+    return render_template('main/projects.html', projects=nps, group_project=group_project)
 
 
 @main.route('/project/create_edit', methods=['GET', 'POST'])

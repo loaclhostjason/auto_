@@ -39,6 +39,7 @@
                         {% for project in projects %}
                             <tr>
                                 {% set num = group_project.get(project.id) %}
+                                {#                            {{ num }}#}
                                 {% if num %}
                                     <td class="text-center" rowspan="{{ num }}"
                                         style="border-right: 1px solid #dddddd">
