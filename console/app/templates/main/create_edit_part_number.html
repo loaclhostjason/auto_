@@ -6,7 +6,8 @@
 
 {% block main_content %}
     {% include "main/modals/update_name.html" %}
-    {% include "main/modals/update_las.html" %}
+{#    {% include "main/modals/update_las.html" %}#}
+    {% include "main/modals/update_las_part.html" %}
     {% include 'main/modals/add_content.html' %}
 
     <div class="col-sm-12 console-title clearfix">
@@ -105,7 +106,8 @@
     {% assets "go_js" %}
         <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
-    <script src="{{ url_for('static', filename='js/part/part.js') }}"></script>
+{#    <script src="{{ url_for('static', filename='js/part/part.js') }}"></script>#}
+    <script src="{{ url_for('static', filename='js/part/part2.js') }}"></script>
     <script src="{{ url_for('static', filename='js/part/part_tree.js') }}"></script>
 
     <script>

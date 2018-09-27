@@ -131,7 +131,7 @@ class UtilPartNum(ExportXml):
                     for pn in part_num_data:
                         part_num_info_doc = doc.createElement('PartNum')
                         part_num_info_doc.setAttribute('Value', pn['number'])
-                        part_num_info_doc.setAttribute('Condition', UtilXml().change_data(pn['las']))
+                        part_num_info_doc.setAttribute('Condition', UtilXml().change_las_data(pn['las']))
                         part_num_doc.appendChild(part_num_info_doc)
                 part_list.appendChild(part_num_doc)
 
