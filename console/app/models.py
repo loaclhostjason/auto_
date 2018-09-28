@@ -36,6 +36,7 @@ class User(UserMixin, db.Model):
     project_group = db.relationship('ProjectGroup', backref=db.backref("users"))
 
     project_id = db.Column(db.String(100))
+    pg_id = db.Column(db.String(100))
 
     # group_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     # user = db.relationship('User', remote_side='User.id', backref=db.backref("users", cascade="all, delete-orphan"))
