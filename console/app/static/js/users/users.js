@@ -137,10 +137,11 @@ $(document).ready(function () {
             }
 
             data.forEach(function (val) {
-                if ($.inArray(val[0], pg_id_) > -1) {
+                if (pg_id_ && pg_id_.length && $.inArray(val[0], pg_id_) > -1) {
                     project_select_html += '<option selected value="' + val[0] + '">' + val[1] + '</option>';
-                } else
+                } else {
                     project_select_html += '<option value="' + val[0] + '">' + val[1] + '</option>';
+                }
             });
             return project_select_html;
         }
@@ -193,6 +194,7 @@ $(document).ready(function () {
     var pm_file_modal = $('#fp-file-modal');
     pm_file_modal.on('hide.bs.modal', function () {
         pm.hide_modal($(this));
+        $('#handler').multiselect('rebuild');
     });
     pm_file_modal.on('show.bs.modal', function (event) {
         var btn = $(event.relatedTarget);
@@ -205,13 +207,16 @@ $(document).ready(function () {
             data = resp['data'];
             var project_select = modal.find('[name="project_group"]');
             pg_id = resp['pg_id'];
-            pg_id = [Number(pg_id)];
+            pg_id = [Number(pg_id)].filter(function (value) {
+                return value
+            });
             console.log(data);
             var project_select_html = pm.get_file_option(data, pg_id);
             project_select.html(project_select_html);
         }).done(function () {
             if (data) {
-                var project_group_id = pg_id || data[0][0];
+                var project_group_id = pg_id && pg_id.length ? pg_id[0] : data[0][0];
+                console.log(project_group_id);
                 $.get('/project/group/file?project_group_id=' + project_group_id + '&u_id=' + uid, function (resp) {
                     var file_data = resp['data'];
                     var p_ids = resp['project_id'];
@@ -219,10 +224,13 @@ $(document).ready(function () {
                     p_ids.forEach(function (va) {
                         n_p_ids.push(Number(va));
                     });
+                    console.log(n_p_ids)
                     var project_id = modal.find('[name="project_id"]');
                     var project_id_html = pm.get_file_option(file_data, n_p_ids);
                     project_id.html(project_id_html);
+                    console.log(project_id_html)
                     multiselect(project_id);
+                    $('#handler').multiselect('rebuild');
                 })
             }
         })

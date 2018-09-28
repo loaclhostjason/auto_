@@ -49,5 +49,5 @@ def get_project_user_file():
 
     projects = [(v.id, v.name) for v in projects if v.id]
 
-    project_id = str(user.project_id).split(',') if user else []
+    project_id = str(user.project_id).split(',') if user and user.project_id else []
     return jsonify({'data': projects, 'project_id': project_id})
