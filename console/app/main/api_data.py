@@ -96,6 +96,8 @@ def option_project_data():
 
 
 def split_default_val(data, bit_len):
+    if not data:
+        return
     if len(data) == bit_len:
         return data
 
