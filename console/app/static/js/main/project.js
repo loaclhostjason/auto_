@@ -268,7 +268,8 @@ $(document).ready(function () {
                     $('.submit-project-data').show();
                 }
 
-                projects.get_protect_relation(project_id)
+                if (level < 4)
+                    projects.get_protect_relation(project_id)
             } else
                 toastr.error(resp.message)
         })

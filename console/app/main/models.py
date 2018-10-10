@@ -208,7 +208,7 @@ class ProjectData(db.Model):
         bit_len, *args = AttrContent.get_attr_info(relation_id, is_parent=True)
         key = list()
         if not did_len:
-            return list()
+            return list(), []
 
         extra_key = ['byte{}'.format(v) for v in range(did_len)]
 

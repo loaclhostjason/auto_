@@ -140,7 +140,7 @@ def edit_project_data_api(project_id):
     default_conf = get_default_conf(default_val)
 
     if not data:
-        return jsonify({'success': False, 'message': 'project_id不存在'})
+        return jsonify({'success': False, 'message': 'DidLength 不存在，请检查'})
 
     new_dict = dict()
     for v in data:

@@ -260,7 +260,7 @@ var thirdContextMenu =
     );
 
 myDiagram.nodeTemplateMap.add("FirstNode",
-    $$(go.Node, "Horizontal", {selectionObjectName: "FirstNode"},
+    $$(go.Node, "Horizontal", {selectionObjectName: "FirstNode", deletable: false},
         $$(go.Panel, "Auto", {name: "FirstNode"},
             $$(go.Shape, "RoundedRectangle", {strokeWidth: 1, fill: 'white'}),
             $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name"))
@@ -289,7 +289,7 @@ myDiagram.nodeTemplateMap.add("FirstNode",
 
 
 myDiagram.nodeTemplateMap.add("SecondNode",
-    $$(go.Node, "Horizontal", {selectionObjectName: "SecondNode"},
+    $$(go.Node, "Horizontal", {selectionObjectName: "SecondNode", deletable: false},
         $$(go.Panel, "Auto", {name: "SecondNode"},
             $$(go.Shape, "RoundedRectangle", {strokeWidth: 1, fill: 'white'}),
             $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name"))
@@ -319,7 +319,7 @@ myDiagram.nodeTemplateMap.add("SecondNode",
 
 
 myDiagram.nodeTemplateMap.add("ThirdNode",
-    $$(go.Node, "Auto",
+    $$(go.Node, "Auto", {deletable: false},
         $$(go.Shape, "RoundedRectangle", {strokeWidth: 1, fill: 'white'}),
         $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name")),
         {
