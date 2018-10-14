@@ -50,6 +50,7 @@ $(document).ready(function () {
                     if (resp['level'] && resp['level'] === 3) {
                         $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position, ext_bitPosition));
                         $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf, bit_position));
+                        init_editTable();
                     } else {
                         $('.table-project-data thead').html('');
                         $('.table-project-data tbody').html('');
@@ -90,7 +91,12 @@ $(document).ready(function () {
                 html += '<tr class="data-class">';
                 html += '<input type="hidden" name="project_relation_id" value="' + data['level_4_id'] + '">';
                 html += '<input type="hidden" name="name" value="' + data['level_4'] + '">';
-                html += '<td class="text-center"><a href="javascript:void(0)" class="del-project-func text-danger pull-left" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a>' + data['level_4'] + '</td>';
+
+                // show las change name
+                console.log(data['level_4']);
+                html += '<td class="text-center"><a href="javascript:void(0)" class="del-project-func text-danger pull-left" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a>';
+                html += '<a href="javascript:void (0)" class="display_name" data-pk="' + data['level_4_id'] + '">' + data['level_4'] + '</a></td>';
+
                 html += '<td class="text-center"><div style="display: inline-flex"><div style="float: left"><input name="las" class="tc-search-words" value="' + (data_info['las'] || '') + '"></div>';
                 html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal-bak"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
                 html += '</td>';
@@ -359,7 +365,33 @@ $(document).ready(function () {
                 })
             }
         })
-    })
+    });
+
+    // 修改las name
+    function init_editTable() {
+        $('.display_name').editable({
+            type: "text",
+            title: "显示名",
+            disabled: false,
+            display: false,
+            emptytext: "无",
+            url: '/change/project/data/name',
+            validate: function (value) {
+                if (!$.trim(value)) {
+                    return '不能为空';
+                }
+            },
+            success: function (response, newValue) {
+                if (response.success) {
+                    $(this).text(newValue);
+                    toastr.success(response.message)
+                } else {
+                    toastr.error(response.message)
+                }
+            }
+        });
+    }
+
 });
 
 // extra config

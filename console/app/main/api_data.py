@@ -182,3 +182,29 @@ def get_las_info():
 
     data = read_excel(path, las.file if las else None)
     return jsonify({'data': data})
+
+
+# change project data las name
+@main.route('/change/project/data/name', methods=['post'])
+@login_required
+def change_project_data_name():
+    name = request.form.get('value')
+    project_relation_id = request.form.get('pk')
+
+    if not name or not project_relation_id:
+        return jsonify({'success': False, 'message': '提交参数不对'})
+
+    project_data = ProjectData.query.filter_by(project_relation_id=project_relation_id).first()
+    project_relation = ProjectRelation.query.filter_by(id=project_relation_id).first()
+
+    if not project_data or not project_relation:
+        return jsonify({'success': False, 'message': '没有这条记录'})
+
+    project_data.name = name
+    db.session.add(project_data)
+
+    project_relation.name = name
+    db.session.add(project_relation)
+
+    db.session.commit()
+    return jsonify({'success': True, 'message': '更新成功'})

@@ -114,7 +114,7 @@ class ProjectData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     project_relation_id = db.Column(db.Integer, db.ForeignKey('project_relation.id'))
     las = db.Column(db.String(250))
-    name = db.Column(db.String(32))
+    name = db.Column(db.String(200))
 
     content = db.Column(db.Text)
     # real_content = db.Column(db.Text)
