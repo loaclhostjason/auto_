@@ -49,7 +49,7 @@ def projects():
         project_list = project_query.filter(or_(Project.id.in_(project_ids), Project.user_id == current_user.id))
 
     group_project = db.session.query(Project.id, Project.project_group_id,
-                                     func.count(Project.id).label('project_num')).\
+                                     func.count(Project.id).label('project_num')). \
         group_by(Project.project_group_id).all()
 
     project_ = project_list.order_by(Project.id.desc()).all()
@@ -268,6 +268,11 @@ def edit_project_name():
     project_relation.name = name
     db.session.add(project_relation)
     db.session.commit()
+
+    # 修改 零件号
+    project_part = ProjectPartNumRelation.query.filter_by(project_id=project_relation.project_id).first()
+    project_part.name = name
+    db.session.add(project_part)
 
     return jsonify(
         {'success': True, 'message': '更新成功', 'level': project_relation.level, 'parent_id': project_relation.parent_id})
