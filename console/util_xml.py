@@ -94,17 +94,52 @@ class XmlData(object):
     def _get_xml_extra_pin_data(content):
         if not content:
             return list()
-        pin_num = content[-1].get('pin_num')
-        pin_num = int(pin_num)
-        content = [
-            {
-                'item': v['item'],
-                'item_value': v['item_default']
-            } for v in content[:-1] if v.get('item_default')
-        ]
-        content = content * pin_num
-        result = [content[i:i + len(content) // 2] for i in range(0, len(content), len(content) // 2)]
-        return result
+        pin_num_l = [v for v in content if v.get('pin_num')]
+        if not pin_num_l:
+            return []
+
+        pin_num = pin_num_l[0]['pin_num']
+
+        remove_pin_content = [v for v in content if not v.get('pin_num')]
+
+        if not remove_pin_content:
+            return []
+
+        new_content = [remove_pin_content] * int(pin_num)
+
+        out_list = []
+        for index, info_list in enumerate(new_content):
+            out = []
+            for info in info_list:
+                if info.get('item_default'):
+                    items = info['item_default'].split('/')
+
+                    try:
+                        item = items[index]
+                    except Exception:
+                        if index > 0:
+                            item = items[index - 1]
+                        else:
+                            item = ''
+                    out.append({
+                        'item': info['item'],
+                        'item_value': item
+                    })
+            out_list.append(out)
+
+        #  todo change / to list
+        # pin_num = int(pin_num)
+        # content = [
+        #     {
+        #         'item': v['item'],
+        #         'item_value': v['item_default']
+        #     } for v in content[:-1] if v.get('item_default')
+        # ]
+        # content = content * pin_num
+        # result = [content[i:i + len(content) // 2] for i in range(0, len(content), len(content) // 2)]
+
+        # print(result)
+        return out_list
 
     @staticmethod
     def _get_xml_pin_data(content):
