@@ -64,9 +64,20 @@
                                                 <td>{{ attr['item'] }}</td>
                                                 <td>
                                                     {% set items = pin[loop_root * 2+ loop.index0 - 2]['item_value'] if pin else default_attr.get(attr['item'], '').split('/') %}
+{#                                                    {{ pin }}#}
+{#                                                    --#}
+{#                                                    {{ items }}#}
+{#                                                    --{{ index-1 }}--#}
+{#                                                    {{ items[index-1] }}#}
                                                     <input name="item" value="{{ attr['item'] }}" type="hidden"/>
-                                                    <input name="item_value" class="td-input" required
-                                                           value="{{ items[index - 1] }}"/>
+                                                    {% if pin %}
+                                                        <input name="item_value" class="td-input" required
+                                                               value="{{ items }}"/>
+                                                    {% else %}
+                                                        <input name="item_value" class="td-input" required
+                                                               value="{{ items[index-1] }}"/>
+                                                    {% endif %}
+
                                                 </td>
                                             </tr>
                                         {% endif %}
