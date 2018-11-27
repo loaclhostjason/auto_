@@ -192,6 +192,8 @@ def download_file():
     export_xml.run()
 
     # file = '{}_{}'.format(project.project_group.name, project.name)
+    if not project.project_config_name:
+        return jsonify({})
     file = project.project_config_name.lower()
 
     filename = '%s.95' % file

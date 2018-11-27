@@ -54,8 +54,10 @@ class ExportXml(XmlData):
     def xml_managers_attr(self):
         project = Project.query.get_or_404(self.project_id)
         # result = '{}_{}'.format(project.project_group.name, project.name)
-        result = project.project_config_name.lower()
-        return result
+        if project.project_config_name:
+            result = project.project_config_name.lower()
+            return result
+        return
 
     @property
     def xml_pin(self):
@@ -132,7 +134,8 @@ class ExportXml(XmlData):
             else:
                 did_len = real_content.get('DidLength')
                 # real_content['DefaultValue'] = self.str_to_hex(real_content.get('DefaultValue'), did_len)
-                real_content['DefaultValue'] = split_default_val(real_content.get('DefaultValue'), int(did_len or 0) * 2)
+                real_content['DefaultValue'] = split_default_val(real_content.get('DefaultValue'),
+                                                                 int(did_len or 0) * 2)
             result[pr.name] = real_content
 
         return result
