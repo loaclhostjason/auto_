@@ -169,6 +169,8 @@ def after_request(response):
             r[pr.project_id].append(pr.timestamp)
 
     d = {k: max(v) for k, v in r.items() if v}
+
+    # print(d)
     if not d:
         return response
 

@@ -2,6 +2,68 @@ var app_common = new AppCommonClass();
 
 var $$ = go.GraphObject.make;
 
+
+function TreeFunc() {
+    this.extra_config = $('.add-extra-config');
+    this.submit_project = $('.submit-project-data');
+
+    this.getFirstAttr = function (obj) {
+        var node = obj.part.data;
+        if (node === null) return false;
+
+        var parent_id = node['key'];
+        var level = node['level'];
+
+        $.g_projects.get_attr_input(project_id, level, parent_id);
+
+        // extra config
+        this.extra_config.show();
+        this.extra_config.attr('level', 1);
+        this.extra_config.attr('project_relation_id', parent_id);
+        this.submit_project.hide();
+    };
+
+    this.getSecondAttr = function (obj) {
+        var node = obj.part.data;
+        if (node === null) return false;
+
+        // console.log(node);
+        var default_name = node['name'];
+
+        var parent_id = node['key'];
+        var level = node['level'];
+        $.g_projects.get_project_data(project_id, parent_id);
+        $.g_projects.get_attr_input(project_id, level, parent_id, default_name);
+
+        // extra config
+        this.extra_config.show();
+        this.extra_config.attr('level', 2);
+        this.extra_config.attr('name', node['name']);
+        this.extra_config.attr('project_relation_id', parent_id);
+        this.submit_project.hide();
+    };
+
+    this.thirdAttr = function (obj) {
+        var node = obj.part.data;
+        if (node === null) return false;
+
+        var parent_id = node['key'];
+        var level = node['level'];
+        console.log(level);
+
+        $.g_parent_id = parent_id;
+        $.g_projects.get_project_data(project_id, parent_id);
+        $.g_projects.get_attr_input(project_id, level, parent_id);
+
+        // extra config
+        this.extra_config.hide();
+        this.submit_project.show();
+    }
+}
+
+var tree_func = new TreeFunc();
+
+
 var myDiagram =
     $$(go.Diagram, "myDiagramProject",
         {
@@ -95,6 +157,7 @@ var secondContextMenu =
                 if (resp.success) {
                     toastr.success(resp.message);
                     $.g_projects.get_protect_relation(project_id);
+                    $('#attr-form').html('');
                 } else {
                     toastr.error(resp.message)
                 }
@@ -196,6 +259,7 @@ var thirdContextMenu =
                 if (resp.success) {
                     toastr.success(resp.message);
                     $.g_projects.get_protect_relation(project_id);
+                    $('#attr-form').html('');
                 } else {
                     toastr.error(resp.message)
                 }
@@ -267,21 +331,17 @@ myDiagram.nodeTemplateMap.add("FirstNode",
         ),
         {
             click: function (e, obj) {
-                var node = obj.part.data;
-                if (node === null) return false;
-
-                var parent_id = node['key'];
-                var level = node['level'];
-
-                $.g_projects.get_attr_input(project_id, level, parent_id);
-
-                // extra config
-                $('.add-extra-config').show();
-                $('.add-extra-config').attr('level', 1);
-                $('.add-extra-config').attr('project_relation_id', parent_id);
-                $('.submit-project-data').hide();
+                tree_func.getFirstAttr(obj);
+                return false;
+            },
+            mouseEnter: function (e, obj) {
+                window.oncontextmenu = function (event) {
+                    tree_func.getFirstAttr(obj);
+                    return false;
+                }
             }
-        }, {
+        },
+        {
             contextMenu: firstContextMenu
         },
         $$(go.Panel, {height: 15}, $$("TreeExpanderButton"))
@@ -296,20 +356,14 @@ myDiagram.nodeTemplateMap.add("SecondNode",
         ),
         {
             click: function (e, obj) {
-                var node = obj.part.data;
-                if (node === null) return false;
-
-                var parent_id = node['key'];
-                var level = node['level'];
-                $.g_projects.get_project_data(project_id, parent_id);
-                $.g_projects.get_attr_input(project_id, level, parent_id);
-
-                // extra config
-                $('.add-extra-config').show();
-                $('.add-extra-config').attr('level', 2);
-                $('.add-extra-config').attr('name', node['name']);
-                $('.add-extra-config').attr('project_relation_id', parent_id);
-                $('.submit-project-data').hide();
+                tree_func.getSecondAttr(obj);
+                return false;
+            },
+            mouseEnter: function (e, obj) {
+                window.oncontextmenu = function (event) {
+                    tree_func.getSecondAttr(obj);
+                    return false;
+                }
             }
         }, {
             contextMenu: secondContextMenu
@@ -324,20 +378,14 @@ myDiagram.nodeTemplateMap.add("ThirdNode",
         $$(go.TextBlock, {margin: 8}, new go.Binding("text", "name")),
         {
             click: function (e, obj) {
-                var node = obj.part.data;
-                if (node === null) return false;
-
-                var parent_id = node['key'];
-                var level = node['level'];
-                console.log(level);
-
-                $.g_parent_id = parent_id;
-                $.g_projects.get_project_data(project_id, parent_id);
-                $.g_projects.get_attr_input(project_id, level, parent_id);
-
-                // extra config
-                $('.add-extra-config').hide();
-                $('.submit-project-data').show();
+                tree_func.thirdAttr(obj);
+                return false;
+            },
+            mouseEnter: function (e, obj) {
+                window.oncontextmenu = function (event) {
+                    tree_func.thirdAttr(obj);
+                    return false;
+                }
             }
         }, {
             contextMenu: thirdContextMenu

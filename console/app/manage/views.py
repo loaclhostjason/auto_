@@ -190,3 +190,25 @@ def delete_project_group(id):
         return jsonify({'success': False, 'message': 'projects 关联中'})
     db.session.delete(project_group_info)
     return jsonify({'success': True, 'message': '更新成功'})
+
+
+@manage.after_request
+def after_request(response):
+    from ..main.models import Project
+    if not request.url_rule or request.method != 'POST':
+        return response
+
+    if request.url_rule.rule != '/manage/attr/content/add':
+        return response
+
+    project_id = request.args.get('project_id')
+
+    project = Project.query.filter_by(id=project_id).first()
+    if not project:
+        return response
+
+    project.last_time = datetime.now()
+
+    db.session.add(project)
+    db.session.commit()
+    return response

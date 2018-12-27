@@ -135,6 +135,11 @@ def edit_project_data_api(project_id):
     if not data_relation_id:
         return jsonify({'success': False, 'message': '没数据，不能保持'})
 
+    # print(request.form.getlist('las'))
+    check_las = [v for v in request.form.getlist('las') if not v]
+    if len(check_las):
+        return jsonify({'success': False, 'message': 'LAS不能为空，如果保存请将空的LAS 填写 None'})
+
     project_relation = ProjectRelation.query.filter_by(id=data_relation_id).first()
     data, default_val = ProjectData().get_content(project_id, project_relation.parent_id, project_relation.id)
     default_conf = get_default_conf(default_val)

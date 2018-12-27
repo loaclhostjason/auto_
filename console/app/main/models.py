@@ -113,7 +113,7 @@ class ProjectData(db.Model):
     __tablename__ = 'project_data'
     id = db.Column(db.Integer, primary_key=True)
     project_relation_id = db.Column(db.Integer, db.ForeignKey('project_relation.id'))
-    las = db.Column(db.String(250))
+    las = db.Column(db.String(10280))
     name = db.Column(db.String(200))
 
     content = db.Column(db.Text)

@@ -21,12 +21,13 @@ $(document).ready(function () {
             });
         };
 
-        this.get_attr_input = function (project_id, level, id) {
+        this.get_attr_input = function (project_id, level, id, default_name) {
+            var _default_name = default_name || null;
             $.get('/attr/content?project_id=' + project_id + '&level=' + level + '&project_relation_id=' + id, function (resp) {
                 if (resp.success) {
                     var data = resp['data'];
                     var content = resp['content'];
-                    attr_html(data, content, id, level);
+                    attr_html(data, content, id, level, _default_name);
                 } else {
                     toastr.error(resp.message)
                 }
@@ -97,7 +98,7 @@ $(document).ready(function () {
                 html += '<td class="text-center"><a href="javascript:void(0)" class="del-project-func text-danger pull-left" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a>';
                 html += '<a href="javascript:void (0)" class="display_name" data-pk="' + data['level_4_id'] + '">' + data['level_4'] + '</a></td>';
 
-                html += '<td class="text-center"><div style="display: inline-flex"><div style="float: left"><input name="las" class="tc-search-words" value="' + (data_info['las'] || '') + '"></div>';
+                html += '<td class="text-center"><div style="display: inline-flex"><div style="float: left"><input name="las" required class="tc-search-words" value="' + (data_info['las'] || '') + '"></div>';
                 html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal-bak"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
                 html += '</td>';
 
