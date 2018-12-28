@@ -14,9 +14,14 @@
 
             <div>
                 <a href="{{ url_for('.create_edit_project') }}" class="btn btn-primary">新建文件</a>
+
+
                 {% if current_user.is_admin or current_user.is_pm_admin %}
                     <a href="javascript:void(0)" class="btn btn-primary download-file pull-right">数据发布</a>
                 {% endif %}
+{#                <span class="text-explode">|</span>#}
+{#                <a href="javascript:void(0)" class="btn btn-primary export-json pull-right" style="margin-right: 20px">导出模板</a>#}
+
             </div>
             <div>
                 <table class="table table-hover project-table">
@@ -24,7 +29,7 @@
                     <tr>
                         <th width="120" class="text-center" style="border-right: 1px solid #dddddd">项目</th>
                         <th>文件名</th>
-                        <th width="100">拥有者</th>
+                        <th width="100">创建者</th>
                         <th width="150">最后修改时间</th>
                         <th width="180" class="text-right">操作</th>
                     </tr>
@@ -34,6 +39,7 @@
                         {% for project in projects %}
                             <tr>
                                 {% set num = group_project.get(project.id) %}
+                                {#                            {{ num }}#}
                                 {% if num %}
                                     <td class="text-center" rowspan="{{ num }}"
                                         style="border-right: 1px solid #dddddd">
@@ -60,6 +66,10 @@
                                         {% endif %}
                                         <a target="_blank" href="{{ url_for('.edit_file', project_id=project.id) }}">编辑结构</a>
                                         <span class="text-explode">|</span>
+                                        <a target="_blank"
+                                           href="{{ url_for('.edit_part_num', project_id=project.id) }}">编辑零件号</a>
+                                    </div>
+                                    <div>
                                         <a href="javascript:void (0)" class="delete-project"
                                            data-id="{{ project.id }}">删除</a>
                                     </div>
@@ -111,8 +121,33 @@
                         }
                     }).done(function () {
                         project_id.forEach(function (value) {
-                            {#downloadFile('/download_file?project_id=' + value)#}
                             export_file('/download_file?project_id=' + value);
+
+                            downloadFile('/download_file_part_number?project_id=' + value);
+
+                            downloadFile('/download_json?project_id=' + value);
+                        })
+                    });
+
+                }
+
+            });
+
+            $('.export-json').click(function () {
+                var project_id = [];
+                $('.project-table').find('.publish_project:checked').each(function () {
+                    project_id.push($(this).val())
+                });
+
+
+                if (project_id) {
+                    $.get('file/info/is?project_id=' + project_id.toString(), function (resp) {
+                        if (!resp.success) {
+                            toastr.error(resp.message)
+                        }
+                    }).done(function () {
+                        project_id.forEach(function (value) {
+                            export_file('/download_json?project_id=' + value);
                         })
                     });
 
@@ -132,10 +167,10 @@
                     toastr.clear();
                     toastr.options.timeOut = 2000;
                     toastr.success('导出成功');
+
                 },
                 failCallback: function (html, url) {
                     var json = JSON.parse(html);
-                    console.log(json);
                     if (json.status === 512) {
                         toastr.clear();
                         toastr.options.timeOut = 2000;

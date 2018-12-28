@@ -9,7 +9,9 @@
     {% include 'main/modals/create_project_file.html' %}
     {% include 'main/modals/add_content.html' %}
     {% include "main/modals/update_name.html" %}
-    {% include "main/modals/update_las.html" %}
+{#    {% include "main/modals/update_las.html" %}#}
+    {% include "main/modals/update_las_bak.html" %}
+    {% include "main/modals/import_json_file.html" %}
 
     <div class="col-sm-12 console-title clearfix">
         <div class="pull-left">
@@ -41,13 +43,16 @@
 {#                                    <span class="text-explode">|</span>#}
 {#                                {% endif %}#}
                                     <a href="javascript:void (0)"
+                                       class="btn btn-primary btn-xs import-json-file">导入模板</a>
+                                    <span class="text-explode">|</span>
+                                    <a href="javascript:void (0)"
                                        class="btn btn-primary btn-xs add-project-file">添加项目文件</a>
                                 </label>
                             {% endif %}
 
                         </span>
                     </div>
-                    <div class="charttable-w">
+                    <div class="charttable-w diag">
                         <div id="myDiagramProject" style="min-height: 400px"></div>
                     </div>
                 </div>
@@ -79,17 +84,8 @@
                     <div class="charttable-title">
                         <span class="title-text">项目--数据编辑区</span>
                     </div>
-                    <div style="margin: 0 10px;">
-                        <div class="alert alert-warning" style="margin-top: 10px">
-                            <span>
-                                <b>提示：</b>
-                                <span>1 字节数 根据 did配置项【DidLength】</span>
-                                <span>2 先填完las后，才能对字节进行编辑！</span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="charttable-w" style="padding: 0 10px 10px 10px">
-                        <div style="overflow-y: auto;min-height: 200px;">
+                    <div class="charttable-w">
+                        <div style="overflow-y: auto;">
                             <form method="post" id="project-data-form">
                                 <table class="table table-hover table-bordered table-project-data">
                                     <thead></thead>
@@ -99,8 +95,9 @@
                                 </table>
                             </form>
                         </div>
-                        <div style="margin-top: 10px">
-                            <button class="btn btn-primary submit-project-data" type="button" style="display: none">保存</button>
+                        <div style="margin: 10px">
+                            <button class="btn btn-primary submit-project-data" type="button" style="display: none">保存
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -120,12 +117,34 @@
     <script src="{{ url_for('static', filename='js/main/attr.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main/project_tree.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main/project.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main/project_bak.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main/project_file.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main/content.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main/import_json.js') }}"></script>
 
     <script>
         project_id = "{{ project.id if project else '' }}";
         project_group_id = "{{ project.project_group_id if project else '' }}";
         user_id = "{{ current_user.id }}"
     </script>
+{% endblock %}
+
+
+{% block head %}
+
+    {{ super() }}
+    <style>
+        .table-bordered.table-project-data {
+            margin: 0;
+            margin-bottom: 20px;
+        }
+
+        .table-bordered.table-project-data thead th:first-child {
+            border-left: 0;
+        }
+
+        .table-bordered.table-project-data tbody tr td {
+            border-left: 0 !important;
+        }
+    </style>
 {% endblock %}

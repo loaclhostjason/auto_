@@ -14,6 +14,14 @@ def get_copy_parent_id(copy_id):
     return copy_parent_id
 
 
+def get_copy_part_info(copy_id):
+    if not copy_id:
+        return
+
+    info = ProjectPartNumRelation.query.filter_by(id=copy_id).first()
+    return info
+
+
 def delete_project_children(id):
     relations = ProjectRelation.query.filter_by(parent_id=id).all()
     if not relations:
@@ -158,12 +166,10 @@ def get_project_children_v2(project_id, last_relation_id):
     return result
 
 
-def download_files(filename):
+def download_files(filename_path, filename):
     try:
         from urllib.parse import quote
 
-        filename = '%s.95' % filename
-        filename_path = os.path.join(current_app.config['FILE_PATH'], filename)
         print(filename_path)
 
         response = make_response(send_file(filename_path, as_attachment=True))

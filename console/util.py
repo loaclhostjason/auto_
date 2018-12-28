@@ -1,30 +1,18 @@
 # import xml.dom.minidom
-from dom import minidom
+from console.dom import minidom
 import os
 import json
-from app import create_app
-from app.main.models import Project, ProjectRelation, ProjectData
-from app.manage.models import AttrContent, Attr
+from .app.main.models import Project, ProjectRelation, ProjectData
+from .app.manage.models import AttrContent, Attr, ExtraAttrData
+from .app.models import Modification
 from collections import defaultdict, OrderedDict
-from enum import Enum
 import datetime
 import re
 import sys
+from .util_xml import XmlData, UtilXml
 
 os_name = sys.platform
 operate = '\n' if os_name.startswith('win') else '\r\n'
-
-app = create_app()
-app.app_context().push()
-
-
-class Byte(Enum):
-    byte = 'BytePosition'
-
-
-class Bite(Enum):
-    bite = 'BitPosition'
-
 
 sty = {
     '#': '+',
@@ -34,143 +22,11 @@ sty = {
 }
 
 
-def check_las(new_data_init):
-    if '$' in new_data_init:
-        return new_data_init
+class ExportXml(XmlData):
 
-    result = []
-    split_re = '|\\'.join(sty.keys())
-    split_re = '(\\' + split_re + ')'
-    split_data = re.split(r'%s' % split_re, new_data_init)
-
-    if split_data:
-        for dl in split_data:
-            if dl not in sty.keys():
-                result.append('$' + dl)
-            else:
-                result.append(dl)
-    else:
-        result = '$' + new_data_init
-
-    if isinstance(result, list):
-        result = ''.join(result)
-    return result
-
-
-def change_data(new_data_init):
-    if str(new_data_init).lower() == 'none':
-        return ''
-    if not new_data_init:
-        return ''
-
-    hav_i = False
-    if "!" in new_data_init:
-        new_data_init = new_data_init[2:-1]
-        hav_i = True
-
-    new_data_init = check_las(new_data_init)
-
-    new_data = ''
-    if '/' in new_data_init:
-        data = new_data_init.split('/')
-        for index, v in enumerate(data):
-            if index == 0:
-                try:
-                    tmp_s = v[-6]
-                    tmp = v.split(tmp_s)
-                    tmp = [v for v in tmp if v]
-                    new_data += ''.join(tmp[:-1]) + tmp_s + '(' + ''.join(tmp[-1])
-                except Exception as e:
-                    new_data += '(' + v
-            else:
-                if index < len(data) - 1:
-                    if len(v) > 5:
-                        new_data += '/' + v[:5] + ')' + v[5:-5] + '(' + v[-5:]
-                    else:
-                        new_data += '/' + v
-                else:
-                    new_data += '/' + v + ')'
-    else:
-        new_data = new_data_init
-
-    if '#' in new_data:
-        n = new_data.split('#')
-        new_data = ['(%s)' % v for v in n if v]
-        new_data = '+'.join(new_data)
-
-    for k, v in sty.items():
-        new_data = new_data.replace(k, v)
-
-    if hav_i:
-        new_data = '!(' + new_data + ')'
-    return new_data
-
-
-def get_test(did_len, init_val):
-    r = list()
-    for index in range(did_len):
-        r.append('00000000')
-
-    if init_val:
-        return init_val
-    return r
-
-
-class ExportXml(object):
-
-    def __init__(self, project_id):
-        self.project_id = project_id
-
-        self.header_order = ['ApplicationLayer', 'PhysicalLayer']
-
-    @staticmethod
-    def get_parent_id(info):
-        project_relation = ProjectRelation.query.filter_by(id=info.project_relation_id).first()
-        project_relation = ProjectRelation.query.filter_by(
-            id=project_relation.parent_id if project_relation else '').first()
-        if not project_relation:
-            return
-        return project_relation.parent_id
-
-    def tt(self):
-        project_data = ProjectData.query.filter_by(project_id=self.project_id).all()
-        r = defaultdict(list)
-        if not project_data:
-            return r
-        for info in project_data:
-            project_relation = ProjectRelation.query.filter_by(id=info.project_relation_id).first()
-            project_relation = ProjectRelation.query.filter_by(
-                id=project_relation.parent_id if project_relation else '').first()
-            if project_relation:
-                r[project_relation.parent_id].append(info)
-        return r
-
-    # did default value
-    def get_did_default_val(self):
-        project_data = self.tt()
-        if not project_data:
-            return
-
-        r = dict()
-        for parent_id, datas in project_data.items():
-            init_val = []
-            for info in datas:
-                did_len = AttrContent.get_did_len(parent_id)
-                bit_len, start_bit, byte_info = AttrContent.get_attr_info(info.project_relation_id)
-
-                end_bit = start_bit + bit_len
-
-                init_val = get_test(did_len, init_val)
-
-                __init_val = init_val[byte_info]
-                if info.default_conf:
-                    __init_val = __init_val[0:start_bit] + info.default_conf[::-1] + __init_val[end_bit:]
-                init_val[byte_info] = __init_val[::-1]
-
-                r[parent_id] = init_val
-
-        r = {k: ''.join([v for v in list_val]) for k, list_val in r.items()}
-        return r
+    def __init__(self, *args, **kwargs):
+        super(ExportXml, self).__init__(*args, **kwargs)
+        # self.project_id = project_id
 
     def set_path(self):
         if not self.xml_managers_attr:
@@ -197,62 +53,25 @@ class ExportXml(object):
     @property
     def xml_managers_attr(self):
         project = Project.query.get_or_404(self.project_id)
-        result = '{}_{}'.format(project.project_group.name, project.name)
-        return result
+        # result = '{}_{}'.format(project.project_group.name, project.name)
+        if project.project_config_name:
+            result = project.project_config_name.lower()
+            return result
+        return
 
     @property
     def xml_pin(self):
         attr = Attr.query.filter_by(level=1).first()
+        extra_data = ExtraAttrData.query.filter_by(project_id=self.project_id, level=1).first()
         if not attr or not attr.extra_attr_content:
             return list()
-        content = json.loads(attr.extra_attr_content.content_val or '{}') if attr.extra_attr_content else {}
-        content = content.get(str(self.project_id)) or []
+
+        content = json.loads(extra_data.pin) if extra_data and extra_data.pin else []
         if not content:
             content = json.loads(attr.extra_attr_content.content or '{}') if attr.extra_attr_content else []
-            if not content:
-                return list()
-            pin_num = content[-1].get('pin_num')
-            pin_num = int(pin_num)
-            content = [
-                {
-                    'item': v['item'],
-                    'item_value': v['item_default']
-                } for v in content[:-1] if v.get('item_default')
-            ]
-            content = content * pin_num
-            result = [content[i:i + len(content) // 2] for i in range(0, len(content), len(content) // 2)]
-            return result
+            return self._get_xml_extra_pin_data(content)
 
-        result = {
-            'pin_num': 0,
-            'data': list()
-        }
-        for c in content:
-            if 'pin_num' in c.keys():
-                result['pin_num'] = int(c['pin_num'])
-            else:
-                result['data'].append(c)
-
-        pin_num = result['pin_num']
-        pin_num = int(pin_num)
-        data = result['data']
-        if data:
-            result = [data[i:i + len(data) // 2] for i in range(0, len(data), len(data) // 2)]
-        return result
-
-    @staticmethod
-    def __ecu_order():
-        attr = Attr.query.filter_by(level=1).first()
-        if not attr or not attr.content:
-            return list()
-        content = json.loads(attr.content)
-        result = list()
-        for c in content:
-            if c.get('item_protocol'):
-                result.append('%s-%s' % (c['item_protocol'], c['item']))
-            else:
-                result.append(c['item'])
-        return result
+        return self._get_xml_pin_data(content)
 
     @property
     def xml_header_attr(self):
@@ -277,7 +96,7 @@ class ExportXml(object):
 
         content = json.loads(attr_content.real_content)
 
-        order_content = self.__ecu_order()
+        order_content = UtilXml.get_ecu_order()
         if order_content:
             for oc in order_content:
                 result[oc] = content.get(oc) or dict(header_default).get(oc, '')
@@ -287,6 +106,7 @@ class ExportXml(object):
 
     @property
     def xml_did_list(self):
+        from .app.main.api_data import split_default_val
         # default
         default_val_did = self.get_did_default_val()
 
@@ -309,24 +129,15 @@ class ExportXml(object):
             else:
                 real_content = did_default
 
-            if default_val_did and default_val_did.get(pr.id):
+            if default_val_did and default_val_did.get(pr.id) and str(default_val_did.get(pr.id)).replace('0', ''):
                 real_content['DefaultValue'] = self.str_to_hex(default_val_did[pr.id])
             else:
                 did_len = real_content.get('DidLength')
-                real_content['DefaultValue'] = self.str_to_hex(real_content.get('DefaultValue'), did_len)
+                # real_content['DefaultValue'] = self.str_to_hex(real_content.get('DefaultValue'), did_len)
+                real_content['DefaultValue'] = split_default_val(real_content.get('DefaultValue'),
+                                                                 int(did_len or 0) * 2)
             result[pr.name] = real_content
 
-        return result
-
-    @property
-    def __did_order(self):
-        attr = Attr.query.filter_by(level=2).first()
-        if not attr or not attr.content:
-            return []
-        content = json.loads(attr.content)
-        result = list()
-        for v in content:
-            result.append(v['item'])
         return result
 
     @property
@@ -345,7 +156,8 @@ class ExportXml(object):
                                 project.get('project_relation_id')]
 
         attr_content = AttrContent.query.filter(AttrContent.project_relation_id.in_(project_relation_ids)).all()
-        pro = ProjectRelation.query.filter(ProjectRelation.id.in_(project_relation_ids)).all()
+        pro = ProjectRelation.query.filter(ProjectRelation.id.in_(project_relation_ids)). \
+            order_by(ProjectRelation.relation_order).all()
 
         d['parameter_name'] = [{p.id: p.name} for p in pro]
         r = defaultdict(list)
@@ -357,12 +169,20 @@ class ExportXml(object):
                         if not content.get(k):
                             content[k] = t_did.get(k, '')
 
-                    if content.get('BytePosition'):
-                        content['BytePosition'] = int(content['BytePosition']) + 1
-                    if content.get('BitPosition'):
-                        content['BitPosition'] = int(content['BitPosition']) + (
-                                int(content['BitLength']) - 1) if content.get('BitLength') and int(
-                            content['BitLength']) > 0 else 0
+                    byte_p = content.get('BytePosition')
+                    bit_p = content.get('BitPosition')
+                    bit_l = content['BitLength']
+
+                    if byte_p:
+                        content['BytePosition'] = int(byte_p) + 1
+
+                    if bit_p and bit_l:
+                        if int(bit_p) + int(bit_l) - 8 > 0:
+                            content['BitPosition'] = 7
+                        else:
+                            content['BitPosition'] = int(bit_p) + (int(bit_l) - 1) if int(bit_l) > 0 else 0
+                    if bit_l and bit_p and int(bit_l) + int(bit_p) > 8:
+                        content['BitLength'] = 8 - int(bit_p)
                     r[ac.project_relation_id].append(content)
 
         this_id = [v.project_relation_id for v in attr_content]
@@ -380,7 +200,7 @@ class ExportXml(object):
             return
         init_de = '00'
         try:
-            data_len = len(data) // 8 if not did_len else did_len
+            data_len = len(data) // 8 if not did_len else int(did_len)
 
             hex_data = hex(int(data, 2))
             hex_data = hex_data.replace('0x', '')
@@ -389,20 +209,10 @@ class ExportXml(object):
             if (data_len - (len(hex_data) // 2)) >= 1:
                 dif_len = data_len - (len(hex_data) // 2)
                 hex_data = (init_de * dif_len) + hex_data
-        except:
+        except Exception as e:
+            print('hex %s' % e)
             hex_data = data
         return hex_data
-
-    @staticmethod
-    def __parameter_order():
-        attr = Attr.query.filter_by(level=3).first()
-        if not attr or not attr.content:
-            return list()
-        result = list()
-        content = json.loads(attr.content)
-        for ar in content:
-            result.append(ar['item'])
-        return result
 
     @property
     def modification(self):
@@ -421,19 +231,16 @@ class ExportXml(object):
 
         if r:
             for address, projects in r.items():
-                project = ProjectData.query.filter_by(project_id=self.project_id).order_by(
-                    ProjectData.project_relation_id).all()
-                conf_data = defaultdict(list)
-                if project:
-                    for pro in project:
-                        parent_relation = ProjectRelation.query.get_or_404(pro.project_relation_id)
-                        pev_did = ProjectRelation.query.filter_by(id=parent_relation.parent_id).first()
-                        conf_data[parent_relation.parent_id].append((self.str_to_hex(
-                            ProjectData().conf_data(pro.content, self.project_id, pev_did.parent_id)), pro.las))
+                modification = Modification.query.filter_by(project_id=self.project_id).first()
+                modification = json.loads((modification.content or '{}')) if modification else None
+                conf_data = modification.get('conf_data') if modification else {}
+                ext_conf_data = modification.get('ext_conf_data') if modification else {}
 
-                conf_data = {k: v for k, v in conf_data.items()}
+                conf_data = {int(k): v for k, v in conf_data.items() if k}
+                ext_conf_data = {int(k): v for k, v in ext_conf_data.items() if k}
                 conf_data = {
-                    'conf_data': conf_data
+                    'conf_data': conf_data,
+                    'ext_conf_data': ext_conf_data,
                 }
                 new_result[address] = dict(conf_data, **self.__get_(projects))
 
@@ -441,80 +248,89 @@ class ExportXml(object):
 
     @property
     def __default_conf(self):
-        data = ProjectData.query. \
-            filter(ProjectData.project_id == self.project_id, ProjectData.default_conf.isnot(None)).all()
+        mod_data = Modification.query.filter_by(project_id=self.project_id).first()
+
         default_ = dict()
-        if data:
-            for d in data:
-                parent_relation = ProjectRelation.query.get_or_404(d.project_relation_id)
-                if d.default_conf:
-                    default_[parent_relation.parent_id] = d.default_conf
+        if mod_data:
+            default_ = json.loads(mod_data.default_conf or '{}')
+
+        if default_:
+            default_ = {int(k): v for k, v in default_.items() if k}
         return default_
 
-    def xml_section_attr(self, did_name, type_result):
-        attr = Attr.query.filter_by(level=2).first()
-        if not attr or not attr.extra_attr_content:
-            return list()
-        content = json.loads(attr.extra_attr_content.content_val or '{}') if attr.extra_attr_content else {}
-        content = content.get(did_name) or {}
+    @staticmethod
+    def get_default_rw_sec(de_content, rw_type):
+        # rw_type in readsection writsection
+        result = [{
+            'item': v['item'],
+            'item_value': v['item_default']
+        } for v in de_content[rw_type] if v.get('item_default')]
+        result = [v for v in result if v]
+        return result
 
-        read_section = content.get('readsection')
+    def xml_section_attr(self, did_name, type_result):
+        # pro_relation = ProjectRelation.query. \
+        #     filter_by(project_id=self.project_id).order_by(ProjectRelation.relation_order).all()
+        # pro_relation_name = [v.name for v in pro_relation if v.name]
+
+        extra_data = ExtraAttrData.query.filter_by(project_id=self.project_id, level=2).all()
+        attr = Attr.query.filter_by(level=2).first()
+        if not attr:
+            return list()
 
         de_content = json.loads(
             attr.extra_attr_content.content) if attr.extra_attr_content and attr.extra_attr_content.content else {}
-        if not read_section:
-            if de_content.get('readsection'):
-                read_section = [
-                    {
-                        'item': v['item'],
-                        'item_value': v['item_default']
-                    } for v in de_content['readsection'] if v.get('item_default')
-                ]
 
-        write_section = content.get('writsection')
-        if not write_section:
-            if de_content.get('writsection'):
-                write_section = [
-                    {
-                        'item': v['item'],
-                        'item_value': v['item_default']
-                    } for v in de_content['writsection'] if v.get('item_default')
-                ]
+        read_section = None
+        write_section = None
+
+        if not extra_data:
+            read_section = self.get_default_rw_sec(de_content, 'readsection')
+            write_section = self.get_default_rw_sec(de_content, 'writsection')
+        else:
+            for ed in extra_data:
+                if ed.project_relation.name == did_name:
+                    read_section = json.loads(ed.read_sec or '{}')
+
+                if ed.project_relation.name == did_name:
+                    write_section = json.loads(ed.write_sec or '{}')
 
         result = {
-            'read_section': read_section,
-            'write_section': write_section,
+            'read_section': read_section or self.get_default_rw_sec(de_content, 'readsection'),
+            'write_section': write_section or self.get_default_rw_sec(de_content, 'writsection'),
         }
         return result.get(type_result)
 
     @property
     def xml_reset_section(self):
+        pro_relation = ProjectRelation.query. \
+            filter_by(project_id=self.project_id).order_by(ProjectRelation.relation_order).all()
+        pro_relation_name = [v.name for v in pro_relation if v.name]
+
         attr = Attr.query.filter_by(level=1).first()
+        extra_data = ExtraAttrData.query.filter_by(project_id=self.project_id, level=1).first()
         if not attr or not attr.extra_attr_content:
             return list(), list()
-        content = json.loads(attr.extra_attr_content.content_section_val or '{}') if attr.extra_attr_content else {}
-        content = content.get(str(self.project_id))
+
+        content = json.loads(extra_data.reset_sec) if extra_data and extra_data.reset_sec else []
         if not content:
-            content_sec = json.loads(attr.extra_attr_content.content_section or '{}') if attr.extra_attr_content else []
+            content_sec = json.loads(
+                attr.extra_attr_content.content_section or '{}') if attr.extra_attr_content else []
             content = [
                 {
                     'resetsection_item': v['resetsection_item'],
                     'resetsection_item_value': v['resetsection_item_default']
                 } for v in content_sec if v.get('resetsection_item_default')]
 
-        attr2 = Attr.query.filter_by(level=2).first()
-        if not attr or not attr.extra_attr_content:
-            return list(), list()
-        content2 = json.loads(attr2.extra_attr_content.content_val or '{}') if attr.extra_attr_content else {}
+        extra_data_2 = ExtraAttrData.query.filter_by(project_id=self.project_id, level=2).all()
         new_reset_section = []
-        for k, v in content2.items():
-            resetsection = v.get('resetsection')
-            if resetsection:
-                for kk, vv in resetsection.items():
-                    if kk == str(self.project_id):
-                        new_reset_section.append(vv)
+        if extra_data_2:
+            for info in extra_data_2:
+                if info.is_open_reset:
+                    new_reset_section.append(info.project_relation.name)
 
-        return content, sum(new_reset_section, [])
+        new_reset_section = [v for v in pro_relation_name if v in new_reset_section]
+        return content, new_reset_section
 
     @property
     def default_attr(self):
@@ -593,9 +409,12 @@ class ExportXml(object):
             for key, val in self.xml_did_list.items():
                 node_did_item = doc.createElement('DidItem')
                 if val:
-                    for k in self.__did_order:
+                    for k in UtilXml.get_did_order():
                         did_item_s = doc.createElement(k)
-                        did_item_s.appendChild(doc.createTextNode(str(val.get(k) or '')))
+                        if k == 'FeatureCode':
+                            did_item_s.appendChild(doc.createTextNode(UtilXml.change_las_data(str(val.get(k) or ''))))
+                        else:
+                            did_item_s.appendChild(doc.createTextNode(str(val.get(k) or '')))
                         node_did_item.appendChild(did_item_s)
                     node_did_list.appendChild(node_did_item)
         root.appendChild(node_did_list)
@@ -639,19 +458,17 @@ class ExportXml(object):
                         if default_conf.get(parameter_val_kk):
                             default_val = default_conf[parameter_val_kk]
                         else:
-                            # try:
-                            #     default_val = val['conf_data'].get(parameter_val_kk)[0][0]
-                            # except Exception:
-                            #     default_val = ''
                             default_val = ''
 
                         try:
-                            _config_data_las = val['conf_data'].get(parameter_val_kk)[0][0]
-                        except Exception:
-                            _config_data_las = ''
+                            _config_data_las = sum(val['conf_data'].get(parameter_val_kk), [])
+                            _config_data_las = [str(v).lower() for v in _config_data_las if v]
+                        except Exception as e:
+                            _config_data_las = []
 
-                        if _config_data_las:
-                            node_parameter.setAttribute('ParamDefaultValue', self.str_to_hex(str(default_val or '')))
+                        if 'all' not in _config_data_las:
+                            node_parameter.setAttribute('ParamDefaultValue',
+                                                        self.str_to_hex(str(default_val or '')))
                             for parameter_k, parameter_v in parameter_val.items():
 
                                 # parameter and byte bit bit_len
@@ -660,14 +477,17 @@ class ExportXml(object):
                                 # bite
                                 if byte_content:
                                     byte_content = byte_content[0]
-                                    for p_key in self.__parameter_order():
+                                    for p_key in UtilXml.get_parameter_order():
                                         node_byte_name = doc.createElement(p_key)
-                                        node_byte_name.appendChild(doc.createTextNode(str(byte_content.get(p_key, ''))))
+                                        node_byte_name.appendChild(
+                                            doc.createTextNode(str(byte_content.get(p_key, ''))))
                                         node_parameter.appendChild(node_byte_name)
 
                                 # ConfData
                                 node_conf_data = doc.createElement('ConfData')
                                 conf_data = val['conf_data'].get(parameter_k)
+                                conf_data = [(v[0], v[1]) for v in conf_data if
+                                             v[0] and v[1]] if conf_data else None
 
                                 if not conf_data:
                                     node_conf_data.setAttribute('useConfData', 'no')
@@ -677,15 +497,64 @@ class ExportXml(object):
                                     node_conf_data.setAttribute('useConfData', 'true')
                                     for data in conf_data:
                                         node_config_data = doc.createElement('ConfigData')
-                                        if data[0] and data[1] and change_data(data[1]):
+                                        # if data[0] and data[1] and change_data(data[1]):
+                                        if data[0] and data[1] and UtilXml.change_las_data(data[1]):
                                             node_config_data.setAttribute('Value', data[0])
-                                            node_config_data.setAttribute('ConfigExpression', change_data(data[1]))
+                                            node_config_data.setAttribute('ConfigExpression',
+                                                                          UtilXml.change_las_data(data[1]))
                                             node_conf_data.appendChild(node_config_data)
 
                                             node_parameter.appendChild(node_conf_data)
+                                        if data[1] == 'all':
+                                            node_parameter.appendChild(node_conf_data)
+                                            break
 
-                        if _config_data_las:
+                        # if _config_data_las:
+                        if 'all' not in _config_data_las:
                             node_modification_item.appendChild(node_parameter)
+
+                        _ext_conf_datas = val['ext_conf_data'].get(parameter_val_kk)
+                        if _ext_conf_datas and 'all' not in _config_data_las:
+                            for _ext_conf_data in _ext_conf_datas:
+                                ext_parameter = doc.createElement('Parameter')
+                                ext_info = _ext_conf_data.get('info') or {}
+                                ext_data = _ext_conf_data['data']
+                                if ext_info:
+                                    ext_parameter.setAttribute('ParamDefaultValue',
+                                                               self.str_to_hex(
+                                                                   str(ext_info.get('ParamDefaultValue', ''))))
+
+                                    ext_parameter_name = doc.createElement('ParameterName')
+                                    ext_parameter_name.appendChild(
+                                        doc.createTextNode(str(ext_info.get('ParameterName', ''))))
+                                    ext_parameter.appendChild(ext_parameter_name)
+
+                                    ext_byte_name = doc.createElement('BytePosition')
+                                    ext_byte_name.appendChild(doc.createTextNode(str(ext_info.get('BytePosition', ''))))
+                                    ext_parameter.appendChild(ext_byte_name)
+
+                                    ext_bit = doc.createElement('BitPosition')
+                                    ext_bit.appendChild(doc.createTextNode(str(ext_info.get('BitPosition', ''))))
+                                    ext_parameter.appendChild(ext_bit)
+
+                                    ext_bit_len = doc.createElement('BitLength')
+                                    ext_bit_len.appendChild(doc.createTextNode(str(ext_info.get('BitLength', ''))))
+                                    ext_parameter.appendChild(ext_bit_len)
+
+                                    ext_conf_d = doc.createElement('ConfData')
+                                    ext_conf_d.setAttribute('useConfData', 'true')
+
+                                    # print(ext_data)
+                                    for v in ext_data:
+                                        ext_config_data = doc.createElement('ConfigData')
+                                        ext_config_data.setAttribute('Value', v[0])
+                                        ext_config_data.setAttribute('ConfigExpression', UtilXml.change_las_data(v[1]))
+                                        ext_conf_d.appendChild(ext_config_data)
+
+                                    ext_parameter.appendChild(ext_conf_d)
+
+                                node_modification_item.appendChild(ext_parameter)
+
                     node_modification.appendChild(node_modification_item)
         root.appendChild(node_modification)
 
@@ -708,14 +577,19 @@ class ExportXml(object):
             for v in reset_section_attr:
                 node_reset_section.setAttribute(v['resetsection_item'], v['resetsection_item_value'])
         if read_section_val:
-            for v in self.read_section:
-                if v in read_section_val:
-                    node_reset_section_v = doc.createElement('ReadItem')
-                    node_reset_section_v.setAttribute('IDREF', v)
-                    node_reset_section.appendChild(node_reset_section_v)
+            for info in read_section_val:
+                node_reset_section_v = doc.createElement('ReadItem')
+                node_reset_section_v.setAttribute('IDREF', info)
+                node_reset_section.appendChild(node_reset_section_v)
 
         root.appendChild(node_reset_section)
 
+        # RevisionLog
+        root.appendChild(self.xml_log(manager_dict, doc))
+
+        return doc
+
+    def xml_log(self, manager_dict, doc):
         # RevisionLog
         node_log = doc.createElement('RevisionLog')
         node_log_entry = doc.createElement('RevisionLogEntry')
@@ -738,9 +612,7 @@ class ExportXml(object):
         node_log_entry.appendChild(node_log_author)
 
         node_log.appendChild(node_log_entry)
-        root.appendChild(node_log)
-
-        return doc
+        return node_log
 
     def run(self):
         files_path = self.set_path()
@@ -752,7 +624,7 @@ class ExportXml(object):
             doc.writexml(f, indent='', addindent='  ', newl=operate, encoding="utf-8")
 
         file_data = ""
-        with open(files_path, 'r') as f:
+        with open(files_path, 'r', encoding='UTF-8') as f:
             for line in f:
                 if '<DefaultValue' in line:
                     line = line[:20] + (('"' + line[20:-16] + '"') if line[20:-16] else '') + line[-16:-1] + operate
@@ -773,7 +645,7 @@ class ExportXml(object):
             doc.writexml(f, indent='', addindent='  ', newl=operate, encoding="utf-8")
 
         file_data = ""
-        with open(files_path, 'r') as f:
+        with open(files_path, 'r', encoding='UTF-8') as f:
             for line in f:
                 if '<DefaultValue' in line:
                     line = line[:20] + (('"' + line[20:-16] + '"') if line[20:-16] else '') + line[-16:-1] + operate
@@ -783,8 +655,3 @@ class ExportXml(object):
 
         with open(files_path, 'w', encoding='utf-8') as f:
             f.write(file_data)
-
-
-if __name__ == '__main__':
-    export_xml = ExportXml(14)
-    export_xml.run()

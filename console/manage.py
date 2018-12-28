@@ -3,10 +3,10 @@ from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 from flask_assets import ManageAssets
 
-from app.models import *
-from app.assets import assets_env
-from app import app, db
-from app.manage.models import Attr, ExtraAttrContent
+from .app.models import *
+from .app.assets import assets_env
+from .app import app, db
+from .app.manage.models import Attr, ExtraAttrContent
 
 manager = Manager(app)
 migrate = Migrate(app, db)

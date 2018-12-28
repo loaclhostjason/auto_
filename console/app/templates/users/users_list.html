@@ -51,6 +51,29 @@
         {% endif %}
     </td>
 
+    <td>
+        {% if user.project_id %}
+            {% if user.role.name == 'user' %}
+                {{ user.project_id }}
+                <label class="label_border">
+                    <a href="javascript:void (0)" class="fp_file text-success" data-user="{{ user.username }}"
+                       data-uid="{{ user.id }}"><i class="glyphicon glyphicon-edit"></i> 文件</a>
+                </label>
+            {% else %}
+                --
+            {% endif %}
+        {% else %}
+            {% if user.role.name == 'user' %}
+                <label class="label_border">
+                    <a href="javascript:void (0)" class="fp_file text-warning" data-user="{{ user.username }}"
+                       data-uid="{{ user.id }}"><i class="glyphicon glyphicon-plus"></i> 文件</a>
+                </label>
+            {% else %}
+                --
+            {% endif %}
+        {% endif %}
+    </td>
+
     <td class="text-right">
         {% if not user.is_admin %}
             <div>
@@ -76,6 +99,7 @@
     {% include "users/modal/user_modal.html" %}
     {% include "users/modal/edit_user_modal.html" %}
     {% include "users/modal/fp_pm_modal.html" %}
+    {% include "users/modal/fp_file_modal.html" %}
 
     <div class="row">
         <div class="col-sm-12">
@@ -122,6 +146,7 @@
                         <th width="150">到期时间</th>
                         <th width="120">权限</th>
                         <th>项目</th>
+                        <th>文件</th>
                         <th width="160" class="text-right">操作</th>
                     </tr>
                     </thead>

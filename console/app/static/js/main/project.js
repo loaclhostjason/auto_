@@ -21,12 +21,13 @@ $(document).ready(function () {
             });
         };
 
-        this.get_attr_input = function (project_id, level, id) {
+        this.get_attr_input = function (project_id, level, id, default_name) {
+            var _default_name = default_name || null;
             $.get('/attr/content?project_id=' + project_id + '&level=' + level + '&project_relation_id=' + id, function (resp) {
                 if (resp.success) {
                     var data = resp['data'];
                     var content = resp['content'];
-                    attr_html(data, content, id, level);
+                    attr_html(data, content, id, level, _default_name);
                 } else {
                     toastr.error(resp.message)
                 }
@@ -45,8 +46,17 @@ $(document).ready(function () {
                     var bit_position = resp['bit_position'];
                     var byte_position = resp['byte_position'];
                     var default_conf = resp['default_conf'];
-                    $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position));
-                    $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf, bit_position));
+                    var ext_bitPosition = resp['ext_bitPosition'];
+
+                    if (resp['level'] && resp['level'] === 3) {
+                        $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position, ext_bitPosition));
+                        $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf, bit_position));
+                        init_editTable();
+                    } else {
+                        $('.table-project-data thead').html('');
+                        $('.table-project-data tbody').html('');
+                    }
+
                 } else {
                     toastr.error(resp.message)
                 }
@@ -82,9 +92,14 @@ $(document).ready(function () {
                 html += '<tr class="data-class">';
                 html += '<input type="hidden" name="project_relation_id" value="' + data['level_4_id'] + '">';
                 html += '<input type="hidden" name="name" value="' + data['level_4'] + '">';
-                html += '<td class="text-center"><a href="javascript:void(0)" class="del-project-func text-danger pull-left" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a>' + data['level_4'] + '</td>';
-                html += '<td class="text-center"><div style="display: inline-flex"><div style="float: left"><input name="las" class="tc-search-words" value="' + (data_info['las'] || '') + '"></div>';
-                html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
+
+                // show las change name
+                console.log(data['level_4']);
+                html += '<td class="text-center"><a href="javascript:void(0)" class="del-project-func text-danger pull-left" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a>';
+                html += '<a href="javascript:void (0)" class="display_name" data-pk="' + data['level_4_id'] + '">' + data['level_4'] + '</a></td>';
+
+                html += '<td class="text-center"><div style="display: inline-flex"><div style="float: left"><input name="las" required class="tc-search-words" value="' + (data_info['las'] || '') + '"></div>';
+                html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal-bak"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
                 html += '</td>';
 
 
@@ -101,8 +116,9 @@ $(document).ready(function () {
                     if (content['byte' + num]) {
                         html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="' + (content['byte' + num] || '') + '">';
                     } else {
-                        if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
-                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="">';
+                        // if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
+                        if (num == byte_position) {
+                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="">'; // show or hide
                         } else
                             html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="" disabled>';
                     }
@@ -123,7 +139,7 @@ $(document).ready(function () {
             return html
         };
 
-        this.project_thead_html = function (did_len, bit_position, byte_position) {
+        this.project_thead_html = function (did_len, bit_position, byte_position, ext_bitPosition) {
             var html = '';
             html += '<tr>';
             html += '<th width="100" style="vertical-align: middle; min-width: 100px"></th>';
@@ -149,7 +165,9 @@ $(document).ready(function () {
                         _new_byte_position.push(Number(byte_position) + i);
                     }
 
-                    for (var j = 7; j > 7 - _n; j--) {
+                    ext_bitPosition = Number(ext_bitPosition);
+                    // alert(_n)
+                    for (var j = ext_bitPosition; j <= _n + ext_bitPosition - 1; j++) {
                         new_bit_position.push(j)
                     }
 
@@ -209,7 +227,7 @@ $(document).ready(function () {
             }
             html += '</tr>';
             return html;
-        }
+        };
     }
 
     Projects.prototype = Object.create(AppCommonClass.prototype);
@@ -257,7 +275,8 @@ $(document).ready(function () {
                     $('.submit-project-data').show();
                 }
 
-                projects.get_protect_relation(project_id)
+                if (level < 4)
+                    projects.get_protect_relation(project_id)
             } else
                 toastr.error(resp.message)
         })
@@ -266,13 +285,23 @@ $(document).ready(function () {
 
     // submit attr
     $(document).on('click', '.submit-add-attr', function () {
-        var form_data = $('form#attr-form').serialize();
+        var form_ = $('form#attr-form');
+        var form_data = form_.serialize();
+        toastr.options.timeOut = null;
+        toastr.info('正在保存中...，请稍等');
         $.post('/manage/attr/content/add?project_id=' + project_id, form_data, function (resp) {
+            toastr.clear();
+            toastr.options.timeOut = 2000;
             if (resp.success) {
                 projects.get_project_data(project_id, $('[name="project_relation_id"]').val());
-                toastr.success(resp['message'])
-            } else
-                toastr.error(resp['message'])
+                projects.get_attr_input(project_id, form_.find('[name="level"]').val(), form_.find('[name="project_relation_id"]').val());
+
+                toastr.success(resp['message']);
+            } else {
+                toastr.error(resp['message']);
+
+            }
+
         })
     });
 
@@ -299,7 +328,9 @@ $(document).ready(function () {
 
     // submit project data
     $('.submit-project-data').click(function () {
-        var params = $('form#project-data-form').serialize();
+        var this_form = $('form#project-data-form');
+        var params = this_form.serialize();
+
         toastr.options.timeOut = null;
         toastr.info('正在保存中...');
         $.post('/project/data/submit/' + project_id + '?data_relation_id=' + $('[name="project_relation_id"]').val(), params, function (resp) {
@@ -313,179 +344,6 @@ $(document).ready(function () {
         })
     });
 
-    // show las modal
-    var btn_las;
-    var update_las_modal = $("#update-las-modal");
-    $(document).on('click', '.show-las-modal', function () {
-        projects.show_modal(update_las_modal, $(this));
-        update_las_modal.find('.modal-title').text('Las【' + $(this).data('value') + '】编辑信息');
-    });
-    update_las_modal.on('hide.bs.modal', function () {
-        $(this).find('input').val('');
-        $(this).find('select').val('');
-        $(this).find('[name="no_las"]').removeAttr('checked');
-        $('.start_rule:not(:first-of-type)').remove();
-    });
-    var num = 0;
-    update_las_modal.on('show.bs.modal', function (event) {
-        $(this).find('[name="no_las"]').val('!');
-        $.get('/las/get?project_group_id=' + project_group_id).done(function (resp) {
-            var data = resp['data'];
-
-            function option_html(data, selected_val) {
-                var h = '';
-                data.forEach(function (val) {
-                    for (var k in val) {
-                        if (selected_val == k) {
-                            h += '<option selected value="' + k + '">' + k + ' | ' + val[k] + '</option>'
-                        } else
-                            h += '<option value="' + k + '">' + k + ' | ' + val[k] + '</option>'
-                    }
-                });
-                return h
-            }
-
-            btn_las = $(event.relatedTarget);
-            var las_name = btn_las.parents('td').find('input').val();
-            var first_las_name = las_name[0];
-            if (first_las_name === '!') {
-                update_las_modal.find('[name="no_las"]').prop('checked', 'checked');
-                las_name = las_name.substring(2, las_name.length - 1)
-            }
-            if ($.inArray(las_name[las_name.length - 1], ['#', '&', '-', '/']) > -1) {
-                las_name = las_name.substring(0, las_name.length - 2)
-            }
-
-            las_name = String(las_name).replace(/[$]/g, '');
-            // console.log(String(aa));
-
-            las_val = las_name.split(/[/.#+&,-]/);
-            las_f = [];
-            las_val.forEach(function (value) {
-
-                try {
-                    if (las_name.split(value)[1][0])
-                        las_f.push(las_name.split(value)[1][0]);
-                } catch (e) {
-                    console.log(e);
-                }
-
-            });
-
-            var html = '';
-            las_val.forEach(function (val, index) {
-                num += index;
-                html += '<div class="form-group start_rule"><div class="col-sm-6">';
-                html += '<select name="las_' + index + '" class="form-control pull-left">' + option_html(data, val) + '</select></div>';
-                html += '<div class="col-sm-4"><select class="form-control pull-left las_f" name="las_f_' + index + '">';
-                var f = [['', '请选择'], ['#', '#'], ['/', '/'], ['-', '-'], ['&', '&']];
-                if (index === las_val.length - 1) {
-                    f.forEach(function (value) {
-                        html += '<option value="' + value[0] + '">' + value[1] + '</option>';
-                    });
-                } else {
-                    f.forEach(function (value) {
-                        if (las_f[index] === value[0]) {
-                            html += '<option selected value="' + value[0] + '">' + value[1] + '</option>';
-                        } else
-                            html += '<option value="' + value[0] + '">' + value[1] + '</option>';
-                    });
-                }
-
-                html += '</select></div>';
-                html += '<div class="col-sm-2">';
-                html += '<i style="position: relative;top: 10px;right: 20px;cursor: pointer" class="text-success glyphicon glyphicon glyphicon-plus add_las"></i>';
-                if (index !== 0) {
-                    html += '<i style="position: relative;top: 10px;cursor: pointer" class="text-danger glyphicon glyphicon-minus remove_las"></i>';
-                }
-                html += '</div></div>';
-            });
-            $('.parent_rule').html(html);
-        });
-
-
-    });
-
-    var data = '';
-    $.get('/las/get?project_group_id=' + project_group_id).done(function (resp) {
-        data = resp['data'];
-    });
-
-    function option_html2(data) {
-        var h = '';
-        data.forEach(function (val) {
-            for (var k in val) {
-                h += '<option value="' + k + '">' + k + ' | ' + val[k] + '</option>'
-            }
-        });
-        return h
-    }
-
-    $(document).on('click', '.remove_las', function () {
-        $(this).parents('.start_rule').remove();
-    });
-
-    $(document).on('click', '.add_las', function () {
-        var sel = $(this).parents('.start_rule').find('.las_f');
-        if (!sel.val()) {
-            sel.val('#');
-        }
-
-        num += 1;
-        var rule_html = '';
-        rule_html += '<div class="form-group start_rule"><div class="col-sm-6"><select name="las_' + num + '" class="form-control pull-left">' + option_html2(data) + '</select></div>';
-        rule_html += '<div class="col-sm-4"><select class="form-control pull-left las_f" name="las_f_' + num + '">';
-        var f = [['', '请选择'], ['#', '#'], ['/', '/'], ['-', '-'], ['&', '&']];
-        f.forEach(function (value) {
-            rule_html += '<option value="' + value[0] + '">' + value[1] + '</option>';
-        });
-        rule_html += '</select></div>';
-        rule_html += '<div class="col-sm-2"><i style="position: relative;top: 10px;right: 20px;cursor: pointer" class="text-success glyphicon glyphicon glyphicon-plus add_las"></i>';
-        rule_html += '<i style="position: relative;top: 10px;cursor: pointer" class="text-danger glyphicon glyphicon-minus remove_las"></i>';
-        rule_html += '</div></div>';
-
-        $(this).parents('.start_rule').after(rule_html)
-    });
-
-    // $(document).on('change', '.las_f', function () {
-    //     var this_val = $(this).val();
-    //
-    //     // var start_rule_len = $('.start_rule').length;
-    //     num += 1;
-    //     var rule_html = '';
-    //     rule_html += '<div class="form-group start_rule"><div class="col-sm-6"><select name="las_' + num + '" class="form-control pull-left">' + option_html2(data) + '</select></div>';
-    //     rule_html += '<div class="col-sm-6"><select class="form-control pull-left las_f" name="las_f_' + num + '">';
-    //     var f = [['', '请选择'], ['#', '#'], ['/', '/'], ['-', '-'], ['&', '&']];
-    //     f.forEach(function (value) {
-    //         rule_html += '<option value="' + value[0] + '">' + value[1] + '</option>';
-    //     });
-    //     rule_html += '</select></div></div>';
-    //
-    //
-    //     if (this_val) {
-    //         $(this).parents('.start_rule').after(rule_html)
-    //     }
-    // });
-    $('.submit_update_las').click(function () {
-        var no_las = update_las_modal.find('[name="no_las"]:checked').val();
-
-        // var start_rule_len = $('.start_rule').length;
-        var las_name = btn_las.parents('td').find('input');
-        var new_las_name = '';
-        for (var i = 0; i <= num; i++) {
-            if ($('[name="las_' + i + '"]').val())
-                new_las_name += $('[name="las_' + i + '"]').val() + $('[name="las_f_' + i + '"]').val()
-        }
-        if ($.inArray(new_las_name[new_las_name.length - 1], ['#', '&', '-', '/']) > -1) {
-            new_las_name = new_las_name.substring(0, new_las_name.length - 1)
-        }
-
-        if (no_las) {
-            new_las_name = '!(' + new_las_name + ')';
-        }
-        las_name.val(new_las_name);
-        update_las_modal.modal('hide');
-    });
 
     $(document).on('click', '.del-project-func', function () {
         var id = $(this).data('id');
@@ -508,7 +366,33 @@ $(document).ready(function () {
                 })
             }
         })
-    })
+    });
+
+    // 修改las name
+    function init_editTable() {
+        $('.display_name').editable({
+            type: "text",
+            title: "显示名",
+            disabled: false,
+            display: false,
+            emptytext: "无",
+            url: '/change/project/data/name',
+            validate: function (value) {
+                if (!$.trim(value)) {
+                    return '不能为空';
+                }
+            },
+            success: function (response, newValue) {
+                if (response.success) {
+                    $(this).text(newValue);
+                    toastr.success(response.message)
+                } else {
+                    toastr.error(response.message)
+                }
+            }
+        });
+    }
+
 });
 
 // extra config
@@ -516,6 +400,7 @@ $(document).ready(function () {
     $('.add-extra-config').click(function () {
         var level = $(this).attr('level');
         var name = $(this).attr('name');
-        window.location.href = '/project/edit/' + project_id + '/extra?level=' + (level || 0) + '&name=' + name || '';
+        var project_relation_id = $(this).attr('project_relation_id');
+        window.location.href = '/project/edit/' + project_id + '/extra?level=' + (level || 0) + '&name=' + (name || '') + '&project_relation_id=' + project_relation_id || '';
     })
 });

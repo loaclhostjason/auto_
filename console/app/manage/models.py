@@ -84,6 +84,20 @@ class AttrContent(db.Model):
     project_relation = db.relationship('ProjectRelation',
                                        backref=db.backref("attr_content", cascade="all, delete-orphan"))
 
+    def to_json(self, remove_key=None):
+        data = self.to_dict()
+        if remove_key:
+            for rk in remove_key:
+                try:
+                    del data[rk]
+                except Exception as e:
+                    print(e)
+                    pass
+
+        data['project_id'] = None
+        data['project_relation_id'] = None
+        return data
+
     @staticmethod
     def get_did_len(project_relation_id):
         attr = AttrContent.query.filter_by(project_relation_id=project_relation_id).first()
@@ -97,7 +111,7 @@ class AttrContent(db.Model):
         return _len_did
 
     @staticmethod
-    def get_attr_info(project_relation_id, is_parent=False):
+    def get_attr_info(project_relation_id, is_parent=False, show_ext_bit=False, show_param=False):
         from ..main.models import ProjectRelation
         project_relation = ProjectRelation.query.filter_by(id=project_relation_id).first()
 
@@ -112,15 +126,26 @@ class AttrContent(db.Model):
         bit_line = 0
         start_bit = 0
         byte_info = 0
+        ext_bit = 0
+        parameter_name = ''
         if attr:
             try:
 
                 bit_line = int(attr.get('BitLength') or 0) or 0
                 start_bit = int(attr.get('BitPosition') or 0) or 0
                 byte_info = int(attr.get('BytePosition') or 0) or 0
+                ext_bit = int(attr.get('ExtBitPosition') or 0) or 0
+                parameter_name = attr.get('ParameterName') or ''
             except Exception as e:
                 print(e)
                 pass
+
+        if show_ext_bit:
+            return bit_line, start_bit, byte_info, ext_bit
+
+        if show_param:
+            return bit_line, start_bit, byte_info, ext_bit, parameter_name
+
         return bit_line, start_bit, byte_info
 
     def get_insert_data(self, data, project_id):
@@ -156,10 +181,7 @@ class ExtraAttrContent(db.Model):
     attr_id = db.Column(db.Integer, db.ForeignKey('attr.id'))
 
     content = db.Column(db.Text)
-    content_val = db.Column(db.Text)
-
     content_section = db.Column(db.Text)
-    content_section_val = db.Column(db.Text)
     attr = db.relationship('Attr',
                            backref=db.backref("extra_attr_content", uselist=False, cascade="all, delete-orphan"))
 
@@ -210,6 +232,53 @@ class ExtraAttrContent(db.Model):
             return
         result = [cls(**attr_1), cls(**attr_2)]
         db.session.add_all(result)
+        db.session.commit()
+        return
+
+
+class ExtraAttrData(db.Model):
+    __tablename__ = 'extra_attr_data'
+    id = db.Column(db.Integer, primary_key=True)
+
+    level = db.Column(db.Integer)
+    project_relation_id = db.Column(db.Integer, db.ForeignKey('project_relation.id'))
+
+    pin = db.Column(db.Text)
+    reset_sec = db.Column(db.Text)
+    read_sec = db.Column(db.Text)
+    write_sec = db.Column(db.Text)
+    is_open_reset = db.Column(db.Boolean, default=False)
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+
+    project = db.relationship('Project', backref=db.backref("extra_attr_data", cascade="all, delete-orphan"))
+    project_relation = db.relationship('ProjectRelation',
+                                       backref=db.backref("extra_attr_data", cascade="all, delete-orphan"))
+
+    def to_json(self, remove_key=None):
+        data = self.to_dict()
+        if remove_key:
+            for rk in remove_key:
+                try:
+                    del data[rk]
+                except Exception as e:
+                    print(e)
+                    pass
+
+        data['project_id'] = None
+        data['project_relation_id'] = None
+        return data
+
+    @classmethod
+    def create_edit(cls, data, project_id, project_relation_id):
+        is_extra_content = cls.query.filter_by(project_id=project_id, project_relation_id=project_relation_id).first()
+
+        if not is_extra_content:
+            content = cls(**data)
+            db.session.add(content)
+            return
+
+        cls.update_model(is_extra_content, data)
         db.session.commit()
         return
 

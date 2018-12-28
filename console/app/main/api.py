@@ -6,7 +6,7 @@ from .func import *
 from ..manage.models import *
 import json
 from sqlalchemy import func
-from other import del_DF
+from console.config import Config
 
 
 # func tree has deleted
@@ -81,7 +81,7 @@ def create_project():
     if not form_data.get('name'):
         return jsonify({'success': False, 'message': '项目名称不能为空'})
 
-    project = Project.query.filter_by(name=form_data['name']).first()
+    project = Project.query.filter_by(project_group_id=form_data.get('project_group'), name=form_data['name']).first()
     if project:
         return jsonify({'success': False, 'message': '项目名称重复'})
 
@@ -154,9 +154,34 @@ def delete_project_tree(id):
     return jsonify({'success': True, 'message': '更新成功'})
 
 
+def del_DF(file_root, file_name, dir_name):
+    for root, dirs, files in os.walk(file_root, topdown=False):
+        if file_name in files:
+            os.remove(os.path.join(root, file_name))
+        if dir_name in dirs:
+            os.rmdir(os.path.join(root, dir_name))
+
+
 def delete_project_file(project):
-    file = '{}_{}'.format(project.project_group.name, project.project_config_name)
-    del_DF('%s.95' % file, project.name)
+    # xml_file = '{}_{}.95'.format(project.project_group.name, project.name)
+    if project.project_config_name:
+        xml_file = '%s.95' % project.project_config_name.lower()
+        xml_root = Config.FILE_PATH_ROOT
+        del_DF(xml_root, xml_file, project.name)
+
+    json_file = '[{}]{}_{}.json'.format(project.id, project.project_group.name, project.name)
+    json_root = Config.JSON_FILE_PATH
+
+    del_DF(json_root, json_file, project.name)
+
+    part_file = '{}_{}.Part'.format(project.project_group.name, project.name)
+    part_root = Config.PART_PATH_ROOT
+
+    try:
+        del_DF(part_root, part_file, project.name)
+    except ExtraAttrData as e:
+        print(e)
+        pass
 
     project_group_id = project.project_group_id
     db.session.commit()

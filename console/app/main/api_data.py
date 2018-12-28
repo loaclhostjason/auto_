@@ -5,7 +5,8 @@ from flask_login import login_required, current_user
 from .func import *
 from ..manage.models import *
 import json
-from util import ExportXml
+from console.util import ExportXml
+from ..models import Modification
 
 
 # main attr content
@@ -42,10 +43,12 @@ def option_project_data():
 
     r1 = {
         'success': True,
+        'level': project_relation.level,
         'result': result,
         'project_data': project_dict,
         'byte_position': cot.get('BytePosition'),
         'default_conf': default_conf,
+        'ext_bitPosition': cot.get('ExtBitPosition')
     }
     if not real_content.get('BytePosition') or not real_content.get('BitPosition'):
         return jsonify(r1)
@@ -81,16 +84,20 @@ def option_project_data():
     r2 = {
         'success': True,
         'result': result,
+        'level': project_relation.level,
         'project_data': project_dict,
         'did_len': did_len,
         'bit_position': bit_position,
         'byte_position': cot.get('BytePosition'),
         'default_conf': default_conf,
+        'ext_bitPosition': cot.get('ExtBitPosition')
     }
     return jsonify(r2)
 
 
 def split_default_val(data, bit_len):
+    if not data:
+        return
     if len(data) == bit_len:
         return data
 
@@ -101,7 +108,7 @@ def split_default_val(data, bit_len):
     return data
 
 
-def get_default_conf():
+def get_default_conf(default_val=None):
     project_relation_id = request.form.getlist('project_relation_id')
     default_conf = request.form.get('default_conf')
     result = dict()
@@ -109,7 +116,11 @@ def get_default_conf():
         for index, v in enumerate(project_relation_id):
             if default_conf:
                 bit_len, *args = AttrContent.get_attr_info(v)
-                result[v] = default_conf if len(default_conf) == bit_len else split_default_val(default_conf, bit_len)
+                if default_val:
+                    result[v] = default_val if len(default_val) == bit_len else split_default_val(default_val, bit_len)
+                else:
+                    result[v] = default_conf if len(default_conf) == bit_len else split_default_val(default_conf,
+                                                                                                    bit_len)
 
     return result
 
@@ -118,17 +129,23 @@ def get_default_conf():
 @main.route('/project/data/submit/<int:project_id>', methods=['POST'])
 @login_required
 def edit_project_data_api(project_id):
+    from .test import update_default_val
     # get attr 参数
     data_relation_id = request.args.get('data_relation_id')
     if not data_relation_id:
         return jsonify({'success': False, 'message': '没数据，不能保持'})
 
+    # print(request.form.getlist('las'))
+    check_las = [v for v in request.form.getlist('las') if not v]
+    if len(check_las):
+        return jsonify({'success': False, 'message': 'LAS不能为空，如果保存请将空的LAS 填写 None'})
+
     project_relation = ProjectRelation.query.filter_by(id=data_relation_id).first()
-    data = ProjectData().get_content(project_id, project_relation.parent_id)
-    default_conf = get_default_conf()
+    data, default_val = ProjectData().get_content(project_id, project_relation.parent_id, project_relation.id)
+    default_conf = get_default_conf(default_val)
 
     if not data:
-        return jsonify({'success': False, 'message': 'project_id不存在'})
+        return jsonify({'success': False, 'message': 'DidLength 不存在，请检查'})
 
     new_dict = dict()
     for v in data:
@@ -146,8 +163,13 @@ def edit_project_data_api(project_id):
             new_project_data = ProjectData(**val)
             db.session.add(new_project_data)
 
+    # db.session.commit()
+    # update_default_val(project_id, project_relation.parent_id)
+
     # export_xml = ExportXml(project_id)
     # export_xml.run()
+
+    Modification.add_edit(project_id)
     return jsonify({'success': True, 'message': '更新成功'})
 
 
@@ -165,3 +187,29 @@ def get_las_info():
 
     data = read_excel(path, las.file if las else None)
     return jsonify({'data': data})
+
+
+# change project data las name
+@main.route('/change/project/data/name', methods=['post'])
+@login_required
+def change_project_data_name():
+    name = request.form.get('value')
+    project_relation_id = request.form.get('pk')
+
+    if not name or not project_relation_id:
+        return jsonify({'success': False, 'message': '提交参数不对'})
+
+    project_data = ProjectData.query.filter_by(project_relation_id=project_relation_id).first()
+    project_relation = ProjectRelation.query.filter_by(id=project_relation_id).first()
+
+    if not project_data or not project_relation:
+        return jsonify({'success': False, 'message': '没有这条记录'})
+
+    project_data.name = name
+    db.session.add(project_data)
+
+    project_relation.name = name
+    db.session.add(project_relation)
+
+    db.session.commit()
+    return jsonify({'success': True, 'message': '更新成功'})
