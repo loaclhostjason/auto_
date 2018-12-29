@@ -6,7 +6,7 @@ from .forms import UserForm
 from ..base import Check
 from ..models import User
 from .. import db
-from ..decorators import role_required
+from ..decorators import role_required, role_admin_pm
 
 
 def validate_user_pwd(upw, upw2):
@@ -18,7 +18,7 @@ def validate_user_pwd(upw, upw2):
 
 @users.route('/info/<int:id>')
 @login_required
-@role_required
+@role_admin_pm
 def get_user_info(id):
     user = User.query.filter_by(id=id).first()
     if not user:
@@ -28,9 +28,10 @@ def get_user_info(id):
 
 @users.route('/create', methods=['POST'])
 @login_required
-@role_required
+@role_admin_pm
 def create_users():
     users_params = request.form.to_dict()
+    user_role = request.form.get('role')
 
     form = UserForm()
     error_message = Check(form).get_error_message()
@@ -45,7 +46,7 @@ def create_users():
     if old_user:
         return jsonify({'success': False, 'message': '用户名重复'})
 
-    add_user_dict = form.get_user_form()
+    add_user_dict = form.get_user_form(user_role)
     user = User(**add_user_dict)
     db.session.add(user)
     return jsonify({'success': True, 'message': '创建用户成功'})
@@ -53,7 +54,7 @@ def create_users():
 
 @users.route('/edit/<int:id>', methods=['POST'])
 @login_required
-@role_required
+@role_admin_pm
 def edit_users(id):
     users_params = request.form.to_dict()
     type = request.args.get('type')
@@ -72,6 +73,7 @@ def edit_users(id):
             return jsonify({'success': False, 'message': '用户名重复了'})
 
         users_params['expiry_time'] = '{} {}'.format(users_params['expiry_time'], '23:59:59')
+        User.update_model(user, users_params)
 
     else:
         user_message = UserForm().validate_user_pwd()
@@ -81,13 +83,15 @@ def edit_users(id):
         if error_message:
             return jsonify({'success': False, 'message': error_message})
 
-    User.update_model(user, users_params)
+        user.password = users_params.get('upw')
+        db.session.add(user)
+
     return jsonify({'success': True, 'message': '更新成功'})
 
 
 @users.route('/delete/<int:id>', methods=['POST'])
 @login_required
-@role_required
+@role_admin_pm
 def delete_user(id):
     user = User.query.filter_by(id=id).first()
     if not user:
@@ -95,3 +99,39 @@ def delete_user(id):
 
     db.session.delete(user)
     return jsonify({'success': True, 'message': '删除成功'})
+
+
+@users.route('/fp_pm', methods=['POST'])
+@login_required
+@role_admin_pm
+def fp_pm_users():
+    user_id = request.args.get('user_id')
+    project_group_id = request.form.get('project_group')
+
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return jsonify({'success': False, 'message': '没有记录'})
+
+    user.project_group_id = project_group_id
+    db.session.add(user)
+
+    return jsonify({'success': True, 'message': '更新成功'})
+
+
+@users.route('/fp_file', methods=['POST'])
+@login_required
+@role_admin_pm
+def fp_file_users():
+    user_id = request.args.get('user_id')
+    project_ids = request.form.getlist('project_id')
+    pg_id = request.form.get('project_group')
+
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return jsonify({'success': False, 'message': '没有记录'})
+
+    user.project_id = ','.join(project_ids)
+    user.pg_id = pg_id
+    db.session.add(user)
+
+    return jsonify({'success': True, 'message': '更新成功'})

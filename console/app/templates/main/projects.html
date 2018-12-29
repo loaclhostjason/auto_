@@ -14,13 +14,22 @@
 
             <div>
                 <a href="{{ url_for('.create_edit_project') }}" class="btn btn-primary">新建文件</a>
+
+
+                {% if current_user.is_admin or current_user.is_pm_admin %}
+                    <a href="javascript:void(0)" class="btn btn-primary download-file pull-right">数据发布</a>
+                {% endif %}
+{#                <span class="text-explode">|</span>#}
+{#                <a href="javascript:void(0)" class="btn btn-primary export-json pull-right" style="margin-right: 20px">导出模板</a>#}
+
             </div>
             <div>
-                <table class="table table-hover">
+                <table class="table table-hover project-table">
                     <thead>
                     <tr>
-                        <th>产品</th>
-                        <th width="100">拥有者</th>
+                        <th width="120" class="text-center" style="border-right: 1px solid #dddddd">项目</th>
+                        <th>文件名</th>
+                        <th width="100">创建者</th>
                         <th width="150">最后修改时间</th>
                         <th width="180" class="text-right">操作</th>
                     </tr>
@@ -29,6 +38,20 @@
                     {% if projects %}
                         {% for project in projects %}
                             <tr>
+                                {% set num = group_project.get(project.id) %}
+                                {#                            {{ num }}#}
+                                {% if num %}
+                                    <td class="text-center" rowspan="{{ num }}"
+                                        style="border-right: 1px solid #dddddd">
+                                        <span>{{ project.project_group.name }}</span>
+                                    </td>
+                                {% elif loop.index0 == 0 %}
+                                    <td class="text-center" rowspan="{{ num }}"
+                                        style="border-right: 1px solid #dddddd">
+                                        <span>{{ project.project_group.name }}</span>
+                                    </td>
+                                {% endif %}
+
                                 <td>
                                     <a href="{{ url_for('.edit_file', project_id=project.id) }}">{{ project.name or '--' }}</a>
                                 </td>
@@ -37,24 +60,26 @@
 
                                 <td class="text-right">
                                     <div>
-                                        <a href="{{ url_for('.edit_project_data', project_id=project.id) }}">数据编辑</a>
+                                        {% if current_user.is_admin or current_user.is_pm_admin %}
+                                            <input type="checkbox" name="publish_project" class="publish_project"
+                                                   value="{{ project.id }}">
+                                        {% endif %}
+                                        <a target="_blank" href="{{ url_for('.edit_file', project_id=project.id) }}">编辑结构</a>
                                         <span class="text-explode">|</span>
-                                        <a href="{{ url_for('.edit_file', project_id=project.id) }}">编辑结构</a>
-                                        <span class="text-explode">|</span>
+                                        <a target="_blank"
+                                           href="{{ url_for('.edit_part_num', project_id=project.id) }}">编辑零件号</a>
+                                    </div>
+                                    <div>
                                         <a href="javascript:void (0)" class="delete-project"
                                            data-id="{{ project.id }}">删除</a>
                                     </div>
-                                    <div>
-                                        <a href="{{ url_for('.download_file', file_name=project.name) }}">数据发布</a>
-                                    </div>
-
                                 </td>
                             </tr>
                         {% endfor %}
 
                     {% else %}
                         <tr>
-                            <td style="padding: 50px 0" colspan="4" align="center">
+                            <td style="padding: 50px 0" colspan="5" align="center">
                                 <span>没有记录</span>
                             </td>
                         </tr>
@@ -74,14 +99,87 @@
 {% block scripts %}
 
     {{ super() }}
+    <script src="{{ url_for('static', filename='vendor/jquery.fileDownload.min.js') }}"></script>
     <script>
         $(document).ready(function () {
             $('.delete-project').click(function () {
-                let _this_id = $(this).data('id');
+                var _this_id = $(this).data('id');
                 $.update_info_reload('是否删除项目', '/project/delete/' + _this_id, '')
+            });
+
+            $('.download-file').click(function () {
+                var project_id = [];
+                $('.project-table').find('.publish_project:checked').each(function () {
+                    project_id.push($(this).val())
+                });
+
+
+                if (project_id) {
+                    $.get('file/info/is?project_id=' + project_id.toString(), function (resp) {
+                        if (!resp.success) {
+                            toastr.error(resp.message)
+                        }
+                    }).done(function () {
+                        project_id.forEach(function (value) {
+                            export_file('/download_file?project_id=' + value);
+
+                            downloadFile('/download_file_part_number?project_id=' + value);
+
+                            downloadFile('/download_json?project_id=' + value);
+                        })
+                    });
+
+                }
+
+            });
+
+            $('.export-json').click(function () {
+                var project_id = [];
+                $('.project-table').find('.publish_project:checked').each(function () {
+                    project_id.push($(this).val())
+                });
+
+
+                if (project_id) {
+                    $.get('file/info/is?project_id=' + project_id.toString(), function (resp) {
+                        if (!resp.success) {
+                            toastr.error(resp.message)
+                        }
+                    }).done(function () {
+                        project_id.forEach(function (value) {
+                            export_file('/download_json?project_id=' + value);
+                        })
+                    });
+
+                }
+
             })
+        });
+
+        function export_file(url) {
+            $.fileDownload(url, {
+                httpMethod: 'get',
+                prepareCallback: function (url) {
+                    toastr.options.timeOut = null;
+                    toastr.info('下载开始，请稍等...');
+                },
+                successCallback: function (url) {
+                    toastr.clear();
+                    toastr.options.timeOut = 2000;
+                    toastr.success('导出成功');
+
+                },
+                failCallback: function (html, url) {
+                    var json = JSON.parse(html);
+                    if (json.status === 512) {
+                        toastr.clear();
+                        toastr.options.timeOut = 2000;
+                        toastr.error(json.errorMessage);
+                    }
+                }
+            });
+        }
 
 
-        })
     </script>
 {% endblock %}

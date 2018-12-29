@@ -1,0 +1,128 @@
+{% extends "main.html" %}
+{% import "macro/macro_content.html" as content %}}
+
+{% set active = 'file' %}
+{% set menu_open = 'file' %}
+
+{% set attr_extra_content  = extra_attr.content | loads_jason if extra_attr and extra_attr.content  else {} %}
+
+{% set extra_read_sec = extra_data.read_sec | loads_jason  if extra_data and extra_data.read_sec else None %}
+{% set extra_write_sec = extra_data.write_sec | loads_jason  if extra_data and extra_data.write_sec else None %}
+
+{% block main_content %}
+    <div class="col-sm-12 console-title clearfix">
+        <div class="pull-left">
+            <h4>编辑项目文件额外属性</h4>
+            <a href="{{ url_for('.edit_file', project_id=project.id) }}" class="btn btn-xs btn-toinstlist">
+                <span class="icon-toinstlist"></span>
+                <span>返回</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-sm-12" style="margin-top: 10px">
+        <form method="post" class="form-horizontal">
+
+
+            <div class="form-group">
+                <div class="form-group">
+                    <div class="col-sm-2"><label for="" class="control-label pull-right"><span>DID地址名称:</span></label>
+                    </div>
+                    <div class="col-sm-3">
+                        <label style="position: relative; top: 10px;left: 20px">{{ request.args.get('name') }}</label>
+                    </div>
+                </div>
+                <div class="col-sm-2"><label class="control-label pull-right">ReadSection:</label></div>
+                <div class="col-sm-10" style="color: #666">
+
+                    <table class="table table-hover table-extra-readsection">
+                        <thead>
+                        <tr>
+                            <th>属性字段</th>
+                            <th>值</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            {% if attr_extra_content.get('readsection') %}
+                                {% for attr in attr_extra_content['readsection'] %}
+                                    <tr>
+                                        <td>
+                                            {{ attr['item'] }}
+                                        </td>
+                                        <td>
+                                            <input name="readsection_item" value="{{ attr['item'] }}" type="hidden"/>
+                                            <input name="readsection_item_value" class="td-input" required
+                                                   value="{{ extra_read_sec[loop.index0]['item_value'] if extra_read_sec else default_read_attr.get(attr['item'], '') }}"/>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-sm-2"><label class="control-label pull-right">WriteSection:</label></div>
+                <div class="col-sm-10" style="color: #666">
+
+                    <table class="table table-hover table-extra-writsection">
+                        <thead>
+                        <tr>
+                            <th>属性字段</th>
+                            <th>值</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            {% if attr_extra_content.get('writsection') %}
+                                {% for attr in attr_extra_content.get('writsection') %}
+                                    <tr>
+                                        <td>
+                                            {{ attr['item'] }}
+                                        </td>
+                                        <td>
+                                            <input name="writsection_item" value="{{ attr['item'] }}" type="hidden"/>
+                                            <input name="writsection_item_value" class="td-input" required
+                                                   value="{{ extra_write_sec[loop.index0]['item_value'] if extra_write_sec else default_write_attr.get(attr['item'], '') }}"/>
+                                        </td>
+
+                                    </tr>
+                                {% endfor %}
+
+                            {% endif %}
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-3">
+                    <input name="reset_section" value="y" type="checkbox"
+                           {% if extra_data.is_open_reset %}checked{% endif %}> <b class="text-danger">Readback After Reset</b>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-3">
+                    <button class="btn btn-primary">保存</button>
+                    <a href="{{ url_for('.edit_file', project_id=project.id) }}" class="btn btn-default"
+                       style="margin-left: 20px">取消</a>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ super() }}
+{% endblock %}

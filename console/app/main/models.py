@@ -3,6 +3,8 @@ from datetime import datetime
 from enum import Enum
 from flask import request
 import json
+from ..manage.models import AttrContent
+import math
 
 
 class ProjectRelationType(Enum):
@@ -13,17 +15,34 @@ class ProjectRelationType(Enum):
 class Project(db.Model):
     __tablename__ = 'project'
     id = db.Column(db.Integer, primary_key=True)
-    # 名称
+    # 文件名称
     name = db.Column(db.String(68), index=True)
+    # 项目名称
+    # project_name = db.Column(db.String(68), index=True)
+    project_group_id = db.Column(db.Integer, db.ForeignKey('project_group.id'))
 
     first_time = db.Column(db.DateTime, default=datetime.now)
     last_time = db.Column(db.DateTime, default=datetime.now)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    user = db.relationship('User', backref=db.backref("project", cascade="all,delete"))
+    user = db.relationship('User', backref=db.backref("project", cascade="all, delete"))
+    project_group = db.relationship('ProjectGroup', backref=db.backref("project"))
+
+    project_config_name = db.Column(db.String(100))
 
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
+
+    def to_json(self, user_id=None):
+        d = self.to_dict()
+        if d.get('first_time'):
+            del d['first_time']
+        if d.get('last_time'):
+            del d['last_time']
+
+        d['user_id'] = user_id
+        del d['id']
+        return d
 
 
 class ProjectRelation(db.Model):
@@ -32,13 +51,13 @@ class ProjectRelation(db.Model):
     parent_id = db.Column(db.Integer, index=True)
 
     # 名称
-    name = db.Column(db.String(32))
-    level = db.Column(db.Integer, default=1, nullable=False)
+    name = db.Column(db.String(32), index=True)
+    level = db.Column(db.Integer, default=1, nullable=False, index=True)
     type = db.Column(db.Enum(ProjectRelationType), default='worker', nullable=False)
 
     timestamp = db.Column(db.DateTime, default=datetime.now)
 
-    relation_order = db.Column(db.Integer, default=1)
+    relation_order = db.Column(db.Integer, default=1, index=True)
 
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     project = db.relationship('Project', backref=db.backref("project_relation", cascade="all, delete-orphan"))
@@ -46,19 +65,47 @@ class ProjectRelation(db.Model):
     def __init__(self, *args, **kwargs):
         super(ProjectRelation, self).__init__(*args, **kwargs)
 
+    def to_json(self, remove_key=None):
+        d = self.to_dict()
+        if d.get('timestamp'):
+            del d['timestamp']
+
+        d['attr'] = None
+        d['extra_attr'] = None
+        d['project_id'] = None
+        d['parent_id'] = None
+        d['child'] = list()
+
+        # ext
+        if self.level == 3:
+            d['default_conf'] = None
+            d['conf_data'] = None
+            d['ext_conf_data'] = None
+
+        if remove_key:
+            for rk in remove_key:
+                try:
+                    del d[rk]
+                except Exception as e:
+                    print(e)
+                    pass
+        return d
+
     @classmethod
     def add_project_relation(cls, data, content, project_id):
         max_order = cls.query.filter(cls.project_id == project_id, cls.parent_id == data['parent_id']). \
             order_by(cls.relation_order.desc(), cls.id.desc()).first()
         result = []
         for index, name in enumerate(content.split('\r\n'), start=max_order.relation_order + 1 if max_order else 1):
-            data['relation_order'] = index
-            data['name'] = name
-            result.append(cls(**data))
+            if name:
+                data['relation_order'] = index
+                data['name'] = name
+                result.append(cls(**data))
 
         db.session.add_all(result)
         db.session.flush()
         result = [v.id for v in result]
+        db.session.commit()
         return result
 
 
@@ -66,32 +113,86 @@ class ProjectData(db.Model):
     __tablename__ = 'project_data'
     id = db.Column(db.Integer, primary_key=True)
     project_relation_id = db.Column(db.Integer, db.ForeignKey('project_relation.id'))
-    las = db.Column(db.String(32))
-    name = db.Column(db.String(32))
+    las = db.Column(db.String(10280))
+    name = db.Column(db.String(200))
 
     content = db.Column(db.Text)
-    real_content = db.Column(db.Text)
+    # real_content = db.Column(db.Text)
 
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    default_conf = db.Column(db.String(68))
 
     timestamp = db.Column(db.DateTime, default=datetime.now)
     project = db.relationship('Project', backref=db.backref("project_data", cascade="all, delete-orphan"))
     project_relation = db.relationship('ProjectRelation',
                                        backref=db.backref("project_data", cascade="all, delete-orphan"))
 
-    @property
-    def conf_data(self):
-        if not self.content:
+    def to_json(self, remove_key=None):
+        d = self.to_dict()
+        if d.get('timestamp'):
+            del d['timestamp']
+
+        if remove_key:
+            for rk in remove_key:
+                try:
+                    del d[rk]
+                except Exception as e:
+                    print(e)
+                    pass
+
+        d['attr'] = None
+        d['extra_attr'] = None
+        d['project_id'] = None
+        d['project_relation_id'] = None
+        return d
+
+    @staticmethod
+    def p_did_len(project_id, did_relation_id):
+        attr = AttrContent.query.filter_by(project_id=project_id, project_relation_id=did_relation_id).all()
+        d = dict()
+        if attr:
+            for info in attr:
+                # print(info.real_content)
+                content = json.loads(info.real_content or '{}')
+                d.update(content)
+        try:
+            did_len = int(d.get('DidLength'))
+        except:
+            did_len = 0
+        return did_len
+
+    def conf_data(self, content, project_id, did_relation_id, bit_info, las):
+        did_len = self.p_did_len(project_id, did_relation_id)
+        # print(did_len)
+        if not content or not did_len:
             return
 
-        content = json.loads(self.content)
-        extra_key = [
-            'byte0', 'byte1', 'byte2', 'byte3'
-        ]
-        for key in extra_key:
-            if content.get(key):
-                return content[key]
-        return
+        content = json.loads(content)
+
+        result = []
+        extra_key = ['byte{}'.format(v) for v in range(did_len)]
+
+        real_bit_len = bit_info['start_bit'] + bit_info['bit_len']
+
+        extra_key = [v for v in extra_key if content.get(v)]
+
+        if las and str(las).lower() == 'all' and not extra_key:
+            result.append('0')
+            extra_key = True
+
+        if not extra_key:
+            return
+        # print(extra_key)
+        if extra_key and isinstance(extra_key, list):
+            for index, key in enumerate(extra_key):
+                if real_bit_len > 8:
+                    b_len = real_bit_len - 8
+                    b1 = content[key][:-b_len]
+                    b2 = content[key][-b_len:]
+                    result = [b1, b2]
+                else:
+                    result.append(content[key])
+        return result
 
     @staticmethod
     def init_key(str_key):
@@ -100,22 +201,24 @@ class ProjectData(db.Model):
             key.append('%s_%s' % (str_key, index))
         return key
 
-    @classmethod
-    def get_content(cls, project_id):
-        bit0 = cls.init_key('bit0')
-        bit1 = cls.init_key('bit1')
-        bit2 = cls.init_key('bit2')
-        bit3 = cls.init_key('bit3')
+    def get_content(self, project_id, did_relation_id, relation_id=None):
+        from .api_data import split_default_val
 
-        extra_key = [
-            'byte0', 'byte1', 'byte2', 'byte3'
-        ]
+        did_len = self.p_did_len(project_id, did_relation_id)
+        bit_len, *args = AttrContent.get_attr_info(relation_id, is_parent=True)
+        key = list()
+        if not did_len:
+            return list(), []
 
-        key = bit0 + bit1 + bit2 + bit3 + extra_key
+        extra_key = ['byte{}'.format(v) for v in range(did_len)]
+
+        key.extend(extra_key)
 
         project_relation_id = request.form.getlist('project_relation_id')
         result = []
-        print(project_relation_id)
+        # print(project_relation_id)
+
+        default_val = None
         for index, val in enumerate(project_relation_id):
             d = {
                 'project_id': project_id,
@@ -125,33 +228,124 @@ class ProjectData(db.Model):
             for v in key:
                 d['las'] = request.form.getlist('las')[index]
                 d['name'] = request.form.getlist('name')[index]
+
+                if d['las'].lower() == 'all' and request.form.get('%s_%s' % (val, v)):
+                    default_val = request.form.get('%s_%s' % (val, v))
+
+                # if request.form.get('%s_%s' % (val, v)):
                 if request.form.get('%s_%s' % (val, v)):
-                    d['content'][v] = request.form.get('%s_%s' % (val, v))
+                    _this_val = request.form.get('%s_%s' % (val, v))
+                    d['content'][v] = split_default_val(_this_val, bit_len)
+                else:
+                    d['content'][v] = ''
 
             result.append(d)
-        return [v for v in result if v.get('content')]
+        return [v for v in result if v.get('content')], default_val
+
+
+class ProjectGroup(db.Model):
+    __tablename__ = 'project_group'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(32))
+
+
+class ProjectPartNumber(db.Model):
+    __tablename__ = 'project_part_number'
+    id = db.Column(db.Integer, primary_key=True)
+
+    number = db.Column(db.String(120))
+    las = db.Column(db.String(120))
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project = db.relationship('Project', backref=db.backref("part_number", cascade="all, delete-orphan"))
+
+    part_num_relation_id = db.Column(db.Integer, db.ForeignKey('project_part_number_relation.id'))
+    part_num_relation = db.relationship('ProjectPartNumRelation', backref=db.backref("part_number", cascade="all"))
+
+    def to_json(self):
+        data = self.to_dict()
+        del data['id']
+        data['project_id'] = None
+        data['part_num_relation_id'] = None
+        return data
+
+
+class ProjectPartNumberAttr(db.Model):
+    __tablename__ = 'project_part_number_attr'
+    id = db.Column(db.Integer, primary_key=True)
+
+    did = db.Column(db.String(120))
+    name = db.Column(db.String(120))
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project = db.relationship('Project', backref=db.backref("part_number_attr", cascade="all, delete-orphan"))
+
+    part_num_relation_id = db.Column(db.Integer, db.ForeignKey('project_part_number_relation.id'))
+    part_num_relation = db.relationship('ProjectPartNumRelation', backref=db.backref("part_number_attr", cascade="all"))
+
+    def to_json(self):
+        data = self.to_dict()
+        del data['id']
+        data['project_id'] = None
+        data['part_num_relation_id'] = None
+        return data
+
+
+class ProjectPartNumRelation(db.Model):
+    __tablename__ = 'project_part_number_relation'
+    id = db.Column(db.Integer, primary_key=True)
+    parent_id = db.Column(db.Integer, index=True)
+
+    # 名称
+    name = db.Column(db.String(32), index=True)
+    level = db.Column(db.Integer, default=1, nullable=False, index=True)
+
+    relation_order = db.Column(db.Integer, default=1, index=True)
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project = db.relationship('Project', backref=db.backref("project_part_number_relation", cascade="all"))
+
+    def __init__(self, *args, **kwargs):
+        super(ProjectPartNumRelation, self).__init__(*args, **kwargs)
+
+    def to_json(self, remove_key=None):
+        data = self.to_dict()
+        data['child'] = list()
+        data['part'] = list()
+        data['attr'] = None
+        if remove_key:
+            for rk in remove_key:
+                try:
+                    del data[rk]
+                except Exception as e:
+                    print(e)
+                    pass
+        data['project_id'] = None
+        data['parent_id'] = None
+        return data
 
     @classmethod
-    def update_real_content(cls, project_id):
-        db.session.commit()
-        project_data = cls.query.filter_by(project_id=project_id).all()
-        if not project_data:
+    def add_info(cls, data):
+        if not data:
             return
+        r = cls(name=data.name, project_id=data.id)
+        db.session.add(r)
+        db.session.commit()
+        return r
 
+    @classmethod
+    def add_part_relation(cls, data, content, project_id):
+        max_order = cls.query.filter(cls.project_id == project_id, cls.parent_id == data['parent_id']). \
+            order_by(cls.relation_order.desc(), cls.id.desc()).first()
         result = []
-        for data in project_data:
-            content = json.loads(data.content) if data.content else None
-            if content:
-                for index in range(3):
-                    if content.get('byte%s' % index):
-                        result.append(data.name)
-                        result.append(data.las)
-                        result.append('byte%s' % index)
-                        for loop in range(8):
-                            if content.get('bit%s_%s' % (index, loop)):
-                                result.append('bit%s' % loop)
-                        result.append(content.get('byte%s' % index))
+        for index, name in enumerate(content.split('\r\n'), start=max_order.relation_order + 1 if max_order else 1):
+            if name:
+                data['relation_order'] = index
+                data['name'] = name
+                result.append(cls(**data))
 
-            data.real_content = ';'.join(result)
-            print(';'.join(result))
-            db.session.add(data)
+        db.session.add_all(result)
+        db.session.flush()
+        result = [v.id for v in result]
+        db.session.commit()
+        return result

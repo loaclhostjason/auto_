@@ -1,0 +1,3 @@
+recursive-include console/app/static *
+recursive-include console/app/templates *
+recursive-include console *

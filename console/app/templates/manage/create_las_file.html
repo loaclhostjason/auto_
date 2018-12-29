@@ -1,0 +1,60 @@
+{% extends "manage.html" %}
+{% import "macro/macro_form.html" as render_form %}
+
+{% set active = 'las' %}
+{% set menu_open = 'attrs' %}
+
+{% block manage_content %}
+
+    <div class="col-sm-12 console-title bline clearfix">
+        <div class="pull-left">
+            <h4>添加las下拉文件</h4>
+            <a href="{{ url_for('.las') }}" class="btn btn-xs btn-toinstlist">
+                <span class="icon-toinstlist"></span>
+                <span>返回</span>
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-sm-12 row">
+        <div class="alert alert-warning" style="margin-bottom: 16px">
+            <span>
+                <b>提示：</b>
+                <span>上次文件必须是excel格式的,格式内容需注意</span>
+            </span>
+        </div>
+    </div>
+
+
+    <div class="col-sm-12" style="margin-top: 10px">
+        <form method="post" class="form-horizontal" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                <div class="col-sm-2">{{ render_form.input_label(form.file) }}</div>
+                <div class="col-sm-3">
+                    <div class="form-label">
+                        {{ form.file }}
+                        {% if form.file.data %}
+                            <p class="form-input-help">已有文件：{{ form.file.data }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2">{{ render_form.input_label(form.description) }}</div>
+                <div class="col-sm-3">{{ render_form.input(form.description) }}</div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-3">
+                    <button class="btn btn-primary">保存</button>
+                    <a href="{{ url_for('.las') }}" class="btn btn-default" style="margin-left: 20px">取消</a>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

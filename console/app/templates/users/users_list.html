@@ -6,9 +6,100 @@
 {% set active = 'users_list' %}
 {% set menu_open = 'users' %}
 
+{% macro table_content(user) %}
+    <td>{{ user.username or '--' }}</td>
+    <td>
+        {% if user.is_expiry == None or user.is_expiry > 15 %}
+            {{ td_status('有效期内', 'ok') }}
+        {% elif user.is_expiry >=0 %}
+            {{ td_status('即将过期', 'warn') }}
+        {% else %}
+            {{ td_status('已经过期', 'no') }}
+        {% endif %}
+    </td>
+
+    <td>{{ user.login_time or '--' }}</td>
+    <td>{{ user.login_ip or '--' }}</td>
+    <td>{{ user.register_time or '--' }}</td>
+    <td>
+        <label class="label_border">
+            {{ user.expiry_time.strftime('%Y-%m-%d') if  user.expiry_time else  '无限期' }}
+        </label>
+    </td>
+    <td>{{ user.role.value }}</td>
+
+    <td>
+        {% if user.role.name == 'admin' %}
+            <label class="label_border"><span>全部</span></label>
+        {% else %}
+            {% if user.project_group %}
+                <label class="label_border"><span>{{ user.project_group.name }}</span></label>
+                {% if current_user.is_admin or (current_user.is_pm_admin and user.role.name == 'user') %}
+                    <label class="label_border">
+                        <a href="javascript:void (0)" class="fp_pm text-success" data-user="{{ user.username }}"
+                           data-uid="{{ user.id }}"><i class="glyphicon glyphicon-edit"></i> 项目</a>
+                    </label>
+                {% endif %}
+            {% else %}
+                {% if current_user.is_admin or (current_user.is_pm_admin and user.role.name == 'user') %}
+                    <label class="label_border">
+                        <a href="javascript:void (0)" class="fp_pm text-warning" data-user="{{ user.username }}"
+                           data-uid="{{ user.id }}"><i class="glyphicon glyphicon-plus"></i> 项目</a>
+                    </label>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    </td>
+
+    <td>
+        {% if user.project_id %}
+            {% if user.role.name == 'user' %}
+                {{ user.project_id }}
+                <label class="label_border">
+                    <a href="javascript:void (0)" class="fp_file text-success" data-user="{{ user.username }}"
+                       data-uid="{{ user.id }}"><i class="glyphicon glyphicon-edit"></i> 文件</a>
+                </label>
+            {% else %}
+                --
+            {% endif %}
+        {% else %}
+            {% if user.role.name == 'user' %}
+                <label class="label_border">
+                    <a href="javascript:void (0)" class="fp_file text-warning" data-user="{{ user.username }}"
+                       data-uid="{{ user.id }}"><i class="glyphicon glyphicon-plus"></i> 文件</a>
+                </label>
+            {% else %}
+                --
+            {% endif %}
+        {% endif %}
+    </td>
+
+    <td class="text-right">
+        {% if not user.is_admin %}
+            <div>
+                <a href="javascript:void (0)" class="edit_user" data-id="{{ user.id }}"
+                   data-username="{{ user.username }}">编辑信息</a>
+                <span class="text-explode">|</span>
+                <a href="javascript:void (0)" class="delete-user" data-id="{{ user.id }}">删除用户</a>
+            </div>
+            <div>
+                <a href="javascript:void (0)" class="update_password"
+                   data-id="{{ user.id }}"
+                   data-username="{{ user.username }}">修改密码</a>
+            </div>
+
+        {% else %}
+            --
+        {% endif %}
+
+    </td>
+{% endmacro %}
+
 {% block users_content %}
     {% include "users/modal/user_modal.html" %}
     {% include "users/modal/edit_user_modal.html" %}
+    {% include "users/modal/fp_pm_modal.html" %}
+    {% include "users/modal/fp_file_modal.html" %}
 
     <div class="row">
         <div class="col-sm-12">
@@ -28,7 +119,20 @@
         <div class="col-sm-12">
 
             <div>
-                <a href="javascript:void (0)" class="btn btn-primary create_user">创建用户</a>
+                {% if current_user.is_admin %}
+                    <a href="javascript:void (0)" class="btn btn-primary create_user" data-role="project_user">
+                        <i class="glyphicon glyphicon-plus"></i>
+                        项目管理员
+                    </a>
+                    <span class="text-explode">|</span>
+                {% endif %}
+
+                {% if current_user.is_pm_admin or current_user.is_admin %}
+                    <a href="javascript:void (0)" class="btn btn-primary create_com_user" data-role="user">
+                        <i class="glyphicon glyphicon-plus"></i>
+                        普通用户
+                    </a>
+                {% endif %}
             </div>
             <div>
                 <table class="table table-hover">
@@ -40,7 +144,9 @@
                         <th width="120">登录IP</th>
                         <th width="150">注册时间</th>
                         <th width="150">到期时间</th>
-                        <th>权限</th>
+                        <th width="120">权限</th>
+                        <th>项目</th>
+                        <th>文件</th>
                         <th width="160" class="text-right">操作</th>
                     </tr>
                     </thead>
@@ -48,50 +154,13 @@
                     {% if users %}
                         {% for user in users %}
                             <tr>
-                                <td>{{ user.username or '--' }}</td>
-                                <td>
-                                    {% if user.is_expiry == None or user.is_expiry > 15 %}
-                                        {{ td_status('有效期内', 'ok') }}
-                                    {% elif user.is_expiry >=0 %}
-                                        {{ td_status('即将过期', 'warn') }}
-                                    {% else %}
-                                        {{ td_status('已经过期', 'no') }}
-                                    {% endif %}
-                                </td>
-
-                                <td>{{ user.login_time or '--' }}</td>
-                                <td>{{ user.login_ip or '--' }}</td>
-                                <td>{{ user.register_time or '--' }}</td>
-                                <td>
-                                    <label class="label_border">
-                                        {{ user.expiry_time.strftime('%Y-%m-%d') if  user.expiry_time else  '无限期' }}
-                                    </label>
-                                </td>
-                                <td>{{ user.role.value }}</td>
-
-                                <td class="text-right">
-                                    {% if not user.is_admin %}
-                                        <div>
-                                            <a href="javascript:void (0)" class="edit_user" data-id="{{ user.id }}"
-                                               data-username="{{ user.username }}">编辑信息</a>
-                                            <span class="text-explode">|</span>
-                                            <a href="javascript:void (0)" class="delete-user" data-id="{{ user.id }}">删除</a>
-                                        </div>
-                                        <div>
-                                            <a href="javascript:void (0)" class="update_password" data-id="{{ user.id }}"
-                                               data-username="{{ user.username }}">修改密码</a>
-                                        </div>
-                                    {% else %}
-                                        --
-                                    {% endif %}
-
-                                </td>
+                                {{ table_content(user) }}
                             </tr>
-                        {% endfor %}
 
+                        {% endfor %}
                     {% else %}
                         <tr>
-                            <td style="padding: 50px 0" colspan="8" align="center">
+                            <td style="padding: 50px 0" colspan="10" align="center">
                                 <span>没有记录</span>
                             </td>
                         </tr>
@@ -110,4 +179,7 @@
 
     {{ super() }}
     <script src="{{ url_for('static', filename='js/users/users.js') }}"></script>
+    <script>
+        g_user_id = "{{ current_user.id }}"
+    </script>
 {% endblock %}

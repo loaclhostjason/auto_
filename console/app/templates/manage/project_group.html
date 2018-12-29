@@ -1,0 +1,72 @@
+{% extends "manage.html" %}
+{% import "macro/macro_content.html" as content %}
+{% import "macro/macro_form.html" as render_form %}
+{% from "macro/macro_table.html" import td_status %}
+
+{% set active = 'project_group' %}
+{% set menu_open = 'project_group' %}
+
+{% block manage_content %}
+    {% include "manage/modal/project_group_modal.html" %}
+
+    <div class="row">
+        <div class="col-sm-12">
+            {{ content.panel_title('项目管理') }}
+        </div>
+
+        <div class="col-sm-12">
+
+            <div>
+                <a href="javascript:void(0)" class="btn btn-primary create-project-group" data-action="create">新建项目</a>
+            </div>
+
+            <div>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th width="250">项目名称</th>
+                        <th class="text-left">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if project_groups %}
+                        {% for info in project_groups %}
+                            <tr>
+                                <td>{{ info.name }}</td>
+
+                                <td class="text-left">
+                                    <div>
+                                        <a href="javascript:void (0)" class="edit-project-group" data-action="edit"
+                                           data-name="{{ info.name }}"
+                                           data-id="{{ info.id }}"
+                                        >编辑</a>
+                                        <span class="text-explode">|</span>
+                                        <a href="javascript:void (0)" class="delete-project-group"
+                                           data-id="{{ info.id }}">删除</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                    {% else %}
+                        <tr>
+                            <td style="padding: 50px 0" colspan="2" align="center">
+                                <span>没有记录</span>
+                            </td>
+                        </tr>
+
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/manage/project_group.js') }}"></script>
+{% endblock %}

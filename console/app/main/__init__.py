@@ -3,4 +3,4 @@ from flask import Blueprint
 
 main = Blueprint('main', __name__)
 
-from . import views, models, api
+from . import views, models, api, api_data, api_project, part_views

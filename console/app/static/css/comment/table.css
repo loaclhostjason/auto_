@@ -131,11 +131,11 @@ td label {
 .table thead .resize-line-icon {
     border-right: 1px solid #d1d5de;
     position: relative;
-    right: 0px;
+    right: 0;
     height: 20px;
     /* top: 5px; */
     cursor: default;
-    padding: 0 5px;
+    padding: 0 2px;
 }
 
 .table .resize-line {

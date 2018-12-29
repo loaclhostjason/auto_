@@ -14,6 +14,14 @@ def get_copy_parent_id(copy_id):
     return copy_parent_id
 
 
+def get_copy_part_info(copy_id):
+    if not copy_id:
+        return
+
+    info = ProjectPartNumRelation.query.filter_by(id=copy_id).first()
+    return info
+
+
 def delete_project_children(id):
     relations = ProjectRelation.query.filter_by(parent_id=id).all()
     if not relations:
@@ -115,6 +123,7 @@ def get_project_children(project_id):
         if third_relation:
             for th in third_relation:
                 d['level_3'] = th.name
+                d['level_3_id'] = th.id
 
                 forth_relation = ProjectRelation.query.filter_by(parent_id=th.id, level=4).all()
                 if forth_relation:
@@ -127,12 +136,40 @@ def get_project_children(project_id):
     return result
 
 
-def download_files(filename):
+def get_project_children_v2(project_id, last_relation_id):
+    result = list()
+    first_relation = ProjectRelation.query.filter_by(project_id=project_id, level=1).first()
+    d = {
+        'level_1': first_relation.name,
+    }
+
+    second_relation = ProjectRelation.query.filter_by(parent_id=first_relation.id, level=2).all()
+    if not second_relation:
+        return result
+
+    for v in second_relation:
+        d['level_2'] = v.name
+        d['level_2_id'] = v.id
+
+        third_relation = ProjectRelation.query.filter_by(parent_id=v.id, level=3).all()
+        if third_relation:
+            for th in third_relation:
+                d['level_3'] = th.name
+
+                if th.id == last_relation_id:
+                    forth_relation = ProjectRelation.query.filter_by(parent_id=th.id, level=4).all()
+                    if forth_relation:
+                        for forth in forth_relation:
+                            d.update({'level_4': forth.name, 'level_4_id': forth.id})
+                            result.append(d.copy())
+
+    return result
+
+
+def download_files(filename_path, filename):
     try:
         from urllib.parse import quote
 
-        filename = '%s.xml' % filename
-        filename_path = os.path.join(current_app.config['FILE_PATH'], filename)
         print(filename_path)
 
         response = make_response(send_file(filename_path, as_attachment=True))

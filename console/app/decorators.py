@@ -32,3 +32,15 @@ def role_required(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+def role_admin_pm(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            abort(403)
+        if not current_user.is_admin and not current_user.is_pm_admin:
+            abort(403)
+        return f(*args, **kwargs)
+
+    return decorated_function

@@ -9,7 +9,7 @@ from flask_uploads import UploadSet, configure_uploads, DOCUMENTS, patch_request
 
 from .assets import assets_env, bundles
 from .error_handle import ErrorHandler
-from config import Config
+from console.config import Config
 from .jinja_env import JinjaEnv
 from .base_model import BaseModel
 

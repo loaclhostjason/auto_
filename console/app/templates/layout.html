@@ -29,11 +29,13 @@
                                 文件列表</a>
                         </li>
 
-                        {% if current_user.is_admin %}
+                        {% if current_user.is_admin or current_user.is_pm_admin %}
                             <li class="{% if menu_cur == 'users' %}cur{% endif %}">
                                 <a href="{{ url_for('users.users_list') }}"><i class="fa fa-users"></i> 用户管理</a>
                             </li>
+                        {% endif %}
 
+                        {% if current_user.is_admin %}
                             <li class="{% if menu_cur == 'manage' %}cur{% endif %}">
                                 <a href="{{ url_for('manage.attrs') }}"><i class="fa fa-asterisk"></i> 配置管理</a>
                             </li>

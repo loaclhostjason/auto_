@@ -1,0 +1,141 @@
+{% extends "manage.html" %}
+
+{% set active = 'attrs' %}
+{% set menu_open = 'attrs' %}
+
+{% set attr_extra_content  = extra_attr.content | loads_jason if extra_attr and extra_attr.content  else {} %}
+{% block manage_content %}
+
+    <div class="col-sm-12 console-title bline clearfix">
+        <div class="pull-left">
+            <h4>修改默认参数属性</h4>
+            <a href="{{ url_for('.attrs') }}" class="btn btn-xs btn-toinstlist">
+                <span class="icon-toinstlist"></span>
+                <span>返回</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-sm-12" style="margin-top: 10px">
+        <form method="post" class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-2"><label for="" class="control-label pull-right"><span>名称:</span></label></div>
+                <div class="col-sm-3">
+                    <input class="form-control pull-left" name="name" value="{{ attr_info.name }}" disabled>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-sm-2"><label class="control-label pull-right">ReadSection:</label></div>
+                <div class="col-sm-10" style="color: #666">
+
+                    <table class="table table-hover table-extra-readsection">
+                        <thead>
+                        <tr>
+                            <th width="200">属性字段</th>
+                            <th width="200">默认值</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            {% if attr_extra_content.get('readsection') %}
+                                {% for attr in attr_extra_content['readsection'] %}
+                                    <tr>
+                                        <td>
+                                            <input name="readsection_item" class="td-input" required value="{{ attr['item'] }}"/>
+                                        </td>
+                                        <td>
+                                            <input name="readsection_item_default" class="td-input"
+                                                   value="{{ attr['item_default'] }}"/>
+                                        </td>
+
+                                        <td><a href="javascript:void(0);" class="td-remove">移除</a></td>
+                                    </tr>
+
+                                {% endfor %}
+
+                            {% endif %}
+                        </tr>
+                        <tr>
+
+                            <td colspan="2" style="font-size: 15px">
+                                <a class="monitor-dialog-add" href="javascript:void(0)">
+                                    <i class="blue-add-icon"></i>
+                                    <span class="td-add" style="position: relative;top: -1px;">添加</span>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-sm-2"><label class="control-label pull-right">WriteSection:</label></div>
+                <div class="col-sm-10" style="color: #666">
+
+                    <table class="table table-hover table-extra-writsection">
+                        <thead>
+                        <tr>
+                            <th width="200">属性字段</th>
+                            <th width="200">默认值</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            {% if attr_extra_content.get('writsection') %}
+                                {% for attr in attr_extra_content.get('writsection')  %}
+
+                                    <tr>
+                                        <td>
+                                            <input name="writsection_item" class="td-input" required value="{{ attr['item'] }}"/>
+                                        </td>
+                                        <td>
+                                            <input name="writsection_item_default" class="td-input"
+                                                   value="{{ attr['item_default'] }}"/>
+                                        </td>
+
+                                        <td><a href="javascript:void(0);" class="td-remove">移除</a></td>
+                                    </tr>
+
+
+                                {% endfor %}
+
+                            {% endif %}
+                        </tr>
+                        <tr>
+
+                            <td colspan="2" style="font-size: 15px">
+                                <a class="monitor-dialog-add" href="javascript:void(0)">
+                                    <i class="blue-add-icon"></i>
+                                    <span class="td-add" style="position: relative;top: -1px;">添加</span>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-3">
+                    <button class="btn btn-primary">保存</button>
+                    <a href="{{ url_for('.attrs') }}" class="btn btn-default" style="margin-left: 20px">取消</a>
+                </div>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/manage/add_extra_attr2.js') }}"></script>
+{% endblock %}

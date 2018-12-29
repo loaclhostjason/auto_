@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ConfigurationModule v-CONFIG-SCHEMA-VERSION="1.0">
+  <Header>
+    <EcuName>a</EcuName>
+    <RequestId>a</RequestId>
+    <ResponseId>a</ResponseId>
+    <ConfigurationFileNumber>v</ConfigurationFileNumber>
+    <Protocol>
+      <ApplicationLayer>
+        <ApplicationLayerSpec></ApplicationLayerSpec>
+        <P2></P2>
+        <P2Star></P2Star>
+        <S3></S3>
+      </ApplicationLayer>
+      <PhysicalLayer>
+        <Baudrate></Baudrate>
+        <PhysicalLayerSpec></PhysicalLayerSpec>
+        <Pin PinDefinition="D" PinNumber="16"/>
+        <Pin PinDefinition="H" PinNumber="6"/>
+      </PhysicalLayer>
+    </Protocol>
+    <SecurityLevel></SecurityLevel>
+    <AlgorithmNumber></AlgorithmNumber>
+    <ConfigurationIndex></ConfigurationIndex>
+  </Header>
+  <DidList/>
+  <ReadSection/>
+  <ModificationSection/>
+  <WriteSection/>
+  <ResetSection NeedReset="true" DelayForMS="true"/>
+  <RevisionLog>
+    <RevisionLogEntry>
+      <ConfigurationFileNumber>v</ConfigurationFileNumber>
+      <RevisionDate>2018-11-09</RevisionDate>
+      <RevisionDescription>intinal version</RevisionDescription>
+      <RevisionAuthor>admin</RevisionAuthor>
+    </RevisionLogEntry>
+  </RevisionLog>
+</ConfigurationModule>
