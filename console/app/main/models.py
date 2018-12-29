@@ -219,6 +219,7 @@ class ProjectData(db.Model):
         # print(project_relation_id)
 
         default_val = None
+        strInfo = ''
         for index, val in enumerate(project_relation_id):
             d = {
                 'project_id': project_id,
@@ -235,12 +236,14 @@ class ProjectData(db.Model):
                 # if request.form.get('%s_%s' % (val, v)):
                 if request.form.get('%s_%s' % (val, v)):
                     _this_val = request.form.get('%s_%s' % (val, v))
-                    d['content'][v] = split_default_val(_this_val, bit_len)
+                    d['content'][v] = _this_val  #split_default_val(_this_val, bit_len)
+                    if len(_this_val) < bit_len:
+                        strInfo += '%s 行 %s 数据输入不足\r\n' %(d['las'], v)
                 else:
                     d['content'][v] = ''
 
             result.append(d)
-        return [v for v in result if v.get('content')], default_val
+        return [v for v in result if v.get('content')], default_val, strInfo
 
 
 class ProjectGroup(db.Model):
