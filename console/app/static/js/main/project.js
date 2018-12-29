@@ -6,6 +6,20 @@ function remove(arr) {
     return newarr;
 }
 
+function onKeyUpEvent(inputName, strRegExpCheck, strRegExpReplace, strInfo)
+{
+	var inputValue = document.getElementById(inputName);
+	var regExp = new RegExp(strRegExpCheck, 'g');
+	
+	if(!regExp.test(inputValue.value))
+	{
+		toastr.info(strInfo)
+	}
+
+	regExp = new RegExp(strRegExpReplace, 'g');
+	inputValue.value=inputValue.value.replace(regExp, '');
+}
+
 $(document).ready(function () {
     function Projects() {
         AppCommonClass.call(this);
@@ -114,13 +128,13 @@ $(document).ready(function () {
                     html += '<td colspan="8">';
                     html += '<div class="col-xs-12"><div class="row">';
                     if (content['byte' + num]) {
-                        html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="' + (content['byte' + num] || '') + '">';
+                        html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + bit_position.length + '" value="' + (content['byte' + num] || '') + '">';
                     } else {
                         // if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
                         if (num == byte_position) {
-                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="">'; // show or hide
+                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + bit_position.length + '" value="">'; // show or hide
                         } else
-                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="" disabled>';
+                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + bit_position.length + '" value="" disabled>';
                     }
 
                     html += '</div></div></td>';
