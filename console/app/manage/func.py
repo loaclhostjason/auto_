@@ -9,6 +9,7 @@ def get_content():
         'item_protocol',
         'item_zh',
         'item_default',
+        'item_check',
         'item_required',
     ]
     items = request.form.getlist('item')
