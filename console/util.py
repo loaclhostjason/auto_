@@ -350,7 +350,10 @@ class ExportXml(XmlData):
         doc = minidom.Document()
         root = doc.createElement('ConfigurationModule')
 
-        root.setAttribute('%s-CONFIG-SCHEMA-VERSION' % self.xml_managers_attr, '1.0')
+        #root.setAttribute('%s-CONFIG-SCHEMA-VERSION' % self.xml_managers_attr, '1.0')
+        root.setAttribute('ECU-CONFIG-SCHEMA-VERSION', '1.0')
+		
+		
         doc.appendChild(root)
 
         # header
