@@ -20,6 +20,36 @@ function onKeyUpEvent(inputName, strRegExpCheck, strRegExpReplace, strInfo)
 	inputValue.value=inputValue.value.replace(regExp, '');
 }
 
+function calcByteBit(byteStart, bitPos, bitLength, leftMargin, charSpace, charWidth)
+{
+	var retValue = []
+	for(i = 0; i < byteStart; i++)
+		retValue[i] = [0, leftMargin]
+
+	for(i = byteStart, length = bitPos + bitLength; length > 0; length = length - 8, i++)
+	{
+		if(i == byteStart)
+			if(length <= 8)
+				retValue[i] = [bitLength, (8 - length) * (charSpace + charWidth) + leftMargin]
+			else
+				retValue[i] = [8 - bitPos, leftMargin]
+		else if(length > 8)
+			retValue[i] = [8, leftMargin]
+		else
+			retValue[i] = [length, (8 - length) * (charSpace + charWidth) + leftMargin]
+	}
+	
+	length = byteStart * 8 + bitPos + bitLength
+	toastr.info(byteStart)
+	toastr.info(length)
+	length = (((length % 8) > 0) ? Math.floor((length + 8) / 8) : length / 8)
+	toastr.info(length)
+	for(i = length; i < 3; i++)
+		retValue[i] = [0, leftMargin]	
+	
+	return retValue
+}
+
 $(document).ready(function () {
     function Projects() {
         AppCommonClass.call(this);
@@ -116,7 +146,7 @@ $(document).ready(function () {
                 html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal-bak"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
                 html += '</td>';
 
-
+				        var fmInput = calcByteBit(byte_position, bit_position[0], bit_position.length, 2, 12, 10.75)				
                 var bet_number = [];
                 if (did_len) {
                     for (var i = 0; i < did_len; i++) {
@@ -128,13 +158,13 @@ $(document).ready(function () {
                     html += '<td colspan="8">';
                     html += '<div class="col-xs-12"><div class="row">';
                     if (content['byte' + num]) {
-                        html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + bit_position.length + '" value="' + (content['byte' + num] || '') + '">';
+                        html += '<input type="text" style="letter-spacing: 15px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="' + (content['byte' + num] || '') + '">';
                     } else {
                         // if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
                         if (num == byte_position) {
-                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + bit_position.length + '" value="">'; // show or hide
+                            html += '<input type="text" style="letter-spacing: 15px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="">'; // show or hide
                         } else
-                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + bit_position.length + '" value="" disabled>';
+                            html += '<input type="text" style="letter-spacing: 15px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="" disabled>';
                     }
 
                     html += '</div></div></td>';
