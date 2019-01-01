@@ -89,6 +89,7 @@
                         <tr>
                             <th width="200">属性字段</th>
                             <th width="200">默认值</th>
+                            <th width="200">校验规则</th>
                             <th>操作</th>
                         </tr>
                         </thead>
@@ -105,7 +106,10 @@
                                             <input name="resetsection_item_default" class="td-input"
                                                    value="{{ attr['resetsection_item_default'] }}"/>
                                         </td>
-
+										<td>
+											<input name="resetsection_item_check" class="td-input"
+                                                   value="{{ attr['resetsection_item_check'] }}"/>
+										</td>
                                         <td><a href="javascript:void(0);" class="td-remove">移除</a></td>
                                     </tr>
 
