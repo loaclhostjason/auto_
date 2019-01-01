@@ -319,7 +319,8 @@ class ExportXml(XmlData):
             content = [
                 {
                     'resetsection_item': v['resetsection_item'],
-                    'resetsection_item_value': v['resetsection_item_default']
+                    'resetsection_item_value': v['resetsection_item_default'],
+					'resetsection_item_check': v['resetsection_item_check']
                 } for v in content_sec if v.get('resetsection_item_default')]
 
         extra_data_2 = ExtraAttrData.query.filter_by(project_id=self.project_id, level=2).all()
