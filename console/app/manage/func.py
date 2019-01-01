@@ -57,6 +57,7 @@ def get_extra_reset_content():
     field_key = [
         'resetsection_item',
         'resetsection_item_default',
+		'resetsection_item_check',
     ]
     items = request.form.getlist('resetsection_item')
     if not items:
