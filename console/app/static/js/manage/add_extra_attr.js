@@ -22,6 +22,8 @@ $(document).ready(function () {
     html_tr2 += '<tr>';
     html_tr2 += '<td><input name="resetsection_item" class="td-input" required/></td>';
     html_tr2 += '<td><input name="resetsection_item_default" class="td-input"/></td>';
+	html_tr2 += '<td><input name="resetsection_item_check" class="td-input"/></td>';
+
     html_tr2 += '<td><a href="javascript:void(0);" class="td-remove">移除</a></td>';
 
     html_tr2 += '</tr>';
