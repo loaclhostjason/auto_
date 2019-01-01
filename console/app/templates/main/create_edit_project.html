@@ -115,6 +115,7 @@
         <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
     <script src="{{ url_for('static', filename='js/main/attr.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/regexp/check.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main/project_tree.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main/project.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main/project_bak.js') }}"></script>
@@ -146,5 +147,8 @@
         .table-bordered.table-project-data tbody tr td {
             border-left: 0 !important;
         }
+		
+		input[type=text]::-ms-clear{display:none}
+
     </style>
 {% endblock %}
