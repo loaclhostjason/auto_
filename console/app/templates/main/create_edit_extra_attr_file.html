@@ -117,8 +117,13 @@
                                         <td>
                                             <input name="resetsection_item" value="{{ attr['resetsection_item'] }}"
                                                    type="hidden"/>
-                                            <input name="resetsection_item_value" class="td-input" required
-                                                   value="{{ reset_sec[loop.index0]['resetsection_item_value']  if reset_sec else default_sec.get(attr['resetsection_item'], '') }}"/>
+											{% if attr['resetsection_item_check'] == 'TX_B_______' %}
+												<input id={{ attr['resetsection_item'] }} name="resetsection_item_value" class="td-input" required onkeyup='onBoolKeyUpEvent(&quot;{{ attr["resetsection_item"] }}&quot;)'
+													   value="{{ reset_sec[loop.index0]['resetsection_item_value']  if reset_sec else default_sec.get(attr['resetsection_item'], '') }}"/>											
+											{% else %}
+												<input name="resetsection_item_value" class="td-input" required
+													   value="{{ reset_sec[loop.index0]['resetsection_item_value']  if reset_sec else default_sec.get(attr['resetsection_item'], '') }}"/>
+											{% endif %}
                                         </td>
                                     </tr>
 
@@ -149,4 +154,5 @@
 {% block scripts %}
 
     {{ super() }}
+	<script src="{{ url_for('static', filename='js/regexp/check.js') }}"></script>
 {% endblock %}
