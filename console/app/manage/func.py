@@ -9,6 +9,7 @@ def get_content():
         'item_protocol',
         'item_zh',
         'item_default',
+        'item_check',
         'item_required',
     ]
     items = request.form.getlist('item')
@@ -56,6 +57,7 @@ def get_extra_reset_content():
     field_key = [
         'resetsection_item',
         'resetsection_item_default',
+		'resetsection_item_check',
     ]
     items = request.form.getlist('resetsection_item')
     if not items:

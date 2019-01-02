@@ -319,7 +319,8 @@ class ExportXml(XmlData):
             content = [
                 {
                     'resetsection_item': v['resetsection_item'],
-                    'resetsection_item_value': v['resetsection_item_default']
+                    'resetsection_item_value': v['resetsection_item_default'],
+					'resetsection_item_check': v['resetsection_item_check']
                 } for v in content_sec if v.get('resetsection_item_default')]
 
         extra_data_2 = ExtraAttrData.query.filter_by(project_id=self.project_id, level=2).all()
@@ -350,7 +351,10 @@ class ExportXml(XmlData):
         doc = minidom.Document()
         root = doc.createElement('ConfigurationModule')
 
-        root.setAttribute('%s-CONFIG-SCHEMA-VERSION' % self.xml_managers_attr, '1.0')
+        #root.setAttribute('%s-CONFIG-SCHEMA-VERSION' % self.xml_managers_attr, '1.0')
+        root.setAttribute('ECU-CONFIG-SCHEMA-VERSION', '1.0')
+		
+		
         doc.appendChild(root)
 
         # header

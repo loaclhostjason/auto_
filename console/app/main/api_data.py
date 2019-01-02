@@ -141,7 +141,9 @@ def edit_project_data_api(project_id):
         return jsonify({'success': False, 'message': 'LAS不能为空，如果保存请将空的LAS 填写 None'})
 
     project_relation = ProjectRelation.query.filter_by(id=data_relation_id).first()
-    data, default_val = ProjectData().get_content(project_id, project_relation.parent_id, project_relation.id)
+    data, default_val, strInfo = ProjectData().get_content(project_id, project_relation.parent_id, project_relation.id)
+    if strInfo != '':
+        return jsonify({'success': False, 'message': strInfo})
     default_conf = get_default_conf(default_val)
 
     if not data:

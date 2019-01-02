@@ -1,9 +1,49 @@
+document.write("undefinedundefined<script language=javascript src='../regexp/check.js'></script>");
+
 function remove(arr) {
     var newarr = [];
     for (var i = 0; i < arr.length - 1; i++) {
         newarr.push(arr[i]);
     }
     return newarr;
+}
+
+
+function calcByteBit(byteStart, bitPos, bitLength, leftMargin,charWidth)
+{
+	var retValue = []
+	if(bitPos)
+	{
+		for(i = 0; i < byteStart; i++)
+			retValue[i] = [0, leftMargin]
+
+		for(i = byteStart, length = bitPos + bitLength; length > 0; length = length - 8, i++)
+		{
+			if(i == byteStart)
+				if(length <= 8)
+					retValue[i] = [bitLength, (8 - length) * charWidth + leftMargin]
+				else
+					retValue[i] = [8 - bitPos, leftMargin]
+			else if(length > 8)
+				retValue[i] = [8, leftMargin]
+			else
+				retValue[i] = [length, (8 - length) * charWidth + leftMargin]
+		}
+		
+		length = byteStart * 8 + bitPos + bitLength
+		//toastr.info(byteStart)
+		//toastr.info(length)
+		length = (((length % 8) > 0) ? Math.floor((length + 8) / 8) : length / 8)
+		//toastr.info(length)
+		for(i = length; i < 3; i++)
+			retValue[i] = [0, leftMargin]	
+	}
+	else
+	{
+		for(i = 0; i < 3; i++)
+			retValue[i] = [0, 0]	
+	}
+	return retValue
 }
 
 $(document).ready(function () {
@@ -102,6 +142,11 @@ $(document).ready(function () {
                 html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal-bak"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
                 html += '</td>';
 
+				var fmInput = null
+				if(bit_position)
+					fmInput = calcByteBit(byte_position, bit_position[0], bit_position.length, 5, 19.5)
+				else
+					fmInput = calcByteBit(byte_position, null, null, 5, 19.5)
 
                 var bet_number = [];
                 if (did_len) {
@@ -113,15 +158,16 @@ $(document).ready(function () {
                 bet_number.forEach(function (num) {
                     html += '<td colspan="8">';
                     html += '<div class="col-xs-12"><div class="row">';
-                    if (content['byte' + num]) {
-                        html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="' + (content['byte' + num] || '') + '">';
-                    } else {
+                    /*if (content['byte' + num]) {
+                        html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="' + (content['byte' + num] || '') + '">';
+                    } else {*/
                         // if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
-                        if (num == byte_position) {
-                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="">'; // show or hide
+                        //if (num >= byte_position && num <= byte_position + _new_byte_position.length) 
+                        if (bit_position && bit_position.length > 0 && fmInput[num][0] > 0) {
+                            html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="">'; // show or hide
                         } else
-                            html += '<input type="text" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" value="" disabled>';
-                    }
+                            html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="" disabled>';
+                    //}
 
                     html += '</div></div></td>';
                 });
@@ -187,24 +233,24 @@ $(document).ready(function () {
                         if (!aaaa.length) {
                             for (var j = 7; j >= 0; j--) {
                                 if ($.inArray(j, new_bit_position) > -1) {
-                                    a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
+                                    a += '<div style="width: 11.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
                                 } else {
-                                    a += '<div style="width: 12.5%; float: left;text-align: center"><span>' + j + '</span>';
+                                    a += '<div style="width: 11.5%; float: left;text-align: center"><span>' + j + '</span>';
                                 }
                                 a += '</div>';
                             }
                         } else {
                             if ($.inArray(i, aaaa) > -1) {
                                 for (var j = 7; j >= 0; j--) {
-                                    a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
+                                    a += '<div style="width: 11.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
                                     a += '</div>';
                                 }
                             } else {
                                 for (var j = 7; j >= 0; j--) {
                                     if ($.inArray(j, new_bit_position) > -1) {
-                                        a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
+                                        a += '<div style="width: 11.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
                                     } else {
-                                        a += '<div style="width: 12.5%; float: left;text-align: center"><span>' + j + '</span>';
+                                        a += '<div style="width: 11.5%; float: left;text-align: center"><span>' + j + '</span>';
                                     }
                                     a += '</div>';
                                 }
@@ -213,9 +259,9 @@ $(document).ready(function () {
                     } else {
                         for (var j = 7; j >= 0; j--) {
                             if ($.inArray(j, bit_position) > -1 && byte_position == i) {
-                                a += '<div style="width: 12.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
+                                a += '<div style="width: 11.5%; float: left;background: #090; color: #fff; text-align: center"><span>' + j + '</span>';
                             } else {
-                                a += '<div style="width: 12.5%; float: left;text-align: center"><span>' + j + '</span>';
+                                a += '<div style="width: 11.5%; float: left;text-align: center"><span>' + j + '</span>';
                             }
                             a += '</div>';
                         }

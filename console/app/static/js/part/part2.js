@@ -27,7 +27,7 @@ $(document).ready(function () {
             var html = '';
             html += '<tr>';
             html += '<th width="60" style="min-width: 60px"></th>';
-            html += '<th width="120" style="min-width: 120px">零件号</th>';
+            html += '<th width="120" style="min-width: 120px">数据</th>';
             html += '<th width="120" style="min-width: 120px">Las</th>';
             html += '</tr>';
 
