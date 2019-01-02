@@ -11,7 +11,7 @@ function check_input(strCheck)
             strRegExpReplace = '[^0-9]'
 			strInfo = '自然数'
             break;
-        case "N+":  //正整数集
+        case "Z+":  //正整数集
             //strRegExp = '^[1-9]\\d*$'
 			strInfo = '正整数'
             break;
@@ -61,6 +61,28 @@ function check_input(strCheck)
 	return [strRegExpCheck, strRegExpReplace, strInfo];
 }
 
+function prefixInteger(num, n) 
+{
+    return (Array(n).join(0) + num).slice(-n);
+}
+		
+function onBlurEvent(id, strFormat)
+{
+	var inputValue = document.getElementById(id)
+	if(inputValue)
+	{
+		nValueLen = inputValue.value.length
+		nFrmLen = Number(strFormat.substr(2, 2))
+		switch(strFormat.substr(0, 2))
+		{
+			case 'L0':
+				if(nFrmLen > nValueLen)
+					inputValue.value = prefixInteger(inputValue.value, nFrmLen)
+				break
+		}
+	}
+}
+
 function onKeyUpEvent(inputName, strRegExpCheck, strRegExpReplace, strInfo)
 {
 	var inputValue = document.getElementById(inputName);
@@ -77,11 +99,9 @@ function onKeyUpEvent(inputName, strRegExpCheck, strRegExpReplace, strInfo)
 function onCheckKeyUpEvent(id)
 {
 	var inputCheck = document.getElementById(id);
-	var regExp = new RegExp('^(TX){1}(((_N)|(N+)|(_Z)|(_R)|(_S)|(SD)|(_s)|(sd)|(_C)|(CD)|(_B)){1})([0-9]{3})([0-9]{4})', 'g');
+	var regExp = new RegExp('^(TX){1}(((_N)|(N+)|(_Z)|(_R)|(_S)|(SD)|(_s)|(sd)|(_C)|(CD)|(_B)){1})(([0-9]{3})|(___)){1}((([A-Z]{1})([A-Za-z0-9]{1})([0-9]{2}))|(____)){1}', 'g');
 	if(!regExp.test(inputCheck.value))
-		toastr.info(inputCheck.value)
-	else
-		toastr.info('ok')
+		toastr.info('0-1两个字符固定为TX; 2-3两个字符是数据类型(_N:自然数、Z+:正整数、_Z:整数、_R:实数、_S:大写字母、SD:大写字母和数字、_s:小写字母、sd:小写字母和数字、_C:大小写字母、CD:大小写字母和数字、_B:true或false); 4-6三个字符的十进制数是输入最大长度; 7-8两个字符是格式化类型(L0:左端补零);9-10两个字符的十进制数是补位数量')
 }
 
 function onBoolKeyUpEvent(inputName)
