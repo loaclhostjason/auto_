@@ -71,7 +71,7 @@
                                                    value="{{ attr['item_default'] }}"/>
                                         </td>
 										<td>
-											<input name="item_check" class="td-input"
+											<input name="item_check" id="item_check" class="td-input" maxlength="11" onkeyup="onCheckKeyUpEvent('item_check')"
 													value="{{ attr['item_check'] }}"/>
 										</td>
                                         <td>
@@ -120,6 +120,7 @@
     {{ super() }}
     <script src="{{ url_for('static', filename='js/manage/add_attr.js') }}"></script>
     <script src="{{ url_for('static', filename='js/manage/sort.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/regexp/check.js') }}"></script>
     <script>
         attr_id = "{{ attr_info.id }}"
     </script>
