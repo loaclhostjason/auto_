@@ -12,30 +12,37 @@ function remove(arr) {
 function calcByteBit(byteStart, bitPos, bitLength, leftMargin,charWidth)
 {
 	var retValue = []
-	for(i = 0; i < byteStart; i++)
-		retValue[i] = [0, leftMargin]
-
-	for(i = byteStart, length = bitPos + bitLength; length > 0; length = length - 8, i++)
+	if(bitPos)
 	{
-		if(i == byteStart)
-			if(length <= 8)
-				retValue[i] = [bitLength, (8 - length) * charWidth + leftMargin]
+		for(i = 0; i < byteStart; i++)
+			retValue[i] = [0, leftMargin]
+
+		for(i = byteStart, length = bitPos + bitLength; length > 0; length = length - 8, i++)
+		{
+			if(i == byteStart)
+				if(length <= 8)
+					retValue[i] = [bitLength, (8 - length) * charWidth + leftMargin]
+				else
+					retValue[i] = [8 - bitPos, leftMargin]
+			else if(length > 8)
+				retValue[i] = [8, leftMargin]
 			else
-				retValue[i] = [8 - bitPos, leftMargin]
-		else if(length > 8)
-			retValue[i] = [8, leftMargin]
-		else
-			retValue[i] = [length, (8 - length) * charWidth + leftMargin]
+				retValue[i] = [length, (8 - length) * charWidth + leftMargin]
+		}
+		
+		length = byteStart * 8 + bitPos + bitLength
+		//toastr.info(byteStart)
+		//toastr.info(length)
+		length = (((length % 8) > 0) ? Math.floor((length + 8) / 8) : length / 8)
+		//toastr.info(length)
+		for(i = length; i < 3; i++)
+			retValue[i] = [0, leftMargin]	
 	}
-	
-	length = byteStart * 8 + bitPos + bitLength
-	//toastr.info(byteStart)
-	//toastr.info(length)
-	length = (((length % 8) > 0) ? Math.floor((length + 8) / 8) : length / 8)
-	//toastr.info(length)
-	for(i = length; i < 3; i++)
-		retValue[i] = [0, leftMargin]	
-	
+	else
+	{
+		for(i = 0; i < 3; i++)
+			retValue[i] = [0, 0]	
+	}
 	return retValue
 }
 
@@ -135,7 +142,12 @@ $(document).ready(function () {
                 html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal-bak"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
                 html += '</td>';
 
-				var fmInput = calcByteBit(byte_position, bit_position[0], bit_position.length, 5, 19.5)
+				var fmInput = null
+				if(bit_position)
+					fmInput = calcByteBit(byte_position, bit_position[0], bit_position.length, 5, 19.5)
+				else
+					fmInput = calcByteBit(byte_position, null, null, 5, 19.5)
+
                 var bet_number = [];
                 if (did_len) {
                     for (var i = 0; i < did_len; i++) {
@@ -146,15 +158,16 @@ $(document).ready(function () {
                 bet_number.forEach(function (num) {
                     html += '<td colspan="8">';
                     html += '<div class="col-xs-12"><div class="row">';
-                    if (content['byte' + num]) {
+                    /*if (content['byte' + num]) {
                         html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="' + (content['byte' + num] || '') + '">';
-                    } else {
+                    } else {*/
                         // if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
-                        if (num >= byte_position && num <= byte_position + _new_byte_position.length) {
+                        //if (num >= byte_position && num <= byte_position + _new_byte_position.length) 
+                        if (bit_position && bit_position.length > 0 && fmInput[num][0] > 0) {
                             html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="">'; // show or hide
                         } else
                             html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="" disabled>';
-                    }
+                    //}
 
                     html += '</div></div></td>';
                 });
