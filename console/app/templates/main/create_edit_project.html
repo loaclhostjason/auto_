@@ -87,14 +87,26 @@
                     <div class="charttable-w">
                         <div style="overflow-y: auto;">
                             <form method="post" id="project-data-form">
-                                <table class="table table-hover table-bordered table-project-data">
-                                    <thead></thead>
+								<div id="list"> 
+									<div class="lock_box" style="width:300px;">
+										<table class="table table-hover table-bordered ui-table" id="lastable">
+											<thead></thead>
 
-                                    <tbody></tbody>
+											<tbody></tbody>
 
-                                </table>
+										</table>
+									</div>
+									<div class="x_auto_box">
+										<table class="table table-hover table-bordered table-project-data" id="bittable">
+											<thead></thead>
+
+											<tbody></tbody>
+
+										</table>
+									</div>
+								</div>
                             </form>
-                        </div>
+                        </div class="x_auto_box">
                         <div style="margin: 10px">
                             <button class="btn btn-primary submit-project-data" type="button" style="display: none">保存
                             </button>
@@ -149,6 +161,28 @@
         }
 		
 		input[type=text]::-ms-clear{display:none}
+		
+
+		
+		.table-bordered.ui-table {
+			margin: 0;
+			margin-bottom: 20px;
+		}
+		.table-bordered.ui-table thead th:first-child {
+			border-left: 0;
+		}
+		.table-bordered.ui-table tbody tr td {
+			border-left: 0 !important;
+		}
+		
+		div.x_auto_box {
+			overflow-y: hidden;
+			overflow-x: auto;
+		}
+
+		div.lock_box {
+			float: left;
+		}
 
     </style>
 {% endblock %}
