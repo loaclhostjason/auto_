@@ -38,7 +38,7 @@ function required_html(required) {
 }
 
 function required_input(field, required, content, field_protocol, field_default, field_check) {
-    var maxlen = 0, regExpCheck = '', regExpReplace, strInfo = ''
+    var maxlen = 0, regExpCheck = '', regExpReplace, strInfo = '', strFormat = ''
 	if(typeof(field_check) != "undefined" && field_check != null)
 	{
 		var length = field_check.length
@@ -51,11 +51,13 @@ function required_input(field, required, content, field_protocol, field_default,
 			strInfo = retValue[2]
 			//得到长度限制
 			maxlen = parseInt(field_check.substring(length - 7, length - 4))
+			//格式化
+			strFormat = field_check.substring(length - 4, length)
 		}
 	}
 
 	//var html = '<input class="form-control pull-left" name="' + (field_protocol ? field_protocol + '-' : '') + field + '" type="text" value="' + (content ? content[field] || (field_default || '') : "") + '">';
-    var html = '<input class="form-control pull-left" id="' + (field_protocol ? field_protocol + '-' : '') + field + '" name="' + (field_protocol ? field_protocol + '-' : '') + field + '" type="text" value="' + (content ? content[field] || (field_default|| '') : "") + '"' + ((maxlen == 0 || maxlen == NaN) ? 'maxlength="0"' : 'maxlength="' + String(maxlen) + '"') + ((regExpReplace != '') ? ' onkeyup=onKeyUpEvent(\'' + (field_protocol ? field_protocol + '-' : '') + field + '\',\'' + regExpCheck + '\',\'' + regExpReplace + '\',\'' + strInfo + '\')' : 'onkeyup=value=value')  + '>';
+    var html = '<input class="form-control pull-left"' + ' onBlur=onBlurEvent(\'' + (field_protocol ? field_protocol + '-' : '') + field + '\',\'' + strFormat + '\')' + ' id="' + (field_protocol ? field_protocol + '-' : '') + field + '" name="' + (field_protocol ? field_protocol + '-' : '') + field + '" type="text" value="' + (content ? content[field] || (field_default|| '') : "") + '"' + ((maxlen == 0 || maxlen == NaN) ? 'maxlength="0"' : 'maxlength="' + String(maxlen) + '"') + ((regExpReplace != '') ? ' onkeyup=onKeyUpEvent(\'' + (field_protocol ? field_protocol + '-' : '') + field + '\',\'' + regExpCheck + '\',\'' + regExpReplace + '\',\'' + strInfo + '\')' : 'onkeyup=value=value')  + '>';
     if (required)
         html = '<input class="form-control pull-left" name="' + field + '" type="text" value="' + (content ? content[field] || (field_default || '') : "") + '" required>';
 

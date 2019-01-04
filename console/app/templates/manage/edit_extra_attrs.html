@@ -107,7 +107,7 @@
                                                    value="{{ attr['resetsection_item_default'] }}"/>
                                         </td>
 										<td>
-											<input name="resetsection_item_check" class="td-input"
+											<input name="resetsection_item_check" id="resetsection_item_check" class="td-input" maxlength="11" onkeyup="onCheckKeyUpEvent('resetsection_item_check')" 
                                                    value="{{ attr['resetsection_item_check'] }}"/>
 										</td>
                                         <td><a href="javascript:void(0);" class="td-remove">移除</a></td>
@@ -147,4 +147,5 @@
 
     {{ super() }}
     <script src="{{ url_for('static', filename='js/manage/add_extra_attr.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/regexp/check.js') }}"></script>
 {% endblock %}

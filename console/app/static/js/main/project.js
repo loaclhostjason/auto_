@@ -89,10 +89,15 @@ $(document).ready(function () {
                     var ext_bitPosition = resp['ext_bitPosition'];
 
                     if (resp['level'] && resp['level'] === 3) {
+                        $('.ui-table thead').html(_this.project_fixthead_html());
+                        $('.ui-table tbody').html(_this.project_fixdata_html(result, project_data, did_len, byte_position, default_conf, bit_position));
+						
                         $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position, ext_bitPosition));
                         $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf, bit_position));
                         init_editTable();
                     } else {
+                        $('.ui-table thead').html('');
+                        $('.ui-table tbody').html('');
                         $('.table-project-data thead').html('');
                         $('.table-project-data tbody').html('');
                     }
@@ -103,6 +108,56 @@ $(document).ready(function () {
             });
         };
 
+        this.project_fixdata_html = function (result, project_data, did_len, byte_position, default_conf, bit_position) {
+            if (!result || !result.length) return '';
+            var html = '';
+
+            var _new_byte_position = [];
+            if (bit_position) {
+                var start_bit = bit_position[0];
+                var bit_len = start_bit + bit_position.length;
+                var new_byte_position = Math.ceil(bit_len / 8) - 1 + Number(byte_position);
+                var dif_did_len = new_byte_position - byte_position;
+
+                if (dif_did_len) {
+                    for (var i = 1; i <= dif_did_len; i++) {
+                        _new_byte_position.push(Number(byte_position) + i);
+                    }					
+                }
+            }
+			
+            var idIndex = 0
+            result.forEach(function (data) {
+                var prid = data['level_4_id'];
+                var data_info = project_data[data['level_4_id']] || {};
+                var content = data_info['content'] || {};
+
+                html += '<tr class="data-class" las-id="' + idIndex + '">';
+                idIndex = idIndex + 1
+                html += '<input type="hidden" name="project_relation_id" value="' + data['level_4_id'] + '">';
+                html += '<input type="hidden" name="name" value="' + data['level_4'] + '">';
+
+                // show las change name
+                console.log(data['level_4']);
+                html += '<td height="60" class="text-center"><a href="javascript:void(0)" class="del-project-func text-danger pull-left" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a>';
+                html += '<a href="javascript:void (0)" class="display_name" data-pk="' + data['level_4_id'] + '">' + data['level_4'] + '</a></td>';
+
+                html += '<td height="60" class="text-center"><div style="display: inline-flex"><div style="float: left"><input name="las" required class="tc-search-words" value="' + (data_info['las'] || '') + '"></div>';
+                html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal-bak"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
+                html += '</td>';
+
+                html += '</div></div></td>';
+            });
+
+
+            html += '</tr>'
+            if (result) {
+                html += '<tr class="default-v"><td height="60" colspan="2"><div class="col-xs-4"><span style="position: relative; top: 5px;">默认值：</span></div>';
+                html += '<div class="col-xs-8"><input name="default_conf" value="' + (default_conf || '') + '"  class="tc-search-words"/></div></td></tr>';
+            }
+
+			return html
+		}
         this.project_data_html = function (result, project_data, did_len, byte_position, default_conf, bit_position) {
             if (!result || !result.length) return '';
 
@@ -123,24 +178,25 @@ $(document).ready(function () {
                 }
             }
 
-
+			var idIndex = 0
             result.forEach(function (data) {
                 var prid = data['level_4_id'];
                 var data_info = project_data[data['level_4_id']] || {};
                 var content = data_info['content'] || {};
 
-                html += '<tr class="data-class">';
-                html += '<input type="hidden" name="project_relation_id" value="' + data['level_4_id'] + '">';
-                html += '<input type="hidden" name="name" value="' + data['level_4'] + '">';
+                html += '<tr class="data-class" id="bit' + idIndex + '">';
+				idIndex = idIndex + 1
+                //html += '<input type="hidden" name="project_relation_id" value="' + data['level_4_id'] + '">';
+                //html += '<input type="hidden" name="name" value="' + data['level_4'] + '">';
 
                 // show las change name
                 console.log(data['level_4']);
-                html += '<td class="text-center"><a href="javascript:void(0)" class="del-project-func text-danger pull-left" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a>';
+                /*html += '<td class="text-center"><a href="javascript:void(0)" class="del-project-func text-danger pull-left" data-id="' + data['level_4_id'] + '"><i class="glyphicon glyphicon-trash"></i></a>';
                 html += '<a href="javascript:void (0)" class="display_name" data-pk="' + data['level_4_id'] + '">' + data['level_4'] + '</a></td>';
 
                 html += '<td class="text-center"><div style="display: inline-flex"><div style="float: left"><input name="las" required class="tc-search-words" value="' + (data_info['las'] || '') + '"></div>';
                 html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal-bak"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
-                html += '</td>';
+                html += '</td>';*/
 
 				var fmInput = null
 				if(bit_position)
@@ -156,10 +212,10 @@ $(document).ready(function () {
                 }
                 console.log(byte_position);
                 bet_number.forEach(function (num) {
-                    html += '<td colspan="8">';
+                    html += '<td height="60" colspan="8">';
                     html += '<div class="col-xs-12"><div class="row">';
                     /*if (content['byte' + num]) {
-                        html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="' + (content['byte' + num] || '') + '">';
+                        html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="' + (content['byte' + num] || '') + '" ' + ((bit_position.length > 0) ? '' : 'disabled') + '>';
                     } else {*/
                         // if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
                         //if (num >= byte_position && num <= byte_position + _new_byte_position.length) 
@@ -176,20 +232,27 @@ $(document).ready(function () {
                 html += '</tr>'
             });
 
-            if (result) {
-                html += '<tr class="default-v"><td colspan="2"><div class="col-xs-4"><span style="position: relative; top: 5px;">默认值：</span></div>';
-                html += '<div class="col-xs-8"><input name="default_conf" value="' + (default_conf || '') + '"  class="tc-search-words"/></div></td></tr>';
+			if (result) {
+                html += '<tr class="default-v"><td height="60" colspan="3"/></tr>';
             }
 
 
             return html
         };
 
+        this.project_fixthead_html = function () {
+            var html = '';
+            html += '<tr>';
+            html += '<th height="52" width="100" style="vertical-align: middle; min-width: 100px"></th>';
+            html += '<th height="52" width="120" style="vertical-align: middle; min-width: 120px">LAS</th>';
+            html += '</tr>';
+            return html;
+		}
         this.project_thead_html = function (did_len, bit_position, byte_position, ext_bitPosition) {
             var html = '';
             html += '<tr>';
-            html += '<th width="100" style="vertical-align: middle; min-width: 100px"></th>';
-            html += '<th width="120" style="vertical-align: middle; min-width: 120px">LAS</th>';
+            //html += '<th height="50" width="100" style="vertical-align: middle; min-width: 100px"></th>';
+            //html += '<th width="120" style="vertical-align: middle; min-width: 120px">LAS</th>';
 
             var aaaa = [];
             var _new_byte_position = [];
@@ -226,7 +289,7 @@ $(document).ready(function () {
 
             if (did_len) {
                 for (var i = 0; i < did_len; i++) {
-                    html += '<th colspan="8"><div class="text-center with-bottom-border"><span>BYTE' + i + '</span></div>';
+                    html += '<th colspan="8" height="52"><div class="text-center with-bottom-border"><span>BYTE' + i + '</span></div>';
                     html += '<div style="width: 172px">';
                     var a = '';
                     if (_new_byte_position.length && $.inArray(i, _new_byte_position) > -1) {
@@ -401,7 +464,18 @@ $(document).ready(function () {
                 $.post('/project/tree/delete/' + id, '', function (data) {
                     if (data.success) {
                         toastr.success(data.message);
+						var lastr = _this.parents('.data-class').attr('las-id');
                         _this.parents('.data-class').remove();
+						
+						var bit_table = document.getElementById('bittable')
+						var bit_tr = document.getElementById('bit' + lastr)
+						
+						//var las_tr = _this.parentNode.parentNode.rowIndex
+						if(bit_table && bit_tr){
+							//toastr.info(bit_tr.rowIndex)
+							bit_table.deleteRow(bit_tr.rowIndex)
+						}
+						
                         if (!$('.data-class').length) {
                             $('.default-v').remove();
                         }
