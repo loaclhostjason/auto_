@@ -201,11 +201,27 @@ class ProjectData(db.Model):
             key.append('%s_%s' % (str_key, index))
         return key
 
+    def _get_bitwidth(self, start_bit, len_bit):
+        bitwidth = []
+        index = 0
+        while len_bit > 0:
+            if len_bit + start_bit >= 8:
+                bitwidth.append(8 - start_bit)
+            else:
+                bitwidth.append(len_bit - start_bit)
+            len_bit = len_bit - bitwidth[index]
+            start_bit = 0
+            index = index + 1
+        return bitwidth
+
     def get_content(self, project_id, did_relation_id, relation_id=None):
         from .api_data import split_default_val
 
         did_len = self.p_did_len(project_id, did_relation_id)
         bit_len, *args = AttrContent.get_attr_info(relation_id, is_parent=True)
+
+        bit_width = self._get_bitwidth(args[0], bit_len)
+
         key = list()
         if not did_len:
             return list(), []
@@ -226,6 +242,7 @@ class ProjectData(db.Model):
                 'project_relation_id': val,
                 'content': {},
             }
+            bit_width_index = 0
             for v in key:
                 d['las'] = request.form.getlist('las')[index]
                 d['name'] = request.form.getlist('name')[index]
@@ -237,8 +254,9 @@ class ProjectData(db.Model):
                 if request.form.get('%s_%s' % (val, v)):
                     _this_val = request.form.get('%s_%s' % (val, v))
                     d['content'][v] = _this_val  #split_default_val(_this_val, bit_len)
-                    if len(_this_val) < bit_len:
-                        strInfo += '%s 行 %s 数据输入不足\r\n' %(d['las'], v)
+                    if len(_this_val) < bit_width[bit_width_index]: #bit_len:
+                        strInfo += '%s 行 %s 数据输入不足%d\r\n' %(d['las'], v, bit_width[bit_width_index])
+                    bit_width_index = bit_width_index + 1
                 else:
                     d['content'][v] = ''
 
