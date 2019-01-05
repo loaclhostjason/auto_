@@ -11,25 +11,14 @@ function check_input(strCheck)
             strRegExpReplace = '[^0-9]'
 			strInfo = '自然数'
             break;
-        case "Z+":  //正整数集
-            //strRegExp = '^[1-9]\\d*$'
-			strInfo = '正整数'
-            break;
-        case "_Z":  //整数集
-            //strRegExp = '^-?[1-9]\\d*$'
-			strInfo = '整数'
-            break;
-        case "_R":  //实数集
-            //strRegExp = '^0\\.\\d+$|^[1-9]+(\\.\\d+)?$'
-			strInfo = '实数'
-            break;
         case "_S":  //不含数字大写串
             strRegExpCheck = '[A-Z]+$'
             strRegExpReplace = '[^A-Z]'
 			strInfo = '大写字母'
             break;
         case "SD":  //含数字串且字母开头的大写串
-            //strRegExp = '^(?!^[A-Z][A-Z0-9]*$)'
+            strRegExpCheck = '^[A-Z][A-Z0-9]*$'
+            strRegExpReplace = ''
 			strInfo = '大写字母开头的字母数字串'
             break;
         case "_s":  //不含数字小写串
@@ -38,7 +27,8 @@ function check_input(strCheck)
 			strInfo = '小写字母'
             break;
         case "sd":  //含数字串且字母开头的小写串
-            //strRegExp = '^[a-z][a-z0-9]*$'
+            strRegExpCheck = '^[a-z][a-z0-9]*$'
+            strRegExpReplace = ''
 			strInfo = '小写字母开头的字母数字串'
             break;
         case "_C":  //不含数字串(不判断大小写)
@@ -47,7 +37,8 @@ function check_input(strCheck)
 			strInfo = '字母串'
             break;
         case "CD":  //含数字串且字母开头的串(不判断大小写)
-            //strRegExp = '^[a-zA-Z][a-zA-Z0-9]*$'
+            strRegExpCheck = '^[a-zA-Z][a-zA-Z0-9]*$'
+            strRegExpReplace = ''
 			strInfo = '字母开头的字母数字串'
             break;
         case "_B":  //布尔
@@ -91,17 +82,22 @@ function onKeyUpEvent(inputName, strRegExpCheck, strRegExpReplace, strInfo)
 	if(!regExp.test(inputValue.value))
 	{
 		toastr.info(strInfo)
+        var str = inputValue.value
+        while(str.length > 0 && !regExp.test(str))
+            str = str.substr(0, str.length - 1)
+        inputValue.value = str
 	}
-	regExp = new RegExp(strRegExpReplace, 'g');
-	inputValue.value=inputValue.value.replace(regExp, '');
+
+	//regExp = new RegExp(strRegExpReplace, 'g');
+	//inputValue.value=inputValue.value.replace(regExp, '');
 }
 
 function onCheckKeyUpEvent(id)
 {
 	var inputCheck = document.getElementById(id);
-	var regExp = new RegExp('^(TX){1}(((_N)|(N+)|(_Z)|(_R)|(_S)|(SD)|(_s)|(sd)|(_C)|(CD)|(_B)){1})(([0-9]{3})|(___)){1}((([A-Z]{1})([A-Za-z0-9]{1})([0-9]{2}))|(____)){1}', 'g');
+	var regExp = new RegExp('^(TX){1}(((_N)|(_S)|(SD)|(_s)|(sd)|(_C)|(CD)|(_B)){1})(([0-9]{3})|(___)){1}((([A-Z]{1})([A-Za-z0-9]{1})([0-9]{2}))|(____)){1}', 'g');
 	if(!regExp.test(inputCheck.value))
-		toastr.info('0-1两个字符固定为TX; 2-3两个字符是数据类型(_N:自然数、Z+:正整数、_Z:整数、_R:实数、_S:大写字母、SD:大写字母和数字、_s:小写字母、sd:小写字母和数字、_C:大小写字母、CD:大小写字母和数字、_B:true或false); 4-6三个字符的十进制数是输入最大长度; 7-8两个字符是格式化类型(L0:左端补零);9-10两个字符的十进制数是补位数量')
+		toastr.info('0-1两个字符固定为TX; 2-3两个字符是数据类型(_N:自然数、_S:大写字母、SD:大写字母和数字、_s:小写字母、sd:小写字母和数字、_C:大小写字母、CD:大小写字母和数字、_B:true或false); 4-6三个字符的十进制数是输入最大长度; 7-8两个字符是格式化类型(L0:左端补零);9-10两个字符的十进制数是补位数量')
 }
 
 function onBoolKeyUpEvent(inputName)
