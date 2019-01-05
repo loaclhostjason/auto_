@@ -89,11 +89,17 @@ $(document).ready(function () {
                     var ext_bitPosition = resp['ext_bitPosition'];
 
                     if (resp['level'] && resp['level'] === 3) {
-                        $('.ui-table thead').html(_this.project_fixthead_html());
-                        $('.ui-table tbody').html(_this.project_fixdata_html(result, project_data, did_len, byte_position, default_conf, bit_position));
-						
-                        $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position, ext_bitPosition));
-                        $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf, bit_position));
+                        if(did_len > 0) {
+                            $('.ui-table thead').html(_this.project_fixthead_html());
+                            $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position, ext_bitPosition));
+                            if(result.length > 0) {  
+                                $('.ui-table tbody').html(_this.project_fixdata_html(result, project_data, did_len, byte_position, default_conf, bit_position));						
+                                $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf, bit_position));
+                            }
+                        } else {
+                            $('.ui-table tbody').html('');
+                            $('.table-project-data tbody').html('');
+                        }
                         init_editTable();
                     } else {
                         $('.ui-table thead').html('');
@@ -220,7 +226,7 @@ $(document).ready(function () {
                         // if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
                         //if (num >= byte_position && num <= byte_position + _new_byte_position.length) 
                         if (bit_position && bit_position.length > 0 && fmInput[num][0] > 0) {
-                            html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="">'; // show or hide
+                            html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="' + (content['byte' + num] || '') + '">'; // show or hide
                         } else
                             html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="" disabled>';
                     //}
@@ -233,7 +239,7 @@ $(document).ready(function () {
             });
 
 			if (result) {
-                html += '<tr class="default-v"><td height="60" colspan="3"/></tr>';
+                html += '<tr><td height="60" colspan="24"/></tr>';
             }
 
 
