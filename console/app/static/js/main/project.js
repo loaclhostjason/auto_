@@ -9,7 +9,7 @@ function remove(arr) {
 }
 
 
-function calcByteBit(byteStart, bitPos, bitLength, leftMargin,charWidth)
+function calcByteBit(byteStart, byteLength, bitPos, bitLength, leftMargin, charWidth)
 {
 	var retValue = []
 	if(bitPos)
@@ -35,12 +35,12 @@ function calcByteBit(byteStart, bitPos, bitLength, leftMargin,charWidth)
 		//toastr.info(length)
 		length = (((length % 8) > 0) ? Math.floor((length + 8) / 8) : length / 8)
 		//toastr.info(length)
-		for(i = length; i < 3; i++)
+		for(i = length; i < byteLength; i++)
 			retValue[i] = [0, leftMargin]	
 	}
 	else
 	{
-		for(i = 0; i < 3; i++)
+		for(i = 0; i < byteLength; i++)
 			retValue[i] = [0, 0]	
 	}
 	return retValue
@@ -206,9 +206,9 @@ $(document).ready(function () {
 
 				var fmInput = null
 				if(bit_position)
-					fmInput = calcByteBit(byte_position, bit_position[0], bit_position.length, 5, 19.5)
+					fmInput = calcByteBit(byte_position, did_len, bit_position[0], bit_position.length, 5, 19.5)
 				else
-					fmInput = calcByteBit(byte_position, null, null, 5, 19.5)
+					fmInput = calcByteBit(byte_position, did_len, null, null, 5, 19.5)
 
                 var bet_number = [];
                 if (did_len) {
