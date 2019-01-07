@@ -144,6 +144,8 @@ def edit_project_data_api(project_id):
     data, default_val, strInfo = ProjectData().get_content(project_id, project_relation.parent_id, project_relation.id)
     if strInfo != '':
         return jsonify({'success': False, 'message': strInfo})
+
+    print(111, default_val)
     default_conf = get_default_conf(default_val)
 
     if not data:
@@ -153,7 +155,14 @@ def edit_project_data_api(project_id):
     for v in data:
         new_dict[v['project_relation_id']] = v
 
+    print(default_conf)
+    print(new_dict)
+    has_las_all = False
+    need_id = []
     for project_relation_id, val in new_dict.items():
+        if val.get('las') and str(val['las']).lower() == 'all':
+            has_las_all = True
+        need_id.append(project_relation_id)
         val['content'] = json.dumps(val['content'])
         old_project_data = ProjectData.query.filter_by(project_relation_id=project_relation_id).first()
         if old_project_data:
@@ -170,6 +179,10 @@ def edit_project_data_api(project_id):
 
     # export_xml = ExportXml(project_id)
     # export_xml.run()
+
+    # 如果有all 保存更新 默认值
+    if has_las_all:
+        pass
 
     Modification.add_edit(project_id)
     return jsonify({'success': True, 'message': '更新成功'})

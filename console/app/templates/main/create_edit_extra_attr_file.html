@@ -166,13 +166,12 @@
 
                                             <!-- change by jason , and input change to select  -->
 
+                                            {% set selected_val = reset_sec[loop.index0]['resetsection_item_value']  if reset_sec else default_sec.get(attr['resetsection_item'], '') %}
                                             <select name="resetsection_item_value" class="td-input"
                                                     style="font-size: 13px">
                                                 {% for true_or_false in ['true','false'] %}
-                                                    {% if reset_sec and (reset_sec[loop.index0]['resetsection_item_value'] == true_or_false or default_sec.get(attr['resetsection_item'], '') == true_or_false) %}
-                                                        <option value="{{ true_or_false }}"
-                                                                selected>{{ true_or_false }}
-                                                        </option>
+                                                    {% if selected_val == true_or_false %}
+                                                        <option value="{{ true_or_false }}" selected>{{ true_or_false }}</option>
                                                     {% else %}
                                                         <option value="{{ true_or_false }}">{{ true_or_false }}</option>
                                                     {% endif %}
