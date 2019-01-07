@@ -258,6 +258,9 @@ class ProjectData(db.Model):
                         strInfo += '%s 行 %s 数据输入不足%d\r\n' %(d['las'], v, bit_width[bit_width_index])
                     bit_width_index = bit_width_index + 1
                 else:
+                    byteData = request.form.getlist('%s_%s' % (val, v))
+                    if  len(byteData) > 0 and byteData[0] == '':
+                        strInfo += '%s 行 %s 数据输入不足%d\r\n' % (d['las'], v, bit_width[bit_width_index])
                     d['content'][v] = ''
 
             result.append(d)
