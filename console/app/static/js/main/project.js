@@ -1,4 +1,4 @@
-document.write("undefinedundefined<script language=javascript src='../regexp/check.js'></script>");
+// document.write("undefinedundefined<script language=javascript src='../regexp/check.js'></script>");
 
 function remove(arr) {
     var newarr = [];

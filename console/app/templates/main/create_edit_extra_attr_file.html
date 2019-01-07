@@ -63,19 +63,57 @@
 
                                                 <td>{{ attr['item'] }}</td>
                                                 <td>
+                                                    {% set item_options =  attr.get('item_default').split('/') if attr.get('item_default') else [] %}
                                                     {% set items = pin[loop_root * 2+ loop.index0 - 2]['item_value'] if pin else default_attr.get(attr['item'], '').split('/') %}
-{#                                                    {{ pin }}#}
-{#                                                    --#}
-{#                                                    {{ items }}#}
-{#                                                    --{{ index-1 }}--#}
-{#                                                    {{ items[index-1] }}#}
+                                                    {#                                                    {{ pin }}#}
+                                                    {#                                                    --#}
+                                                    {#                                                    {{ items }}#}
+                                                    {#                                                    --{{ index-1 }}--#}
+                                                    {#                                                    {{ items[index-1] }}#}
                                                     <input name="item" value="{{ attr['item'] }}" type="hidden"/>
                                                     {% if pin %}
-                                                        <input name="item_value" class="td-input" required
-                                                               value="{{ items }}"/>
+                                                        {#                                                        <input name="item_value" class="td-input" required#}
+                                                        {#                                                               value="{{ items }}"/>#}
+
+                                                        <!-- 改动 2个input 标签 改为 select 标签-->
+                                                        <select name="item_value" class="td-input"
+                                                                style="font-size: 13px;min-width: 100px">
+                                                            {% if item_options %}
+                                                                {% for info in item_options %}
+                                                                    {% if items == info %}
+                                                                        <option value="{{ info }}"
+                                                                                selected>{{ info }}</option>
+                                                                    {% else %}
+                                                                        <option value="{{ info }}">{{ info }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            {% else %}
+                                                                <option value='' disabled selected
+                                                                        style='display:none;'>没有默认值
+                                                                </option>
+                                                            {% endif %}
+                                                        </select>
                                                     {% else %}
-                                                        <input name="item_value" class="td-input" required
-                                                               value="{{ items[index-1] }}"/>
+                                                        {#                                                        <input name="item_value" class="td-input" required#}
+                                                        {#                                                               value="{{ items[index-1] }}"/>#}
+
+                                                        <select name="item_value" class="td-input"
+                                                                style="font-size: 13px; min-width: 100px">
+                                                            {% if item_options %}
+                                                                {% for info in item_options %}
+                                                                    {% if items[index-1] == info %}
+                                                                        <option value="{{ info }}"
+                                                                                selected>{{ info }}</option>
+                                                                    {% else %}
+                                                                        <option value="{{ info }}">{{ info }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            {% else %}
+                                                                <option value='' disabled selected
+                                                                        style='display:none;'>没有默认值
+                                                                </option>
+                                                            {% endif %}
+                                                        </select>
                                                     {% endif %}
 
                                                 </td>
@@ -117,13 +155,32 @@
                                         <td>
                                             <input name="resetsection_item" value="{{ attr['resetsection_item'] }}"
                                                    type="hidden"/>
-											{% if attr['resetsection_item_check'] == 'TX_B_______' %}
-												<input id={{ attr['resetsection_item'] }} name="resetsection_item_value" class="td-input" required onkeyup='onBoolKeyUpEvent(&quot;{{ attr["resetsection_item"] }}&quot;)'
-													   value="{{ reset_sec[loop.index0]['resetsection_item_value']  if reset_sec else default_sec.get(attr['resetsection_item'], '') }}"/>											
-											{% else %}
-												<input name="resetsection_item_value" class="td-input" required
-													   value="{{ reset_sec[loop.index0]['resetsection_item_value']  if reset_sec else default_sec.get(attr['resetsection_item'], '') }}"/>
-											{% endif %}
+                                            {#                                            {% if attr['resetsection_item_check'] == 'TX_B_______' %}#}
+                                            {#                                                <input id={{ attr['resetsection_item'] }} name="resetsection_item_value"#}
+                                            {#                                                       class="td-input" required#}
+                                            {#                                                       onkeyup='onBoolKeyUpEvent(&quot;{{ attr["resetsection_item"] }}&quot;)'#}
+                                            {#                                                       value="{{ reset_sec[loop.index0]['resetsection_item_value']  if reset_sec else default_sec.get(attr['resetsection_item'], '') }}"/>#}
+                                            {#                                            {% else %}#}
+                                            {#												<input name="resetsection_item_value" class="td-input" required#}
+                                            {#													   value="{{ reset_sec[loop.index0]['resetsection_item_value']  if reset_sec else default_sec.get(attr['resetsection_item'], '') }}"/>#}
+
+                                            <!-- change by jason , and input change to select  -->
+
+                                            <select name="resetsection_item_value" class="td-input"
+                                                    style="font-size: 13px">
+                                                {% for true_or_false in ['true','false'] %}
+                                                    {% if reset_sec and (reset_sec[loop.index0]['resetsection_item_value'] == true_or_false or default_sec.get(attr['resetsection_item'], '') == true_or_false) %}
+                                                        <option value="{{ true_or_false }}"
+                                                                selected>{{ true_or_false }}
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="{{ true_or_false }}">{{ true_or_false }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+
+                                            <!-- change end -->
+                                            {#                                            {% endif %}#}
                                         </td>
                                     </tr>
 
@@ -154,5 +211,5 @@
 {% block scripts %}
 
     {{ super() }}
-	<script src="{{ url_for('static', filename='js/regexp/check.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/regexp/check.js') }}"></script>
 {% endblock %}

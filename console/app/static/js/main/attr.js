@@ -1,4 +1,4 @@
-document.write("<script language=javascript src=’../regexp/check.js’></script>");
+// document.write("<script language=javascript src=’../regexp/check.js’></script>");
 
 var attr_html = function (data, content, id, level, default_name) {
     var _default_name = default_name || null;
