@@ -22,7 +22,7 @@ var attr_html = function (data, content, id, level, default_name) {
 
         form_html += '</div>';
     });
-    if (is_edited) {
+    if (is_edited === 'True') {
         form_html += '<div class="form-group"><div class="col-sm-4"></div><div class="col-sm-7"><button type="button" class="btn btn-primary submit-add-attr">保存</button></div></div>';
     } else {
         form_html += '<div class="form-group"><div class="col-sm-4"></div><div class="col-sm-7"><button type="button" class="btn btn-primary submit-add-attr" disabled>保存</button></div></div>';
