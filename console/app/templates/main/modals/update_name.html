@@ -41,7 +41,12 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-primary submit_update_name">确定</button>
+                    {% if current_user.is_edited %}
+                        <button class="btn btn-primary submit_update_name">确定</button>
+                    {% else %}
+                        <button class="btn btn-primary submit_update_name" disabled>确定</button>
+                    {% endif %}
+
                     <button class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </div>
