@@ -12,7 +12,7 @@ function remove(arr) {
 function calcByteBit(byteStart, byteLength, bitPos, bitLength, leftMargin, charWidth)
 {
 	var retValue = []
-	if(bitPos)
+	if(bitPos >= 0)
 	{
 		for(i = 0; i < byteStart; i++)
 			retValue[i] = [0, leftMargin]
@@ -205,10 +205,10 @@ $(document).ready(function () {
                 html += '</td>';*/
 
 				var fmInput = null
-				if(bit_position)
+				if(bit_position.length > 0)
 					fmInput = calcByteBit(byte_position, did_len, bit_position[0], bit_position.length, 5, 19.5)
 				else
-					fmInput = calcByteBit(byte_position, did_len, null, null, 5, 19.5)
+					fmInput = calcByteBit(byte_position, did_len, -1, -1, 5, 19.5)
 
                 var bet_number = [];
                 if (did_len) {
@@ -225,7 +225,7 @@ $(document).ready(function () {
                     } else {*/
                         // if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
                         //if (num >= byte_position && num <= byte_position + _new_byte_position.length) 
-                        if (bit_position && bit_position.length > 0 && fmInput[num][0] > 0) {
+                        if (bit_position.length > 0 && fmInput[num][0] > 0) {
                             html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="' + (content['byte' + num] || '') + '">'; // show or hide
                         } else
                             html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="" disabled>';
