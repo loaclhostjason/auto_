@@ -1,5 +1,5 @@
 from flask_login import login_required
-from flask import jsonify, request
+from flask import jsonify, request, redirect, url_for, flash
 
 from . import users
 from .forms import UserForm
@@ -26,6 +26,21 @@ def get_user_info(id):
     return jsonify({'success': True, 'data': user.to_dict()})
 
 
+@users.route('/change_edited/<is_edited>')
+@login_required
+def change_edited(is_edited):
+    uid = request.args.get('id')
+    if not uid:
+        flash({'errors': '用户id丢失'})
+        return redirect(url_for('.users_list'))
+
+    user = User.query.get_or_404(uid)
+    user.is_edited = is_edited == 'False'
+    db.session.add(user)
+    flash({'success': '更新成功'})
+    return redirect(url_for('.users_list'))
+
+
 @users.route('/create', methods=['POST'])
 @login_required
 @role_admin_pm
@@ -47,6 +62,9 @@ def create_users():
         return jsonify({'success': False, 'message': '用户名重复'})
 
     add_user_dict = form.get_user_form(user_role)
+    if user_role != 'admin':
+        add_user_dict['project_group_id'] = request.form.get('project_group_id')
+    # print(add_user_dict)
     user = User(**add_user_dict)
     db.session.add(user)
     return jsonify({'success': True, 'message': '创建用户成功'})

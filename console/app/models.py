@@ -38,6 +38,8 @@ class User(UserMixin, db.Model):
     project_id = db.Column(db.String(100))
     pg_id = db.Column(db.String(100))
 
+    is_edited = db.Column(db.Boolean, default=True, nullable=False)
+
     # group_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     # user = db.relationship('User', remote_side='User.id', backref=db.backref("users", cascade="all, delete-orphan"))
 

@@ -39,7 +39,10 @@ $(document).ready(function () {
         var params = user_modal.find('form').serialize();
         var role = btn.data('role');
         params += '&role=' + role || 'user';
-        console.log(params);
+        if (role !== 'admin') {
+            params += '&project_group_id=' + current_user_project_group;
+        }
+        console.log(111, params);
         $.post('/users/create', params, function (resp) {
             if (resp.success) {
                 sessionStorage.setItem("success", resp.message);

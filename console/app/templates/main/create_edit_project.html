@@ -9,7 +9,7 @@
     {% include 'main/modals/create_project_file.html' %}
     {% include 'main/modals/add_content.html' %}
     {% include "main/modals/update_name.html" %}
-{#    {% include "main/modals/update_las.html" %}#}
+    {#    {% include "main/modals/update_las.html" %}#}
     {% include "main/modals/update_las_bak.html" %}
     {% include "main/modals/import_json_file.html" %}
 
@@ -87,29 +87,39 @@
                     <div class="charttable-w">
                         <div style="overflow-y: auto;">
                             <form method="post" id="project-data-form">
-								<div id="list"> 
-									<div class="lock_box" style="width:300px;">
-										<table class="table table-hover table-bordered ui-table" id="lastable">
-											<thead></thead>
+                                <div id="list">
+                                    <div class="lock_box" style="width:300px;">
+                                        <table class="table table-hover table-bordered ui-table" id="lastable">
+                                            <thead></thead>
 
-											<tbody></tbody>
+                                            <tbody></tbody>
 
-										</table>
-									</div>
-									<div class="x_auto_box">
-										<table class="table table-hover table-bordered table-project-data" id="bittable">
-											<thead></thead>
+                                        </table>
+                                    </div>
+                                    <div class="x_auto_box">
+                                        <table class="table table-hover table-bordered table-project-data"
+                                               id="bittable">
+                                            <thead></thead>
 
-											<tbody></tbody>
+                                            <tbody></tbody>
 
-										</table>
-									</div>
-								</div>
+                                        </table>
+                                    </div>
+                                </div>
                             </form>
-                        </div class="x_auto_box">
+                        </div>
                         <div style="margin: 10px">
-                            <button class="btn btn-primary submit-project-data" type="button" style="display: none">保存
-                            </button>
+                            {% if current_user.is_edited %}
+                                <button class="btn btn-primary submit-project-data" type="button" style="display: none">
+                                    保存
+                                </button>
+                            {% else %}
+                                <button class="btn btn-primary submit-project-data" type="button" style="display: none"
+                                        disabled>
+                                    保存
+                                </button>
+                            {% endif %}
+
                         </div>
                     </div>
                 </div>
@@ -138,7 +148,9 @@
     <script>
         project_id = "{{ project.id if project else '' }}";
         project_group_id = "{{ project.project_group_id if project else '' }}";
-        user_id = "{{ current_user.id }}"
+        user_id = "{{ current_user.id }}";
+
+        is_edited = "{{ true if current_user.is_edit else false }}";
     </script>
 {% endblock %}
 
@@ -159,30 +171,32 @@
         .table-bordered.table-project-data tbody tr td {
             border-left: 0 !important;
         }
-		
-		input[type=text]::-ms-clear{display:none}
-		
 
-		
-		.table-bordered.ui-table {
-			margin: 0;
-			margin-bottom: 20px;
-		}
-		.table-bordered.ui-table thead th:first-child {
-			border-left: 0;
-		}
-		.table-bordered.ui-table tbody tr td {
-			border-left: 0 !important;
-		}
-		
-		div.x_auto_box {
-			overflow-y: hidden;
-			overflow-x: auto;
-		}
+        input[type=text]::-ms-clear {
+            display: none
+        }
 
-		div.lock_box {
-			float: left;
-		}
+        .table-bordered.ui-table {
+            margin: 0;
+            margin-bottom: 20px;
+        }
+
+        .table-bordered.ui-table thead th:first-child {
+            border-left: 0;
+        }
+
+        .table-bordered.ui-table tbody tr td {
+            border-left: 0 !important;
+        }
+
+        div.x_auto_box {
+            overflow-y: hidden;
+            overflow-x: auto;
+        }
+
+        div.lock_box {
+            float: left;
+        }
 
     </style>
 {% endblock %}

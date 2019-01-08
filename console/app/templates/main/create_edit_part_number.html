@@ -6,7 +6,7 @@
 
 {% block main_content %}
     {% include "main/modals/update_name.html" %}
-{#    {% include "main/modals/update_las.html" %}#}
+    {#    {% include "main/modals/update_las.html" %}#}
     {% include "main/modals/update_las_part.html" %}
     {% include 'main/modals/add_content.html' %}
 
@@ -64,7 +64,17 @@
                                     <div class="form-group">
                                         <div class="col-sm-4"></div>
                                         <div class="col-sm-7">
-                                            <button type="button" class="btn btn-primary submit-add-part-attr">保存</button>
+                                            {% if current_user.is_edited %}
+                                                <button type="button" class="btn btn-primary submit-add-part-attr">
+                                                    保存
+                                                </button>
+                                            {% else %}
+                                                <button type="button" class="btn btn-primary submit-add-part-attr"
+                                                        disabled>
+                                                    保存
+                                                </button>
+                                            {% endif %}
+
                                         </div>
                                     </div>
                                 </form>
@@ -88,8 +98,16 @@
                                     <tbody></tbody>
                                 </table>
                             </form>
-                            <button class="btn btn-primary submit-project-part" type="button" style="display: none">保存
-                            </button>
+                            {% if current_user.is_edited %}
+                                <button class="btn btn-primary submit-project-part" type="button" style="display: none">
+                                    保存
+                                </button>
+                            {% else %}
+                                <button class="btn btn-primary submit-project-part" type="button" style="display: none"
+                                        disabled>保存
+                                </button>
+                            {% endif %}
+
                         </div>
                     </div>
                 </div>
@@ -106,7 +124,7 @@
     {% assets "go_js" %}
         <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
-{#    <script src="{{ url_for('static', filename='js/part/part.js') }}"></script>#}
+    {#    <script src="{{ url_for('static', filename='js/part/part.js') }}"></script>#}
     <script src="{{ url_for('static', filename='js/part/part2.js') }}"></script>
     <script src="{{ url_for('static', filename='js/part/part_tree.js') }}"></script>
 

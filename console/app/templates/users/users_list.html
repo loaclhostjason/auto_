@@ -74,6 +74,12 @@
         {% endif %}
     </td>
 
+    <td>
+        <span>{{ '√' if user.is_edited  else  '✖' }}</span>
+        <span class="text-explode">|</span>
+        <a href="{{ url_for('.change_edited', is_edited=user.is_edited, id=user.id) }}">{{ '关闭' if user.is_edited  else  '开启' }}</a>
+    </td>
+
     <td class="text-right">
         {% if not user.is_admin %}
             <div>
@@ -147,6 +153,7 @@
                         <th width="120">权限</th>
                         <th>项目</th>
                         <th>文件</th>
+                        <th>是否编辑</th>
                         <th width="160" class="text-right">操作</th>
                     </tr>
                     </thead>
@@ -180,6 +187,7 @@
     {{ super() }}
     <script src="{{ url_for('static', filename='js/users/users.js') }}"></script>
     <script>
-        g_user_id = "{{ current_user.id }}"
+        g_user_id = "{{ current_user.id }}";
+        current_user_project_group = "{{ current_user.project_group_id }}"
     </script>
 {% endblock %}
