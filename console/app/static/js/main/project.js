@@ -9,7 +9,7 @@ function remove(arr) {
 }
 
 
-function calcByteBit(byteStart, byteLength, bitPos, bitLength, leftMargin, charWidth)
+function calcByteBit(byteStart, byteLength, bitPos, extBitPos, bitLength, leftMargin, charWidth)
 {
 	var retValue = []
 	if(bitPos >= 0)
@@ -27,7 +27,7 @@ function calcByteBit(byteStart, byteLength, bitPos, bitLength, leftMargin, charW
 			else if(length > 8)
 				retValue[i] = [8, leftMargin]
 			else
-				retValue[i] = [length, (8 - length) * charWidth + leftMargin]
+				retValue[i] = [length, (8 - length - extBitPos) * charWidth + leftMargin]
 		}
 		
 		length = byteStart * 8 + bitPos + bitLength
@@ -94,7 +94,7 @@ $(document).ready(function () {
                             $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position, ext_bitPosition));
                             if(result.length > 0) {  
                                 $('.ui-table tbody').html(_this.project_fixdata_html(result, project_data, did_len, byte_position, default_conf, bit_position));						
-                                $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf, bit_position));
+                                $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf, bit_position, ext_bitPosition));
                             }
                         } else {
                             $('.ui-table tbody').html('');
@@ -164,7 +164,7 @@ $(document).ready(function () {
 
 			return html
 		}
-        this.project_data_html = function (result, project_data, did_len, byte_position, default_conf, bit_position) {
+        this.project_data_html = function (result, project_data, did_len, byte_position, default_conf, bit_position, ext_bitPos) {
             if (!result || !result.length) return '';
 
 
@@ -203,12 +203,13 @@ $(document).ready(function () {
                 html += '<td class="text-center"><div style="display: inline-flex"><div style="float: left"><input name="las" required class="tc-search-words" value="' + (data_info['las'] || '') + '"></div>';
                 html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal-bak"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
                 html += '</td>';*/
-
+                if(ext_bitPos == undefined)
+					        ext_bitPos = 0
 				var fmInput = null
 				if(bit_position.length > 0)
-					fmInput = calcByteBit(byte_position, did_len, bit_position[0], bit_position.length, 5, 19.5)
+					fmInput = calcByteBit(byte_position, did_len, bit_position[0], ext_bitPos, bit_position.length, 5, 19.5)
 				else
-					fmInput = calcByteBit(byte_position, did_len, -1, -1, 5, 19.5)
+					fmInput = calcByteBit(byte_position, did_len, -1, -1, ext_bitPos, 5, 19.5)
 
                 var bet_number = [];
                 if (did_len) {
@@ -226,7 +227,7 @@ $(document).ready(function () {
                         // if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
                         //if (num >= byte_position && num <= byte_position + _new_byte_position.length) 
                         if (bit_position.length > 0 && fmInput[num][0] > 0) {
-                            html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="' + (content['byte' + num] || '') + '">'; // show or hide
+                            html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="' + (((fmInput[num][0] < content['byte' + num].length) ? content['byte' + num].substr(0, fmInput[num][0]) : content['byte' + num]) || '') + '">'; // show or hide
                         } else
                             html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="" disabled>';
                     //}
@@ -239,7 +240,7 @@ $(document).ready(function () {
             });
 
 			if (result) {
-                html += '<tr><td height="60" colspan="24"/></tr>';
+                html += '<tr><td height="60" colspan="' + 8 * did_len + '"/></tr>';
             }
 
 
