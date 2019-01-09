@@ -201,16 +201,30 @@ class ProjectData(db.Model):
             key.append('%s_%s' % (str_key, index))
         return key
 
-    def _get_bitwidth(self, start_bit, len_bit):
+    def _get_bitwidth(self, start_bit, ext_bit, len_bit):
         bitwidth = []
         index = 0
         while len_bit > 0:
-            if len_bit + start_bit >= 8:
+            '''if len_bit + start_bit >= 8:
                 bitwidth.append(8 - start_bit)
             else:
-                bitwidth.append(len_bit - start_bit)
+                bitwidth.append(len_bit - start_bit)'''
+            if index == 0:
+                if len_bit + start_bit < 8:
+                    bitwidth.append(len_bit)
+                else:
+                    bitwidth.append(8 - start_bit)
+            else:
+                if ext_bit >= 8:
+                    bitwidth.append(0)
+                    len_bit = 0
+                else:
+                    if len_bit > 8 - ext_bit:
+                        bitwidth.append(8 - ext_bit)
+                    else:
+                        bitwidth.append(len_bit)
             len_bit = len_bit - bitwidth[index]
-            start_bit = 0
+            #start_bit = 0
             index = index + 1
         return bitwidth
 
@@ -218,9 +232,9 @@ class ProjectData(db.Model):
         from .api_data import split_default_val
 
         did_len = self.p_did_len(project_id, did_relation_id)
-        bit_len, *args = AttrContent.get_attr_info(relation_id, is_parent=True)
+        bit_len, *args = AttrContent.get_attr_info(relation_id, is_parent=True, show_ext_bit=True)
 
-        bit_width = self._get_bitwidth(args[0], bit_len)
+        bit_width = self._get_bitwidth(args[0], args[2], bit_len)
 
         key = list()
         if not did_len:

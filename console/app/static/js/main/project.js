@@ -27,7 +27,14 @@ function calcByteBit(byteStart, byteLength, bitPos, extBitPos, bitLength, leftMa
 			else if(length > 8)
 				retValue[i] = [8, leftMargin]
 			else
-				retValue[i] = [length, (8 - length - extBitPos) * charWidth + leftMargin]
+      {
+				if(8 - length - extBitPos < 0 && 8 - extBitPos > 0)
+					retValue[i] = [8 - extBitPos, leftMargin]
+				else if(8 - extBitPos <= 0)
+					retValue[i] = [0, leftMargin]
+				else
+				  retValue[i] = [length, (8 - length - extBitPos) * charWidth + leftMargin]
+        }
 		}
 		
 		length = byteStart * 8 + bitPos + bitLength
@@ -227,7 +234,7 @@ $(document).ready(function () {
                         // if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
                         //if (num >= byte_position && num <= byte_position + _new_byte_position.length) 
                         if (bit_position.length > 0 && fmInput[num][0] > 0) {
-                            html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="' + (((fmInput[num][0] < content['byte' + num].length) ? content['byte' + num].substr(0, fmInput[num][0]) : content['byte' + num]) || '') + '">'; // show or hide
+                            html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="' + (((fmInput[num][0] < content['byte' + num].length) ? content['byte' + num].substring(content['byte' + num].length - fmInput[num][0], content['byte' + num].length) : content['byte' + num]) || '') + '">'; // show or hide
                         } else
                             html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="" disabled>';
                     //}
