@@ -420,6 +420,7 @@ $(document).ready(function () {
                 projects.get_attr_input(project_id, form_.find('[name="level"]').val(), form_.find('[name="project_relation_id"]').val());
 
                 toastr.success(resp['message']);
+                $('.submit-project-data').trigger('click')
             } else {
                 toastr.error(resp['message']);
 
