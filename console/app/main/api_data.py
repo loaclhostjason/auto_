@@ -144,7 +144,9 @@ def edit_project_data_api(project_id):
     data, default_val, strInfo = ProjectData().get_content(project_id, project_relation.parent_id, project_relation.id)
     if strInfo != '':
         return jsonify({'success': False, 'message': strInfo})
-    default_conf = get_default_conf(default_val)
+    #default_conf = get_default_conf(default_val)
+    default_conf = request.form.get('default_conf') #默认值去掉由输入的byteN数据进行计算 get_default_conf(default_val)
+    default_conf = get_default_conf(default_conf)   #改为默认值自身
 
     if not data:
         return jsonify({'success': False, 'message': 'DidLength 不存在，请检查'})

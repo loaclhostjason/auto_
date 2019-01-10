@@ -249,6 +249,7 @@ class ProjectData(db.Model):
         # print(project_relation_id)
 
         default_val = None
+        default_conf = None
         strInfo = ''
         for index, val in enumerate(project_relation_id):
             d = {
@@ -257,12 +258,14 @@ class ProjectData(db.Model):
                 'content': {},
             }
             bit_width_index = 0
+            fill_value = ''
             for v in key:
                 d['las'] = request.form.getlist('las')[index]
                 d['name'] = request.form.getlist('name')[index]
 
                 if d['las'].lower() == 'all' and request.form.get('%s_%s' % (val, v)):
                     default_val = request.form.get('%s_%s' % (val, v))
+                    default_conf = request.form.get('default_conf')
 
                 # if request.form.get('%s_%s' % (val, v)):
                 if request.form.get('%s_%s' % (val, v)):
@@ -270,6 +273,7 @@ class ProjectData(db.Model):
                     d['content'][v] = _this_val  #split_default_val(_this_val, bit_len)
                     if len(_this_val) < bit_width[bit_width_index]: #bit_len:
                         strInfo += '%s 行 %s 数据输入不足%d\r\n' %(d['las'], v, bit_width[bit_width_index])
+                    fill_value = fill_value + _this_val
                     bit_width_index = bit_width_index + 1
                 else:
                     byteData = request.form.getlist('%s_%s' % (val, v))
@@ -278,6 +282,8 @@ class ProjectData(db.Model):
                     d['content'][v] = ''
 
             result.append(d)
+            if d['las'].lower() == 'all' and default_conf and fill_value != default_conf:
+                strInfo += '第 %d (ALL)行数据与默认值不一致' %(index + 1)
         return [v for v in result if v.get('content')], default_val, strInfo
 
 
