@@ -28,12 +28,19 @@ class ExportXml(XmlData):
         super(ExportXml, self).__init__(*args, **kwargs)
         # self.project_id = project_id
 
+    @property
+    def project_info(self):
+        project = Project.query.filter_by(id=self.project_id).first()
+        return project
+
     def set_path(self):
         if not self.xml_managers_attr:
             return
         path = os.path.abspath(os.path.dirname(__file__))
         real_path = os.path.join(path, 'files', 'all')
-        files_path = os.path.join(real_path, '%s.95' % self.xml_managers_attr)
+
+        project = self.project_info
+        files_path = os.path.join(real_path, '%s_%s.95' % (project.project_group.name, self.xml_managers_attr))
 
         if not os.path.exists(real_path):
             os.makedirs(real_path)
@@ -228,7 +235,7 @@ class ExportXml(XmlData):
                     if project_relation_child:
                         for pc in project_relation_child:
                             r[v].append({'project_relation_id': pc.id})
-                            #print(pc)
+                            # print(pc)
 
         new_result = dict()
 
@@ -302,7 +309,7 @@ class ExportXml(XmlData):
                     write_section = json.loads(ed.write_sec or '{}')
 
                 if ed.project_relation.name == did_name:
-                    is_open_reset = ed.is_open_reset # False#ed.project_relation
+                    is_open_reset = ed.is_open_reset  # False#ed.project_relation
 
         result = {
             'read_section': read_section or self.get_default_rw_sec(de_content, 'readsection'),
@@ -330,7 +337,7 @@ class ExportXml(XmlData):
                 {
                     'resetsection_item': v['resetsection_item'],
                     'resetsection_item_value': v['resetsection_item_default'],
-					'resetsection_item_check': v['resetsection_item_check']
+                    'resetsection_item_check': v['resetsection_item_check']
                 } for v in content_sec if v.get('resetsection_item_default')]
 
         extra_data_2 = ExtraAttrData.query.filter_by(project_id=self.project_id, level=2).all()
@@ -361,10 +368,9 @@ class ExportXml(XmlData):
         doc = minidom.Document()
         root = doc.createElement('ConfigurationModule')
 
-        #root.setAttribute('%s-CONFIG-SCHEMA-VERSION' % self.xml_managers_attr, '1.0')
+        # root.setAttribute('%s-CONFIG-SCHEMA-VERSION' % self.xml_managers_attr, '1.0')
         root.setAttribute('ECU-CONFIG-SCHEMA-VERSION', '1.0')
-		
-		
+
         doc.appendChild(root)
 
         # header
@@ -558,7 +564,7 @@ class ExportXml(XmlData):
                                     ext_conf_d = doc.createElement('ConfData')
                                     ext_conf_d.setAttribute('useConfData', 'true')
 
-                                    #print(ext_data)
+                                    # print(ext_data)
                                     for v in ext_data:
                                         ext_config_data = doc.createElement('ConfigData')
                                         ext_config_data.setAttribute('Value', v[0])
@@ -581,9 +587,8 @@ class ExportXml(XmlData):
                 if read_section_attr:
                     for rs in read_section_attr:
                         node_write_item.setAttribute(rs['item'], rs['item_value'])
-                #node_write_item.setAttribute('ResetReadback', str(self.xml_section_attr(val, 'is_open_reset')))
+                # node_write_item.setAttribute('ResetReadback', str(self.xml_section_attr(val, 'is_open_reset')))
                 node_write_section.appendChild(node_write_item)
-
 
         root.appendChild(node_write_section)
 

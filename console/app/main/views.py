@@ -198,7 +198,7 @@ def download_file():
         return jsonify({})
     file = project.project_config_name.lower()
 
-    filename = '%s.95' % file
+    filename = '%s_%s.95' % (project.project_group.name, file)
     filename_path = os.path.join(current_app.config['FILE_PATH'], filename)
     return download_files(filename_path, filename)
 

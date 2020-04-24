@@ -162,7 +162,7 @@ class XmlData(object):
     @staticmethod
     def get_ext_conf_data(bit_info, default_val):
         # 跨 1或者多个 字节时
-        bit_pos = bit_info['bit_len'] - (8 - bit_info['start_bit']) - bit_info['ext_bit']
+        bit_pos = bit_info['bit_len'] - (8 - bit_info['start_bit']) + bit_info['ext_bit']
 
         d = {
             'ParamDefaultValue': default_val,
