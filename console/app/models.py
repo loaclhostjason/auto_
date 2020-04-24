@@ -152,10 +152,6 @@ class Modification(db.Model):
         conf_data = defaultdict(list)
         ext_conf_data = dict()
         new_relation = defaultdict(list)
-        _ext_conf_data = {
-            'info': '',
-            'data': []
-        }
 
         project = ProjectData.query.filter_by(project_id=project_id).order_by(ProjectData.project_relation_id).all()
         if project:
@@ -177,6 +173,11 @@ class Modification(db.Model):
                 conf_datas = ProjectData().conf_data(pro.content, project_id, pev_did.parent_id, bit_info, pro.las)
                 # print(conf_datas)
                 new_relation[parent_relation.parent_id].append(int(pro.project_relation_id))
+
+                _ext_conf_data = {
+                    'info': '',
+                    'data': []
+                }
                 if conf_datas:
                     for index, cd_info in enumerate(conf_datas):
                         if index == 0:
@@ -191,13 +192,28 @@ class Modification(db.Model):
                                 default_val = default_conf.get(parent_relation.parent_id, '')
 
                                 _ext_conf_data['info'] = export_xml.get_ext_conf_data(bit_info, default_val)
+                                _ext_conf_data['data'] = _ext_conf_data['data'] or []
                                 _ext_conf_data['data'].append(ext_config_data)
                                 ext_conf_data[parent_relation.id] = _ext_conf_data
+
+        # 多参数 跨字节 问题
+        def merge_list(data):
+            new_list = {
+                'info': None,
+                'data': []
+            }
+            for _ in data:
+                new_list['data'].append(_['data'])
+                new_list['info'] = _['info']
+            new_list = {k: (sum(v, []) if isinstance(v, list) else v) for k, v in new_list.items()}
+            return [new_list]
 
         ext_conf_data = {
             k: [ext_conf_data[val] for val in v if ext_conf_data.get(val)] for k, v in new_relation.items()}
 
-        ext_conf_data = {k: v for k, v in ext_conf_data.items() if v}
+        # 解决 跨字段 显示多行
+        ext_conf_data = {k: merge_list(v) for k, v in ext_conf_data.items() if v}
+        # print('ext_conf_data', ext_conf_data)
 
         result = {
             'conf_data': conf_data,

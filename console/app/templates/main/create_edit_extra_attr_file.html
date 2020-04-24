@@ -161,6 +161,13 @@
                                             {#                                                       onkeyup='onBoolKeyUpEvent(&quot;{{ attr["resetsection_item"] }}&quot;)'#}
                                             {#                                                       value="{{ reset_sec[loop.index0]['resetsection_item_value']  if reset_sec else default_sec.get(attr['resetsection_item'], '') }}"/>#}
                                             {#                                            {% else %}#}
+																							{% if attr['resetsection_item'] == 'DelayForMS' %}
+																							
+																							<input type="text" name="resetsection_item_value" class="td-input" style="font-size: 13px"
+	                                                   value="{{ reset_sec[loop.index0]['resetsection_item_value']  if reset_sec else default_sec.get(attr['resetsection_item'], '')  }}"/>
+																							{% else %}
+																							
+																							
                                             {#												<input name="resetsection_item_value" class="td-input" required#}
                                             {#													   value="{{ reset_sec[loop.index0]['resetsection_item_value']  if reset_sec else default_sec.get(attr['resetsection_item'], '') }}"/>#}
 
@@ -178,7 +185,7 @@
                                                     {% endif %}
                                                 {% endfor %}
                                             </select>
-
+											{% endif %}
                                             <!-- change end -->
                                             {#                                            {% endif %}#}
                                         </td>

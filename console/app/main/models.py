@@ -182,16 +182,37 @@ class ProjectData(db.Model):
 
         if not extra_key:
             return
-        # print(extra_key)
+        #print(extra_key)
         if extra_key and isinstance(extra_key, list):
+            real_bit_pos = bit_info['start_bit']
+            ext_bit_position = bit_info['ext_bit']
             for index, key in enumerate(extra_key):
+                '''
                 if real_bit_len > 8:
                     b_len = real_bit_len - 8
                     b1 = content[key][:-b_len]
                     b2 = content[key][-b_len:]
                     result = [b1, b2]
+                    print(result)
                 else:
                     result.append(content[key])
+                '''
+                '''if index == 0:
+                    appData = content[key] + '00000000'[:real_bit_pos]
+                    if real_bit_len < 8:
+                        appData = '00000000'[8 - real_bit_len] + appData
+                else:
+                    if real_bit_len < 8:
+                        if ext_bit_position == 7:
+                            appData = content[key] + '00000000'[8 - real_bit_len]
+                        else:
+                            appData = '00000000'[8 - real_bit_len] + content[key]
+                    else:
+                        appData = content[key]
+                real_bit_len -= 8
+                real_bit_pos = 0'''
+                result.append(content[key])
+                #print(content[key])
         return result
 
     @staticmethod
@@ -209,6 +230,7 @@ class ProjectData(db.Model):
                 bitwidth.append(8 - start_bit)
             else:
                 bitwidth.append(len_bit - start_bit)'''
+            #print(len_bit)
             if index == 0:
                 if len_bit + start_bit < 8:
                     bitwidth.append(len_bit)
@@ -249,6 +271,7 @@ class ProjectData(db.Model):
         # print(project_relation_id)
 
         default_val = None
+        default_conf = None
         strInfo = ''
         for index, val in enumerate(project_relation_id):
             d = {
@@ -257,12 +280,14 @@ class ProjectData(db.Model):
                 'content': {},
             }
             bit_width_index = 0
+            fill_value = ''
             for v in key:
                 d['las'] = request.form.getlist('las')[index]
                 d['name'] = request.form.getlist('name')[index]
 
                 if d['las'].lower() == 'all' and request.form.get('%s_%s' % (val, v)):
                     default_val = request.form.get('%s_%s' % (val, v))
+                    default_conf = request.form.get('default_conf')
 
                 # if request.form.get('%s_%s' % (val, v)):
                 if request.form.get('%s_%s' % (val, v)):
@@ -270,6 +295,7 @@ class ProjectData(db.Model):
                     d['content'][v] = _this_val  #split_default_val(_this_val, bit_len)
                     if len(_this_val) < bit_width[bit_width_index]: #bit_len:
                         strInfo += '%s 行 %s 数据输入不足%d\r\n' %(d['las'], v, bit_width[bit_width_index])
+                    fill_value = fill_value + _this_val
                     bit_width_index = bit_width_index + 1
                 else:
                     byteData = request.form.getlist('%s_%s' % (val, v))
@@ -278,6 +304,8 @@ class ProjectData(db.Model):
                     d['content'][v] = ''
 
             result.append(d)
+            if d['las'].lower() == 'all' and default_conf and fill_value != default_conf:
+                strInfo += '第 %d (ALL)行数据与默认值不一致' %(index + 1)
         return [v for v in result if v.get('content')], default_val, strInfo
 
 

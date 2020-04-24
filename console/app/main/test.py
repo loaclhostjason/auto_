@@ -66,6 +66,7 @@ def get_did_default_val(project_id):
             # 跨字节 默认值
             if info.default_conf:
                 if end_bit > 8:
+                    #print("kuazijie")
                     b_len = end_bit - 8
 
                     d1 = info.default_conf[:-b_len]

@@ -53,17 +53,7 @@ def option_project_data():
     if not real_content.get('BytePosition') or not real_content.get('BitPosition'):
         return jsonify(r1)
 
-    if project_data:
-        for v in project_data:
-            if v.content:
-                vv = {k: v for k, v in v.to_dict().items() if k != 'content'}
-                c = json.loads(v.content)
-                t = {k: v for k, v in c.items() if not k.startswith('bit')}
-                byte_c = 'byte%s' % real_content['BytePosition']
-
-                t[byte_c] = c.get(byte_c) or ''
-                vv['content'] = t
-                project_dict[v.project_relation_id] = vv
+    pre_bytepos = real_content['BytePosition']
 
     did_len = 0
     if result:
@@ -72,6 +62,24 @@ def option_project_data():
         if attr_content and attr_content.real_content:
             real_content = json.loads(attr_content.real_content)
             did_len = real_content.get('DidLength') or 0
+
+    if project_data:
+        for v in project_data:
+            if v.content:
+                vv = {k: v for k, v in v.to_dict().items() if k != 'content'}
+                c = json.loads(v.content)
+                t = {k: v for k, v in c.items() if not k.startswith('bit')}
+                byte_c = 'byte%s' % pre_bytepos #real_content['BytePosition']
+
+                t[byte_c] = c.get(byte_c) or ''
+                vv['content'] = t
+
+                if len(t) < int(did_len):
+                    for n in range(int(did_len) - len(t)):
+                        byte_c = 'byte%d' % (len(t) + n)
+                        t[byte_c] = ''
+
+                project_dict[v.project_relation_id] = vv
 
     bit_position = list()
     if cot.get('BitPosition') and cot.get('BitLength'):
@@ -106,7 +114,6 @@ def split_default_val(data, bit_len):
     else:
         data = ''.join(['0' for v in range(bit_len - len(data))]) + data
     return data
-
 
 def get_default_conf(default_val=None):
     project_relation_id = request.form.getlist('project_relation_id')
@@ -144,9 +151,9 @@ def edit_project_data_api(project_id):
     data, default_val, strInfo = ProjectData().get_content(project_id, project_relation.parent_id, project_relation.id)
     if strInfo != '':
         return jsonify({'success': False, 'message': strInfo})
-
-    print(111, default_val)
-    default_conf = get_default_conf(default_val)
+    #default_conf = get_default_conf(default_val)
+    default_conf = request.form.get('default_conf') #默认值去掉由输入的byteN数据进行计算 get_default_conf(default_val)
+    default_conf = get_default_conf(default_conf)   #改为默认值自身
 
     if not data:
         return jsonify({'success': False, 'message': 'DidLength 不存在，请检查'})

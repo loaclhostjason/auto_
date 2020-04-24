@@ -107,17 +107,24 @@
                                                    value="{{ attr['resetsection_item'] }}"/>
                                         </td>
                                         <td>
-{#                                            <input name="resetsection_item_default" class="td-input"#}
-{#                                                   value="{{ attr['resetsection_item_default'] }}"/>#}
-                                            <select name="resetsection_item_default" class="td-input" style="font-size: 13px">
-                                                {% for true_or_false in ['true', 'false'] %}
-                                                    {% if attr['resetsection_item_default'] == true_or_false %}
-                                                        <option value="{{ true_or_false }}" selected>{{ true_or_false }}</option>
-                                                    {% else %}
-                                                        <option value="{{ true_or_false }}">{{ true_or_false }}</option>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </select>
+											{% if attr['resetsection_item'] == 'DelayForMS' %}
+											
+	 											<input type="text" name="resetsection_item_default" class="td-input" style="font-size: 13px" 
+	                                                   value="{{ attr['resetsection_item_default'] }}"/>
+												
+											{% else %}
+	{#                                            <input name="resetsection_item_default" class="td-input"#}
+	{#                                                   value="{{ attr['resetsection_item_default'] }}"/>#}
+												<select name="resetsection_item_default" class="td-input" style="font-size: 13px">
+													{% for true_or_false in ['true', 'false'] %}
+														{% if attr['resetsection_item_default'] == true_or_false %}
+															<option value="{{ true_or_false }}" selected>{{ true_or_false }}</option>
+														{% else %}
+															<option value="{{ true_or_false }}">{{ true_or_false }}</option>
+														{% endif %}
+													{% endfor %}
+												</select>
+											{% endif %}
                                         </td>
                                         {#<td>
 											<input name="resetsection_item_check" id="resetsection_item_check" class="td-input" maxlength="11" onkeyup="onCheckKeyUpEvent('resetsection_item_check')" 

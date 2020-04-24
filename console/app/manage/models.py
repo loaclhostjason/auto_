@@ -215,7 +215,8 @@ class ExtraAttrContent(db.Model):
                 "writsection": [
                     {"item_zh": "DidWriteScope", "item": "DidWriteScope"},
                     {"item_zh": "ReadBackCompare", "item": "ReadBackCompare"},
-                    {"item_zh": "DelayForMS", "item": "DelayForMS"}
+                    {"item_zh": "DelayForMS", "item": "DelayForMS"},
+                    {"item_zh": "ResetReadBack", "item": "ResetReadBack"}
                 ],
                 "readsection": [
                     {"item_zh": "OverrideDefault", "item": "OverrideDefault"}

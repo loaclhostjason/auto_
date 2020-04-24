@@ -172,17 +172,19 @@ class ExportXml(XmlData):
                     byte_p = content.get('BytePosition')
                     bit_p = content.get('BitPosition')
                     bit_l = content['BitLength']
-
                     if byte_p:
                         content['BytePosition'] = int(byte_p) + 1
+                        # content['BytePosition'] = int(byte_p) + 188
 
                     if bit_p and bit_l:
                         if int(bit_p) + int(bit_l) - 8 > 0:
                             content['BitPosition'] = 7
                         else:
+                            # content['BitPosition'] = int(bit_p) + (int(bit_l) - 1) if int(bit_l) > 0 else 0
                             content['BitPosition'] = int(bit_p) + (int(bit_l) - 1) if int(bit_l) > 0 else 0
                     if bit_l and bit_p and int(bit_l) + int(bit_p) > 8:
                         content['BitLength'] = 8 - int(bit_p)
+                        # content['BitLength'] = 888 - int(bit_p)
                     r[ac.project_relation_id].append(content)
 
         this_id = [v.project_relation_id for v in attr_content]
@@ -226,6 +228,7 @@ class ExportXml(XmlData):
                     if project_relation_child:
                         for pc in project_relation_child:
                             r[v].append({'project_relation_id': pc.id})
+                            #print(pc)
 
         new_result = dict()
 
@@ -238,11 +241,13 @@ class ExportXml(XmlData):
 
                 conf_data = {int(k): v for k, v in conf_data.items() if k}
                 ext_conf_data = {int(k): v for k, v in ext_conf_data.items() if k}
+
                 conf_data = {
                     'conf_data': conf_data,
                     'ext_conf_data': ext_conf_data,
                 }
                 new_result[address] = dict(conf_data, **self.__get_(projects))
+                # print(new_result[address])
 
         return new_result
 
@@ -283,6 +288,7 @@ class ExportXml(XmlData):
 
         read_section = None
         write_section = None
+        is_open_reset = False
 
         if not extra_data:
             read_section = self.get_default_rw_sec(de_content, 'readsection')
@@ -295,9 +301,13 @@ class ExportXml(XmlData):
                 if ed.project_relation.name == did_name:
                     write_section = json.loads(ed.write_sec or '{}')
 
+                if ed.project_relation.name == did_name:
+                    is_open_reset = ed.is_open_reset # False#ed.project_relation
+
         result = {
             'read_section': read_section or self.get_default_rw_sec(de_content, 'readsection'),
             'write_section': write_section or self.get_default_rw_sec(de_content, 'writsection'),
+            'is_open_reset': is_open_reset
         }
         return result.get(type_result)
 
@@ -548,7 +558,7 @@ class ExportXml(XmlData):
                                     ext_conf_d = doc.createElement('ConfData')
                                     ext_conf_d.setAttribute('useConfData', 'true')
 
-                                    # print(ext_data)
+                                    #print(ext_data)
                                     for v in ext_data:
                                         ext_config_data = doc.createElement('ConfigData')
                                         ext_config_data.setAttribute('Value', v[0])
@@ -571,7 +581,10 @@ class ExportXml(XmlData):
                 if read_section_attr:
                     for rs in read_section_attr:
                         node_write_item.setAttribute(rs['item'], rs['item_value'])
+                #node_write_item.setAttribute('ResetReadback', str(self.xml_section_attr(val, 'is_open_reset')))
                 node_write_section.appendChild(node_write_item)
+
+
         root.appendChild(node_write_section)
 
         # ResetSection

@@ -61,6 +61,7 @@ class XmlData(object):
 
                 # 跨字节 默认值
                 if info.default_conf:
+                    # print("跨字节")
                     info.default_conf = split_default_val(info.default_conf, bit_len)
                     if end_bit > 8:
                         b_len = end_bit - 8
@@ -160,13 +161,17 @@ class XmlData(object):
 
     @staticmethod
     def get_ext_conf_data(bit_info, default_val):
+        # 跨 1或者多个 字节时
+        bit_pos = bit_info['bit_len'] - (8 - bit_info['start_bit']) - bit_info['ext_bit']
+
         d = {
             'ParamDefaultValue': default_val,
             'ParameterName': bit_info['parameter_name'],
             'BytePosition': bit_info['byte_info'] + 2,
-            'BitPosition': bit_info['ext_bit'],
+            'BitPosition': bit_pos - 1 if bit_pos <= 8 else 7,
             'BitLength': bit_info['start_bit'] + bit_info['bit_len'] - 8,
         }
+        # print(d)
         return d
 
 

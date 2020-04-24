@@ -16,9 +16,7 @@
                 <a href="{{ url_for('.create_edit_project') }}" class="btn btn-primary">新建文件</a>
 
 
-                {% if current_user.is_admin or current_user.is_pm_admin %}
                     <a href="javascript:void(0)" class="btn btn-primary download-file pull-right">数据发布</a>
-                {% endif %}
 {#                <span class="text-explode">|</span>#}
 {#                <a href="javascript:void(0)" class="btn btn-primary export-json pull-right" style="margin-right: 20px">导出模板</a>#}
 
@@ -60,10 +58,8 @@
 
                                 <td class="text-right">
                                     <div>
-                                        {% if current_user.is_admin or current_user.is_pm_admin %}
                                             <input type="checkbox" name="publish_project" class="publish_project"
                                                    value="{{ project.id }}">
-                                        {% endif %}
                                         <a target="_blank" href="{{ url_for('.edit_file', project_id=project.id) }}">编辑结构</a>
                                         <span class="text-explode">|</span>
                                         <a target="_blank"
