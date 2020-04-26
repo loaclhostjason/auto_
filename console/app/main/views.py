@@ -275,8 +275,9 @@ def edit_project_name():
 
     # 修改 零件号
     project_part = ProjectPartNumRelation.query.filter_by(project_id=project_relation.project_id).first()
-    project_part.name = name
-    db.session.add(project_part)
+    if project_part:
+        project_part.name = name
+        db.session.add(project_part)
 
     return jsonify(
         {'success': True, 'message': '更新成功', 'level': project_relation.level, 'parent_id': project_relation.parent_id})

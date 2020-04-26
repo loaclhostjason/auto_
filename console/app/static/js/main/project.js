@@ -9,48 +9,42 @@ function remove(arr) {
 }
 
 
-function calcByteBit(byteStart, byteLength, bitPos, extBitPos, bitLength, leftMargin, charWidth)
-{
-	var retValue = []
-	if(bitPos >= 0)
-	{
-		for(i = 0; i < byteStart; i++)
-			retValue[i] = [0, leftMargin]
+function calcByteBit(byteStart, byteLength, bitPos, extBitPos, bitLength, leftMargin, charWidth) {
+    var retValue = []
+    if (bitPos >= 0) {
+        for (i = 0; i < byteStart; i++)
+            retValue[i] = [0, leftMargin]
 
-		for(i = byteStart, length = bitPos + bitLength; length > 0; length = length - 8, i++)
-		{
-			if(i == byteStart)
-				if(length <= 8)
-					retValue[i] = [bitLength, (8 - length) * charWidth + leftMargin]
-				else
-					retValue[i] = [8 - bitPos, leftMargin]
-			else if(length > 8)
-				retValue[i] = [8, leftMargin]
-			else
-      {
-				if(8 - length - extBitPos < 0 && 8 - extBitPos > 0)
-					retValue[i] = [8 - extBitPos, leftMargin]
-				else if(8 - extBitPos <= 0)
-					retValue[i] = [0, leftMargin]
-				else
-				  retValue[i] = [length, (8 - length - extBitPos) * charWidth + leftMargin]
+        for (i = byteStart, length = bitPos + bitLength; length > 0; length = length - 8, i++) {
+            if (i == byteStart)
+                if (length <= 8)
+                    retValue[i] = [bitLength, (8 - length) * charWidth + leftMargin]
+                else
+                    retValue[i] = [8 - bitPos, leftMargin]
+            else if (length > 8)
+                retValue[i] = [8, leftMargin]
+            else {
+                if (8 - length - extBitPos < 0 && 8 - extBitPos > 0)
+                    retValue[i] = [8 - extBitPos, leftMargin]
+                else if (8 - extBitPos <= 0)
+                    retValue[i] = [0, leftMargin]
+                else
+                    retValue[i] = [length, (8 - length - extBitPos) * charWidth + leftMargin]
+            }
         }
-		}
-		
-		length = byteStart * 8 + bitPos + bitLength
-		//toastr.info(byteStart)
-		//toastr.info(length)
-		length = (((length % 8) > 0) ? Math.floor((length + 8) / 8) : length / 8)
-		//toastr.info(length)
-		for(i = length; i < byteLength; i++)
-			retValue[i] = [0, leftMargin]	
-	}
-	else
-	{
-		for(i = 0; i < byteLength; i++)
-			retValue[i] = [0, 0]	
-	}
-	return retValue
+
+        length = byteStart * 8 + bitPos + bitLength
+        //toastr.info(byteStart)
+        //toastr.info(length)
+        length = (((length % 8) > 0) ? Math.floor((length + 8) / 8) : length / 8)
+        //toastr.info(length)
+        for (i = length; i < byteLength; i++)
+            retValue[i] = [0, leftMargin]
+    } else {
+        for (i = 0; i < byteLength; i++)
+            retValue[i] = [0, 0]
+    }
+    return retValue
 }
 
 $(document).ready(function () {
@@ -83,8 +77,9 @@ $(document).ready(function () {
             });
         };
 
-        this.get_project_data = function (project_id, parent_id) {
+        this.get_project_data = function (project_id, parent_id, is_save) {
             var _this = this;
+            var isSave = is_save || false;
             $.get('/project/data/get?project_id=' + project_id + '&project_relation_id=' + parent_id, function (resp) {
                 if (resp.success) {
                     var result = resp['result'];
@@ -96,11 +91,11 @@ $(document).ready(function () {
                     var ext_bitPosition = resp['ext_bitPosition'];
 
                     if (resp['level'] && resp['level'] === 3) {
-                        if(did_len > 0) {
+                        if (did_len > 0) {
                             $('.ui-table thead').html(_this.project_fixthead_html());
                             $('.table-project-data thead').html(_this.project_thead_html(did_len, bit_position, byte_position, ext_bitPosition));
-                            if(result.length > 0) {  
-                                $('.ui-table tbody').html(_this.project_fixdata_html(result, project_data, did_len, byte_position, default_conf, bit_position));						
+                            if (result.length > 0) {
+                                $('.ui-table tbody').html(_this.project_fixdata_html(result, project_data, did_len, byte_position, default_conf, bit_position));
                                 $('.table-project-data tbody').html(_this.project_data_html(result, project_data, did_len, byte_position, default_conf, bit_position, ext_bitPosition));
                             }
                         } else {
@@ -117,6 +112,21 @@ $(document).ready(function () {
 
                 } else {
                     toastr.error(resp.message)
+                }
+            }).always(function (resp) {
+                // 2按钮 同步保存
+                if (isSave) {
+                    var this_form = $('form#project-data-form');
+                    var params = this_form.serialize();
+                    console.log('params', params);
+                    $.post('/project/data/submit/' + project_id + '?data_relation_id=' + $('[name="project_relation_id"]').val(), params, function (resp) {
+                        showLoadingOff();
+                        if (resp.success) {
+                            projects.get_project_data(project_id, $.g_parent_id);
+                        } else {
+                            toastr.error(resp.message);
+                        }
+                    })
                 }
             });
         };
@@ -135,10 +145,10 @@ $(document).ready(function () {
                 if (dif_did_len) {
                     for (var i = 1; i <= dif_did_len; i++) {
                         _new_byte_position.push(Number(byte_position) + i);
-                    }					
+                    }
                 }
             }
-			
+
             var idIndex = 0
             result.forEach(function (data) {
                 var prid = data['level_4_id'];
@@ -169,8 +179,8 @@ $(document).ready(function () {
                 html += '<div class="col-xs-8"><input name="default_conf" value="' + (default_conf || '') + '"  class="tc-search-words"/></div></td></tr>';
             }
 
-			return html
-		}
+            return html
+        }
         this.project_data_html = function (result, project_data, did_len, byte_position, default_conf, bit_position, ext_bitPos) {
             if (!result || !result.length) return '';
 
@@ -191,14 +201,14 @@ $(document).ready(function () {
                 }
             }
 
-			var idIndex = 0
+            var idIndex = 0
             result.forEach(function (data) {
                 var prid = data['level_4_id'];
                 var data_info = project_data[data['level_4_id']] || {};
                 var content = data_info['content'] || {};
 
                 html += '<tr class="data-class" id="bit' + idIndex + '">';
-				idIndex = idIndex + 1
+                idIndex = idIndex + 1
                 //html += '<input type="hidden" name="project_relation_id" value="' + data['level_4_id'] + '">';
                 //html += '<input type="hidden" name="name" value="' + data['level_4'] + '">';
 
@@ -210,13 +220,13 @@ $(document).ready(function () {
                 html += '<td class="text-center"><div style="display: inline-flex"><div style="float: left"><input name="las" required class="tc-search-words" value="' + (data_info['las'] || '') + '"></div>';
                 html += '<div style="float: right; padding:5px 0 0 10px"><a href="javascript:void(0)" class="show-las-modal-bak"  data-value="' + data['level_4'] + '"><i class="glyphicon glyphicon-edit"></i></a></div></div>';
                 html += '</td>';*/
-                if(ext_bitPos == undefined)
-					        ext_bitPos = 0
-				var fmInput = null
-				if(bit_position.length > 0)
-					fmInput = calcByteBit(byte_position, did_len, bit_position[0], ext_bitPos, bit_position.length, 5, 19.5)
-				else
-					fmInput = calcByteBit(byte_position, did_len, -1, -1, ext_bitPos, 5, 19.5)
+                if (ext_bitPos == undefined)
+                    ext_bitPos = 0
+                var fmInput = null
+                if (bit_position.length > 0)
+                    fmInput = calcByteBit(byte_position, did_len, bit_position[0], ext_bitPos, bit_position.length, 5, 19.5)
+                else
+                    fmInput = calcByteBit(byte_position, did_len, -1, -1, ext_bitPos, 5, 19.5)
 
                 var bet_number = [];
                 if (did_len) {
@@ -231,15 +241,15 @@ $(document).ready(function () {
                     /*if (content['byte' + num]) {
                         html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="' + (content['byte' + num] || '') + '" ' + ((bit_position.length > 0) ? '' : 'disabled') + '>';
                     } else {*/
-                        // if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
-                        //if (num >= byte_position && num <= byte_position + _new_byte_position.length) 
-                        if (bit_position.length > 0 && fmInput[num][0] > 0) {
-                            html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="';
-                            if(content['byte' + num])
-                                html += (((fmInput[num][0] < content['byte' + num].length) ? content['byte' + num].substring(content['byte' + num].length - fmInput[num][0], content['byte' + num].length) : content['byte' + num]) || '')
-                            html += '">'; // show or hide
-                        } else
-                            html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="" disabled>';
+                    // if ($.inArray(num, _new_byte_position) > -1 || num == byte_position) {
+                    //if (num >= byte_position && num <= byte_position + _new_byte_position.length)
+                    if (bit_position.length > 0 && fmInput[num][0] > 0) {
+                        html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="';
+                        if (content['byte' + num])
+                            html += (((fmInput[num][0] < content['byte' + num].length) ? content['byte' + num].substring(content['byte' + num].length - fmInput[num][0], content['byte' + num].length) : content['byte' + num]) || '')
+                        html += '">'; // show or hide
+                    } else
+                        html += '<input type="text" style="letter-spacing: 13.5px; padding-right:0px; padding-left:' + fmInput[num][1] + 'px" class="tc-search-words col-xs-12" name="' + prid + '_byte' + num + '" id="' + prid + '_byte' + num + '" onkeyup=onKeyUpEvent(\'' + prid + '_byte' + num + '\',\'[01]+$\',\'[^01]\',\'请输入0或1\')' + ' maxlength="' + fmInput[num][0] + '" value="" disabled>';
                     //}
 
                     html += '</div></div></td>';
@@ -249,7 +259,7 @@ $(document).ready(function () {
                 html += '</tr>'
             });
 
-			if (result) {
+            if (result) {
                 html += '<tr><td height="60" colspan="' + 8 * did_len + '"/></tr>';
             }
 
@@ -264,7 +274,7 @@ $(document).ready(function () {
             html += '<th height="52" width="120" style="vertical-align: middle; min-width: 120px">LAS</th>';
             html += '</tr>';
             return html;
-		}
+        }
         this.project_thead_html = function (did_len, bit_position, byte_position, ext_bitPosition) {
             var html = '';
             html += '<tr>';
@@ -408,25 +418,30 @@ $(document).ready(function () {
         })
     });
 
+    // 数据量大 保存 loading
+    function showLoadingOn() {
+        document.getElementById("over").style.display = "block";
+        document.getElementById("layout").style.display = "block";
+    }
+    function showLoadingOff() {
+        document.getElementById("over").style.display = "none";
+        document.getElementById("layout").style.display = "none";
+    }
 
     // submit attr
     $(document).on('click', '.submit-add-attr', function () {
         var form_ = $('form#attr-form');
         var form_data = form_.serialize();
-        toastr.options.timeOut = null;
-        toastr.info('正在保存中...，请稍等');
+        showLoadingOn();
         $.post('/manage/attr/content/add?project_id=' + project_id, form_data, function (resp) {
-            toastr.clear();
-            toastr.options.timeOut = 2000;
             if (resp.success) {
-                projects.get_project_data(project_id, $('[name="project_relation_id"]').val());
+                projects.get_project_data(project_id, $('[name="project_relation_id"]').val(), true);
                 projects.get_attr_input(project_id, form_.find('[name="level"]').val(), form_.find('[name="project_relation_id"]').val());
 
                 toastr.success(resp['message']);
-                $('.submit-project-data').trigger('click')
             } else {
+                showLoadingOff();
                 toastr.error(resp['message']);
-
             }
 
         })
@@ -482,18 +497,18 @@ $(document).ready(function () {
                 $.post('/project/tree/delete/' + id, '', function (data) {
                     if (data.success) {
                         toastr.success(data.message);
-						var lastr = _this.parents('.data-class').attr('las-id');
+                        var lastr = _this.parents('.data-class').attr('las-id');
                         _this.parents('.data-class').remove();
-						
-						var bit_table = document.getElementById('bittable')
-						var bit_tr = document.getElementById('bit' + lastr)
-						
-						//var las_tr = _this.parentNode.parentNode.rowIndex
-						if(bit_table && bit_tr){
-							//toastr.info(bit_tr.rowIndex)
-							bit_table.deleteRow(bit_tr.rowIndex)
-						}
-						
+
+                        var bit_table = document.getElementById('bittable')
+                        var bit_tr = document.getElementById('bit' + lastr)
+
+                        //var las_tr = _this.parentNode.parentNode.rowIndex
+                        if (bit_table && bit_tr) {
+                            //toastr.info(bit_tr.rowIndex)
+                            bit_table.deleteRow(bit_tr.rowIndex)
+                        }
+
                         if (!$('.data-class').length) {
                             $('.default-v').remove();
                         }
